@@ -4,6 +4,7 @@
 A chess playing application, with a GUI that displays the board and allows the human player to move according to the rules of the game.
 
 **Distributed AI**
+
 The "armies" of chess pieces for the AI is divided into three "corp":
 
 The "left" side bishop commands the three left pawns and the left knight.
