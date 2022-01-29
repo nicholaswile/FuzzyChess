@@ -17,7 +17,7 @@ public class MainMenu : MonoBehaviour
     }
     // Update is called once per frame
     void Update()
-    {
+    { 
         if (Input.anyKey && softScreen.activeSelf)
         {
             softScreen.SetActive(false);
@@ -35,6 +35,7 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Human vs AI Play Mode");
         // Start game in Human Mode
         GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+
     }
 
     public void UI_AIMode()
