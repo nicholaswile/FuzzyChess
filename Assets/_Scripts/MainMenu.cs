@@ -35,7 +35,6 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Human vs AI Play Mode");
         // Start game in Human Mode
         GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
-
     }
 
     public void UI_AIMode()
@@ -49,7 +48,6 @@ public class MainMenu : MonoBehaviour
         mainMenuScreen.SetActive(true);
         currentScreen.SetActive(false);
     }
-
 
     public void UI_StatsMode()
     {

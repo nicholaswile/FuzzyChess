@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private GameObject mainScreen;
+    [SerializeField] private GameObject mainScreen, winScreen;
 
     private void Awake()
     {
@@ -20,6 +20,7 @@ public class UIManager : MonoBehaviour
     private void GameManager_StateChanged(GameState state)
     {
         mainScreen.SetActive(state == GameState.MainMenu);
+        winScreen.SetActive(state == GameState.Win);
     }
 
     // Start is called before the first frame update

@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleWin()
     {
-        throw new NotImplementedException();
+        Debug.Log("Win");
     }
 
     private void HandleEnemyTurn()
