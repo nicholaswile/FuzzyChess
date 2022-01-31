@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/*
+ * This script isn't really doing anything right now; might come back and do stuff with it later
+ */
+
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private GameObject mainScreen, winScreen;
+    [SerializeField] private GameObject mainScreen;
 
     private void Awake()
     {
@@ -20,18 +24,5 @@ public class UIManager : MonoBehaviour
     private void GameManager_StateChanged(GameState state)
     {
         mainScreen.SetActive(state == GameState.MainMenu);
-        winScreen.SetActive(state == GameState.Win);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

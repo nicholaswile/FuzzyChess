@@ -17,7 +17,16 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+
     }
 
     private void Start()
@@ -60,12 +69,12 @@ public class GameManager : MonoBehaviour
 
     private void HandleRolling()
     {
-        throw new NotImplementedException();
+        Debug.Log("Rolling");
     }
 
     private void HandleLose()
     {
-        throw new NotImplementedException();
+        Debug.Log("Lose");
     }
 
     private void HandleWin()
@@ -75,7 +84,16 @@ public class GameManager : MonoBehaviour
 
     private void HandleEnemyTurn()
     {
-        throw new NotImplementedException();
+        Debug.Log("Enemy Turn");
+        StartCoroutine(IEnemyTurn());
+    }
+
+    private IEnumerator IEnemyTurn()
+    {
+        // Put Enemy turn info here
+        yield return new WaitForSeconds(3);
+        Debug.Log("Enemy turn over");
+        Instance.UpdateGameState(GameState.PlayerTurn);
     }
 
     private void HandlePlayerTurn()
