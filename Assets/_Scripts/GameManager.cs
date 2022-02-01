@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     public GameState State;
 
+    private const string WINS = "Wins", LOSS = "Losses";
+
     // Used to notify scripts who subscribed that state changed
     public static event Action<GameState> StateChanged;
 
@@ -75,11 +77,35 @@ public class GameManager : MonoBehaviour
     private void HandleLose()
     {
         Debug.Log("Lose");
+        if (PlayerPrefs.HasKey(LOSS))
+        {
+            string s = PlayerPrefs.GetString(LOSS);
+            int i = Convert.ToInt32(s);
+            i++;
+            PlayerPrefs.SetString(LOSS, Convert.ToString(i));
+        }
+        else
+        {
+            PlayerPrefs.SetString(LOSS, "1");
+        }
     }
 
     private void HandleWin()
     {
         Debug.Log("Win");
+        if (PlayerPrefs.HasKey(WINS))
+        {
+            string s = PlayerPrefs.GetString(WINS);
+            int i = Convert.ToInt32(s);
+            i++;
+            PlayerPrefs.SetString(WINS, Convert.ToString(i));
+        }
+        else
+        {
+            PlayerPrefs.SetString(WINS, "1");
+        }
+
+
     }
 
     private void HandleEnemyTurn()
