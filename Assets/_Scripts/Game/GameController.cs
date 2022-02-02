@@ -19,12 +19,12 @@ public class GameController : MonoBehaviour
         CreatePlayers();
     }
 
-    private void SetDependencies() 
+    private void SetDependencies()
     {
         pieceCreator = GetComponent<CreatePieces>();
     }
 
-    private void CreatePlayers() 
+    private void CreatePlayers()
     {
         whitePlayer = new Player(Team.White, board);
         blackPlayer = new Player(Team.Black, board);
@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour
 
     private void CreatePiecesFromLayout(Layout layout)
     {
-        for (int i = 0; i < layout.GetNumberOfPieces(); i++) 
+        for (int i = 0; i < layout.GetNumberOfPieces(); i++)
         {
             Vector2Int squareCoords = layout.GetCoordsAtIndex(i);
             Team team = layout.GetTeamColorAtIndex(i);
@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void CreatePieceAndInitialize(Vector2Int squareCoords, Team team, Type type) 
+    private void CreatePieceAndInitialize(Vector2Int squareCoords, Team team, Type type)
     {
         Piece newPiece = pieceCreator.CreatePiece(type).GetComponent<Piece>();
         newPiece.SetData(squareCoords, team, board);
@@ -76,16 +76,27 @@ public class GameController : MonoBehaviour
         player.GenerateAllMoves();
     }
 
+    public bool IsTeamTurnActive(Team team)
+    {
+        return activePlayer.team == team;
+    }
+
+    private void ChangeActiveTeam()
+    {
+        activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
+    }
 
     public void EndTurn()
     {
         GenerateAllPlayerMoves(activePlayer);
         GenerateAllPlayerMoves(GetOppositePlayer(activePlayer));
+        ChangeActiveTeam();
     }
 
     private Player GetOppositePlayer(Player player)
     {
         return player == whitePlayer ? blackPlayer : whitePlayer;
+
     }
 
 

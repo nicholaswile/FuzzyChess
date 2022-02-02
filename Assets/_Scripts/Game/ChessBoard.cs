@@ -20,7 +20,7 @@ public class ChessBoard : MonoBehaviour
         CreateBoardGrid();
     }
 
-    public void SetDependencies(GameController controller) 
+    public void SetDependencies(GameController controller)
     {
         this.controller = controller;
     }
@@ -30,12 +30,12 @@ public class ChessBoard : MonoBehaviour
         grid = new Piece[BOARD_SIZE, BOARD_SIZE];
     }
 
-    public Vector3 GetPositionFromCoords(Vector2Int coords) 
+    public Vector3 GetPositionFromCoords(Vector2Int coords)
     {
         return bottomLeftMarker.position + new Vector3(coords.x * squareSize, 0f, coords.y * squareSize);
     }
 
-    private Vector2Int GetCoordsFromPosition(Vector3 inputPosition) 
+    private Vector2Int GetCoordsFromPosition(Vector3 inputPosition)
     {
         int x = Mathf.FloorToInt(inputPosition.x / squareSize) + BOARD_SIZE / 2;
         int y = Mathf.FloorToInt(inputPosition.z / squareSize) + BOARD_SIZE / 2;
@@ -50,14 +50,19 @@ public class ChessBoard : MonoBehaviour
         {
             if (piece != null && selectedPiece == piece)
                 DeselectPiece();
+
+            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team))
+                SelectPiece(piece);
+
             else if (selectedPiece.CanMoveTo(coords))
                 OnSelectedPieceMoved(coords, selectedPiece);
-            else if (piece != null && selectedPiece != piece)
+
+            else if (piece != null && selectedPiece)
                 SelectPiece(piece);
         }
-        else 
+        else
         {
-            if (piece != null)
+            if (piece != null && controller.IsTeamTurnActive(piece.team))
                 SelectPiece(piece);
         }
     }
@@ -72,7 +77,7 @@ public class ChessBoard : MonoBehaviour
     private void ShowSelectionSquares(List<Vector2Int> selection)
     {
         Dictionary<Vector3, bool> squaresData = new Dictionary<Vector3, bool>();
-        for (int i = 0; i < selection.Count; i++) 
+        for (int i = 0; i < selection.Count; i++)
         {
             Vector3 position = GetPositionFromCoords(selection[i]);
             bool isSquareFree = GetPieceOnSquare(selection[i]) == null;
@@ -105,7 +110,7 @@ public class ChessBoard : MonoBehaviour
 
     private void TakePiece(Piece piece)
     {
-        if (piece) 
+        if (piece)
         {
             grid[piece.occupiedSquare.x, piece.occupiedSquare.y] = null;
             controller.OnPieceRemoved(piece);
@@ -139,9 +144,9 @@ public class ChessBoard : MonoBehaviour
 
     public bool HasPiece(Piece piece)
     {
-        for (int i = 0; i < BOARD_SIZE; i++) 
+        for (int i = 0; i < BOARD_SIZE; i++)
         {
-            for (int j = 0; j < BOARD_SIZE; j++) 
+            for (int j = 0; j < BOARD_SIZE; j++)
             {
                 if (grid[i, j] == piece)
                     return true;
