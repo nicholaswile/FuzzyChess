@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
