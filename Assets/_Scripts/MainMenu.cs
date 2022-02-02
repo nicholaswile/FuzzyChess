@@ -21,18 +21,25 @@ public class MainMenu : MonoBehaviour
         statsScreen.SetActive(false);
         rulesScreen.SetActive(false);
         creditsScreen.SetActive(false);
-        
+
         // Will comment the following out once ai vs ai mode is complete
         aiVsAiButton.interactable = false;
 
         // Text = saved win score
+        SetStatText();
+
+        // And wherever wins / losses are handled (probably Game Manager), update the value
+    }
+
+    private void SetStatText()
+    {
         if (PlayerPrefs.HasKey(WINS))
         {
             winText.text = PlayerPrefs.GetString(WINS);
         }
         else
         {
-            winText.text = "999";
+            winText.text = "000";
         }
 
         if (PlayerPrefs.HasKey(LOSS))
@@ -41,11 +48,10 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            loseText.text = "999";
+            loseText.text = "000";
         }
-
-        // And wherever wins / losses are handled (probably Game Manager), update the value
     }
+
     // Update is called once per frame
     void Update()
     { 
@@ -53,6 +59,10 @@ public class MainMenu : MonoBehaviour
         {
             softScreen.SetActive(false);
             mainMenuScreen.SetActive(true);
+        }
+        if (statsScreen.activeSelf)
+        {
+            SetStatText();
         }
     }
     public void UI_PlayMode()

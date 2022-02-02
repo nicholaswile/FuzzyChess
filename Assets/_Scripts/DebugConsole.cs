@@ -51,9 +51,10 @@ public class DebugConsole : MonoBehaviour
 
         float y = 0f;
 
-        GUI.Box(new Rect(0, y, Screen.width, 30), " ");
+        GUI.Box(new Rect(0, y, Screen.width, 60), " ");
         GUI.backgroundColor = new Color(0, 0, 0, 0);
-        input = GUI.TextField(new Rect(10f, y + 5f, Screen.width - 20f, 20f), input);
+        GUI.skin.textField.fontSize = 30;
+        input = GUI.TextField(new Rect(10f, y + 5f, Screen.width - 20f, 40f), input);
     }
 
     private void HandleInput()
@@ -71,12 +72,14 @@ public class DebugConsole : MonoBehaviour
             case ("roll"):
                 GameManager.Instance.UpdateGameState(GameState.Rolling);
                 break;
+/* These commands are commented out because they break the turn controller 
             case ("player"):
                 GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
                 break;
             case ("enemy"):
                 GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
                 break;
+*/
             case ("w_score"):
                 PlayerPrefs.SetString(WINS, parse[1]);
                 break;
@@ -108,8 +111,8 @@ public class DebugConsole : MonoBehaviour
         "win",
         "lose",
         "roll",
-        "player",
-        "enemy",
+        //"player",
+        //"enemy",
         "w_score",
         "l_score",
         "reload",
