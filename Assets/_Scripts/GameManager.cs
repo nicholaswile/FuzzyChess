@@ -104,14 +104,12 @@ public class GameManager : MonoBehaviour
         {
             PlayerPrefs.SetString(WINS, "1");
         }
-
-
     }
 
     private void HandleEnemyTurn()
     {
         Debug.Log("Enemy Turn");
-        StartCoroutine(IEnemyTurn());
+       // StartCoroutine(IEnemyTurn());
     }
 
     private IEnumerator IEnemyTurn()

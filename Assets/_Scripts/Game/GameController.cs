@@ -17,6 +17,18 @@ public class GameController : MonoBehaviour
     {
         SetDependencies();
         CreatePlayers();
+
+        GameManager.StateChanged += GameManager_StateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.StateChanged -= GameManager_StateChanged;
+    }
+
+    private void GameManager_StateChanged(GameState obj)
+    {
+        ChangeActiveTeam();
     }
 
     private void SetDependencies()
@@ -90,7 +102,15 @@ public class GameController : MonoBehaviour
     {
         GenerateAllPlayerMoves(activePlayer);
         GenerateAllPlayerMoves(GetOppositePlayer(activePlayer));
-        ChangeActiveTeam();
+        if (GameManager.Instance.State == GameState.PlayerTurn)
+        {
+            GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
+        }
+        else if (GameManager.Instance.State == GameState.EnemyTurn)
+        {
+            GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+        }
+        //ChangeActiveTeam();
     }
 
     private Player GetOppositePlayer(Player player)
