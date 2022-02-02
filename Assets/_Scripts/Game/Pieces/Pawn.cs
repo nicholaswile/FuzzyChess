@@ -22,6 +22,10 @@ public class Pawn : Piece
         float reachDistance = 1;
         foreach (var direction in directions)
         {
+            if (this.team == Team.White && direction.y != 1)
+                continue;
+            if (this.team == Team.Black && direction.y != -1)
+                continue;
             for (int i = 1; i <= reachDistance; i++)
             {
                 Vector2Int nextCoords = occupiedSquare + direction * i;
