@@ -13,6 +13,7 @@ public class ChessBoard : MonoBehaviour
     private Piece selectedPiece;
     private GameController controller;
     private CreateHighlighters highlighter;
+    private readonly List<String> pieceMoves = new List<String>();
 
     private void Awake()
     {
@@ -52,8 +53,16 @@ public class ChessBoard : MonoBehaviour
                 DeselectPiece();
             else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team))
                 SelectPiece(piece);
+            //edited by TW
             else if (selectedPiece.CanMoveTo(coords))
+            {
+                Debug.Log("moved to" + coords);
+                Debug.Log("Selected piece" + selectedPiece.GetType());
+                String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
+                Debug.Log("concat: " + test);
+                pieceMoves.Add(test);
                 OnSelectedPieceMoved(coords, selectedPiece);
+            }
         }
         else
         {
@@ -156,4 +165,12 @@ public class ChessBoard : MonoBehaviour
             grid[coords.x, coords.y] = piece;
     }
 
+    //TW - public method to return array which only contains new piece movements, 
+    //discarding the current piecemoves array. Should save on computing power.
+    public List<String> GetNewPieceMoves()
+    {
+        List<String> newPieceMoves = new List<String>(pieceMoves);
+        pieceMoves.Clear();
+        return newPieceMoves;
+    }
 }

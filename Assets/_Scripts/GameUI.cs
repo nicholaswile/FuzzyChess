@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample;
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample, ListParent;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
+    [SerializeField] private Sprite ReplaceSprite;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -70,14 +70,38 @@ public class GameUI : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
     }
 
+    //Heavily modified - TW
     public void UI_Move()
     {
         Debug.Log("Moves");
-        movesList.SetActive(!movesList.activeSelf);
         bool open = movesList.activeSelf;
         movesList.SetActive(!open);
-        if(open == true)
-        Instantiate(mainSample, ListParent.transform);
+        if (open != true)
+        {
+            //Instantiate(mainSample, ListParent.transform);
+            ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
+            //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
+            List<string> newMoves = new List<string>(cBoard.GetNewPieceMoves());
+            //newMoves.ForEach(move => Debug.Log(move));
+            //Add each move to the list
+            foreach(string element in newMoves)
+            {
+                //creates an array of info about the piece movement. movesArr[0] is the name and [1] is the move itself.
+                string[] movesArr = element.Split('|');
+                Debug.Log(movesArr[0]);
+                Debug.Log(movesArr[1]);
+                var newListing = Instantiate(mainSample, ListParent.transform);
+                GameObject childText = newListing.transform.Find("TestText").gameObject;
+                //Debug.Log(child.GetComponent<TMPro.TextMeshProUGUI>().text);
+                childText.GetComponent<TMPro.TextMeshProUGUI>().text = movesArr[1];
+                GameObject childImage = newListing.transform.Find("TestImage").gameObject;
+                //this works but not well
+                //childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = ReplaceSprite;
+                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
+                newListing.SetActive(true);
+            }
+            //Debug.Log(newMoves);
+        }
 
         // Shows moves transcript
     }
