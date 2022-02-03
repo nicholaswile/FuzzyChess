@@ -52,7 +52,8 @@ public class GameController : MonoBehaviour
         board.SetDependencies(this);
         CreatePiecesFromLayout(layoutAtStart);
         activePlayer = whitePlayer;
-        GenerateAllPlayerMoves(activePlayer);
+        GenerateAllPlayerMoves(blackPlayer);
+        GenerateAllPlayerMoves(whitePlayer);
     }
 
     private void CreatePiecesFromLayout(Layout layout)
@@ -96,6 +97,7 @@ public class GameController : MonoBehaviour
     private void ChangeActiveTeam()
     {
         activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
+        board.DeselectPiece();
     }
 
     public void EndTurn()
@@ -110,15 +112,12 @@ public class GameController : MonoBehaviour
         {
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
         }
-        //ChangeActiveTeam();
     }
 
     private Player GetOppositePlayer(Player player)
     {
         return player == whitePlayer ? blackPlayer : whitePlayer;
-
     }
-
 
     public void OnPieceRemoved(Piece piece)
     {

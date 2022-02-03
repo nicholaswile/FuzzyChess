@@ -81,7 +81,7 @@ public class ChessBoard : MonoBehaviour
         highlighter.ShowAvailableMoves(squaresData);
     }
 
-    private void DeselectPiece()
+    public void DeselectPiece()
     {
         selectedPiece = null;
         highlighter.ClearMoves();
