@@ -13,6 +13,7 @@ public class ChessBoard : MonoBehaviour
     private Piece selectedPiece;
     private GameController controller;
     private CreateHighlighters highlighter;
+    private readonly List<String> pieceMoves = new List<String>();
 
     private void Awake()
     {
@@ -42,6 +43,7 @@ public class ChessBoard : MonoBehaviour
         return new Vector2Int(x, y);
     }
 
+    //modified by TW
     public void OnSquareSelected(Vector3 inputPosition)
     {
         Vector2Int coords = GetCoordsFromPosition(inputPosition);
@@ -52,8 +54,22 @@ public class ChessBoard : MonoBehaviour
                 DeselectPiece();
             else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team))
                 SelectPiece(piece);
+
             else if (selectedPiece.CanMoveTo(coords))
+            {
+                //Debug.Log("moved to" + coords);
+                //Debug.Log("Selected piece" + selectedPiece.GetType());
+                String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
+                //Debug.Log("concat: " + test);
+                pieceMoves.Add(test);
                 OnSelectedPieceMoved(coords, selectedPiece);
+                
+                //Call on the GameUI script to get an object from it
+                GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+                Boolean state = TheGameUI.GetMoveListState();
+                if (state)
+                    TheGameUI.updateMoveList();
+            }
         }
         else
         {
@@ -156,4 +172,12 @@ public class ChessBoard : MonoBehaviour
             grid[coords.x, coords.y] = piece;
     }
 
+    //TW - public method to return array which only contains new piece movements, 
+    //discarding the current piecemoves array. Should save on computing power.
+    public List<String> GetNewPieceMoves()
+    {
+        List<String> newPieceMoves = new List<String>(pieceMoves);
+        pieceMoves.Clear();
+        return newPieceMoves;
+    }
 }
