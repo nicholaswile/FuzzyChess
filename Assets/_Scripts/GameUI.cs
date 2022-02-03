@@ -28,11 +28,11 @@ public class GameUI : MonoBehaviour
     private void GameManager_StateChanged(GameState state)
     {
         // Can only skip on player turn
-        exitButton.interactable = (state == GameState.PlayerTurn);
+        //exitButton.interactable = (state == GameState.PlayerTurn);
         skipButton.interactable = (state == GameState.PlayerTurn);
-        moveButton.interactable = (state == GameState.PlayerTurn);
-        camButton.interactable = (state == GameState.PlayerTurn);
-        rollButton.interactable = (state == GameState.PlayerTurn);
+        //moveButton.interactable = (state == GameState.PlayerTurn);
+        //camButton.interactable = (state == GameState.PlayerTurn);
+        //rollButton.interactable = (state == GameState.PlayerTurn);
 
         winScreen.SetActive(state == GameState.Win);
         loseScreen.SetActive(state == GameState.Lose);
