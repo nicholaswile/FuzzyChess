@@ -32,7 +32,7 @@ public class GameUI : MonoBehaviour
         skipButton.interactable = (state == GameState.PlayerTurn);
         //moveButton.interactable = (state == GameState.PlayerTurn);
         //camButton.interactable = (state == GameState.PlayerTurn);
-        //rollButton.interactable = (state == GameState.PlayerTurn);
+        rollButton.interactable = (state == GameState.PlayerTurn);
 
         winScreen.SetActive(state == GameState.Win);
         loseScreen.SetActive(state == GameState.Lose);
