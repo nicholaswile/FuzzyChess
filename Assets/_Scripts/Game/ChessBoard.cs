@@ -50,15 +50,10 @@ public class ChessBoard : MonoBehaviour
         {
             if (piece != null && selectedPiece == piece)
                 DeselectPiece();
-
             else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team))
                 SelectPiece(piece);
-
             else if (selectedPiece.CanMoveTo(coords))
                 OnSelectedPieceMoved(coords, selectedPiece);
-
-            else if (piece != null && selectedPiece)
-                SelectPiece(piece);
         }
         else
         {
