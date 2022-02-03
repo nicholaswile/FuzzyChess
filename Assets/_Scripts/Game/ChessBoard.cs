@@ -43,6 +43,7 @@ public class ChessBoard : MonoBehaviour
         return new Vector2Int(x, y);
     }
 
+    //modified by TW
     public void OnSquareSelected(Vector3 inputPosition)
     {
         Vector2Int coords = GetCoordsFromPosition(inputPosition);
@@ -53,18 +54,21 @@ public class ChessBoard : MonoBehaviour
                 DeselectPiece();
             else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team))
                 SelectPiece(piece);
-            //edited by TW
+
             else if (selectedPiece.CanMoveTo(coords))
             {
-                Debug.Log("moved to" + coords);
-                Debug.Log("Selected piece" + selectedPiece.GetType());
+                //Debug.Log("moved to" + coords);
+                //Debug.Log("Selected piece" + selectedPiece.GetType());
                 String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
-                Debug.Log("concat: " + test);
+                //Debug.Log("concat: " + test);
                 pieceMoves.Add(test);
                 OnSelectedPieceMoved(coords, selectedPiece);
                 
                 //Call on the GameUI script to get an object from it
-                GameUI TheGameUI = GameObject.Find("GameUI").GetComponent<GameUI>();
+                GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+                Boolean state = TheGameUI.GetMoveListState();
+                if (state)
+                    TheGameUI.updateMoveList();
             }
         }
         else

@@ -128,6 +128,11 @@ public class GameUI : MonoBehaviour
         //Debug.Log(newMoves);
     }
 
+    public bool GetMoveListState()
+    {
+        return movesList.activeSelf;
+    }
+
     // Changes camera rotation angle and position
     public void UI_Cam()
     {
