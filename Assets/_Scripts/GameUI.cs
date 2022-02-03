@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour
 {
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample, ListParent;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
@@ -73,6 +74,10 @@ public class GameUI : MonoBehaviour
     {
         Debug.Log("Moves");
         movesList.SetActive(!movesList.activeSelf);
+        bool open = movesList.activeSelf;
+        movesList.SetActive(!open);
+        if(open == true)
+        Instantiate(mainSample, ListParent.transform);
 
         // Shows moves transcript
     }
