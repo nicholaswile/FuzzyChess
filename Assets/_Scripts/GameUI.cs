@@ -9,6 +9,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample, ListParent;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
     [SerializeField] private Sprite ReplaceSprite;
+    private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -16,7 +17,15 @@ public class GameUI : MonoBehaviour
     {
         mainGameUI.SetActive(true);
         captureTable.SetActive(false);
-        movesList.SetActive(false); 
+        movesList.SetActive(false);
+        MakeChessNotation.Add("0", "a");
+        MakeChessNotation.Add("1", "b");
+        MakeChessNotation.Add("2", "c");
+        MakeChessNotation.Add("3", "d");
+        MakeChessNotation.Add("4", "e");
+        MakeChessNotation.Add("5", "f");
+        MakeChessNotation.Add("6", "g");
+        MakeChessNotation.Add("7", "h");
 
         GameManager.StateChanged += GameManager_StateChanged;
     }
@@ -93,7 +102,7 @@ public class GameUI : MonoBehaviour
                 var newListing = Instantiate(mainSample, ListParent.transform);
                 GameObject childText = newListing.transform.Find("TestText").gameObject;
                 //Debug.Log(child.GetComponent<TMPro.TextMeshProUGUI>().text);
-                childText.GetComponent<TMPro.TextMeshProUGUI>().text = movesArr[1];
+                childText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4])+1));
                 GameObject childImage = newListing.transform.Find("TestImage").gameObject;
                 //this works but not well
                 //childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = ReplaceSprite;
