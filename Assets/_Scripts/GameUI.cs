@@ -10,6 +10,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
     [SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
+    private int turnCount = 1;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -87,32 +88,44 @@ public class GameUI : MonoBehaviour
         movesList.SetActive(!open);
         if (open != true)
         {
-            //Instantiate(mainSample, ListParent.transform);
-            ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
-            //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
-            List<string> newMoves = new List<string>(cBoard.GetNewPieceMoves());
-            //newMoves.ForEach(move => Debug.Log(move));
-            //Add each move to the list
-            foreach(string element in newMoves)
-            {
-                //creates an array of info about the piece movement. movesArr[0] is the name and [1] is the move itself.
-                string[] movesArr = element.Split('|');
-                Debug.Log(movesArr[0]);
-                Debug.Log(movesArr[1]);
-                var newListing = Instantiate(mainSample, ListParent.transform);
-                GameObject childText = newListing.transform.Find("TestText").gameObject;
-                //Debug.Log(child.GetComponent<TMPro.TextMeshProUGUI>().text);
-                childText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4])+1));
-                GameObject childImage = newListing.transform.Find("TestImage").gameObject;
-                //this works but not well
-                //childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = ReplaceSprite;
-                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
-                newListing.SetActive(true);
-            }
-            //Debug.Log(newMoves);
+            updateMoveList();
         }
 
         // Shows moves transcript
+    }
+
+    public void updateMoveList()
+    {
+        //Instantiate(mainSample, ListParent.transform);
+        ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
+        //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
+        List<string> newMoves = new List<string>(cBoard.GetNewPieceMoves());
+        //newMoves.ForEach(move => Debug.Log(move));
+        //Add each move to the list
+        foreach (string element in newMoves)
+        {
+            //creates an array of info about the piece movement. movesArr[0] is the name and [1] is the move itself.
+            string[] movesArr = element.Split('|');
+            Debug.Log(movesArr[0]);
+            Debug.Log(movesArr[1]);
+            var newListing = Instantiate(mainSample, ListParent.transform);
+            
+            //turn number update (to be changed later)
+            GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
+            childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
+
+            //move update
+            GameObject childText = newListing.transform.Find("TestText").gameObject;
+            childText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+
+            //sprite update
+            GameObject childImage = newListing.transform.Find("TestImage").gameObject;
+            childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
+
+            turnCount++;
+            newListing.SetActive(true);
+        }
+        //Debug.Log(newMoves);
     }
 
     // Changes camera rotation angle and position

@@ -62,6 +62,9 @@ public class ChessBoard : MonoBehaviour
                 Debug.Log("concat: " + test);
                 pieceMoves.Add(test);
                 OnSelectedPieceMoved(coords, selectedPiece);
+                
+                //Call on the GameUI script to get an object from it
+                GameUI TheGameUI = GameObject.Find("GameUI").GetComponent<GameUI>();
             }
         }
         else
