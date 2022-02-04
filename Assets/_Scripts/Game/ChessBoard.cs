@@ -63,12 +63,21 @@ public class ChessBoard : MonoBehaviour
                 //Debug.Log("concat: " + test);
                 pieceMoves.Add(test);
                 OnSelectedPieceMoved(coords, selectedPiece);
+
+                // NOTE TO MYSELF: Though the 3-turn logic isn't implemented yet, the functionality of piece colors could
+                // be rewritten simply by calling the color change function every 3 turns instead of every end turn,
+                // and checking the above for the "skip" button to be pressed. If pressed, change color immediately after
+                // the turn, no matter what
                 
-                //Call on the GameUI script to get an object from it
+                //Call on the GameUI script to get an object from it. 
+                //Commented out since I realized you can just do this every time the turn ends,
+                //meaning waiting to live update each time the menu is opened is kind of pointless.
+                /**
                 GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
                 Boolean state = TheGameUI.GetMoveListState();
                 if (state)
                     TheGameUI.updateMoveList();
+                **/
             }
         }
         else
@@ -128,8 +137,12 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+    //modified to send a signal to the swapcolor function of GameUI in order to change the color of sprites per team
     private void EndTurn()
     {
+        GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+        TheGameUI.updateMoveList();
+        TheGameUI.SwapPieceColor();
         controller.EndTurn();
     }
 

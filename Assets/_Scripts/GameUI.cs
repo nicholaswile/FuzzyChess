@@ -13,6 +13,7 @@ public class GameUI : MonoBehaviour
     private int turnCount = 1;
     private List<int> skippedTurns = new List<int>();
     private bool skippedTurn = false;
+    private string pieceColor = "White";
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -147,12 +148,19 @@ public class GameUI : MonoBehaviour
 
                 //sprite update
                 GameObject childImage = newListing.transform.Find("TestImage").gameObject;
-                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
+                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
+                Debug.Log("Piece color for this turn: " + pieceColor);
             }
             turnCount++;
             newListing.SetActive(true);
         }
         //Debug.Log(newMoves);
+    }
+
+    public void SwapPieceColor()
+    {
+        if (pieceColor.Equals("White")) pieceColor = "Black";
+        else if (pieceColor.Equals("Black")) pieceColor = "White";
     }
 
     public bool GetMoveListState()
