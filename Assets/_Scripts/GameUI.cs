@@ -129,6 +129,8 @@ public class GameUI : MonoBehaviour
 
             string takenIndicator = "";
 
+            //check if a piece was taken that turn, then put an "x" in the string takenIndicator,
+            //which will, by default, always be included in the final move string, "x" or not
             if(pieceTaken == true)
             {
                 takenIndicator = "x";
@@ -157,6 +159,8 @@ public class GameUI : MonoBehaviour
                 //move update
                 GameObject childText = newListing.transform.Find("TestText").gameObject;
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+                //if a piece was taken, make the color of the take stand out
+                if(takenIndicator.Equals("x")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
 
                 //sprite update
                 GameObject childImage = newListing.transform.Find("TestImage").gameObject;
