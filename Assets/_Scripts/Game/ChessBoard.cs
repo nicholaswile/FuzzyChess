@@ -132,6 +132,8 @@ public class ChessBoard : MonoBehaviour
     {
         if (piece)
         {
+            GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+            TheGameUI.PieceWasTaken();
             grid[piece.occupiedSquare.x, piece.occupiedSquare.y] = null;
             controller.OnPieceRemoved(piece);
         }
