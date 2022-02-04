@@ -78,6 +78,21 @@ public class GameUI : MonoBehaviour
         // Code to handle what happens before the player can skip
 
         GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
+
+        var newListing = Instantiate(mainSample, ListParent.transform);
+
+        //turn number update (to be changed later)
+        GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
+        childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
+
+        //Send SKIP text
+        GameObject childText = newListing.transform.Find("TestText").gameObject;
+        childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("SKIP");
+
+        newListing.SetActive(true);
+
+        turnCount++;
+
     }
 
     //Heavily modified - TW
