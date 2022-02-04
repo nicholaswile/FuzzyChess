@@ -153,6 +153,11 @@ public class ChessBoard : MonoBehaviour
         return true;
     }
 
+    public int GetNumberOfPieceMoves()
+    {
+        return pieceMoves.Count;
+    }
+
     public bool HasPiece(Piece piece)
     {
         for (int i = 0; i < BOARD_SIZE; i++)

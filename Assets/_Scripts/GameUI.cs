@@ -11,6 +11,8 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     private int turnCount = 1;
+    private List<int> skippedTurns = new List<int>();
+    private bool skippedTurn = false;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -81,20 +83,10 @@ public class GameUI : MonoBehaviour
 
         GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
 
-        var newListing = Instantiate(mainSample, ListParent.transform);
-
-        //turn number update (to be changed later)
-        GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
-        childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
-
-        //Send SKIP text
-        GameObject childText = newListing.transform.Find("TestText").gameObject;
-        childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("SKIP");
-
-        newListing.SetActive(true);
-
-        turnCount++;
-
+        ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
+        skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
+        skippedTurn = true;
+        updateMoveList();
     }
 
     //Heavily modified - TW
@@ -118,27 +110,45 @@ public class GameUI : MonoBehaviour
         //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
         List<string> newMoves = new List<string>(cBoard.GetNewPieceMoves());
         //newMoves.ForEach(move => Debug.Log(move));
+
+        //Add Skips Into newMoves list
+        if (skippedTurn)
+        {
+            newMoves.Insert(skippedTurns[skippedTurns.Count - 1], "skip");
+            skippedTurn = false;
+        }
+
         //Add each move to the list
         foreach (string element in newMoves)
         {
             //creates an array of info about the piece movement. movesArr[0] is the name and [1] is the move itself.
-            string[] movesArr = element.Split('|');
-            Debug.Log(movesArr[0]);
-            Debug.Log(movesArr[1]);
             var newListing = Instantiate(mainSample, ListParent.transform);
-            
-            //turn number update (to be changed later)
-            GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
-            childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
 
-            //move update
-            GameObject childText = newListing.transform.Find("TestText").gameObject;
-            childText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+            if (element == "skip")
+            {
+                GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
+                childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
 
-            //sprite update
-            GameObject childImage = newListing.transform.Find("TestImage").gameObject;
-            childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
+                GameObject childText = newListing.transform.Find("TestText").gameObject;
+                childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("SKIP");
+            }
+            else {
+                string[] movesArr = element.Split('|');
+                Debug.Log(movesArr[0]);
+                Debug.Log(movesArr[1]);
 
+                //turn number update (to be changed later)
+                GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
+                childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
+
+                //move update
+                GameObject childText = newListing.transform.Find("TestText").gameObject;
+                childText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+
+                //sprite update
+                GameObject childImage = newListing.transform.Find("TestImage").gameObject;
+                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
+            }
             turnCount++;
             newListing.SetActive(true);
         }
