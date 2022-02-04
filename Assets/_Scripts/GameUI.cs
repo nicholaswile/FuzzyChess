@@ -13,6 +13,8 @@ public class GameUI : MonoBehaviour
     private int turnCount = 1;
     private List<int> skippedTurns = new List<int>();
     private bool skippedTurn = false;
+    private string pieceColor = "White";
+    private bool pieceTaken = false;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -118,12 +120,24 @@ public class GameUI : MonoBehaviour
             skippedTurn = false;
         }
 
-        //Add each move to the list
+        //Add each move to the list (This isn't needed anymore, as each move is added as it's taken.
+        //However, it will be left in, in order to avoid breaking something.)
         foreach (string element in newMoves)
         {
             //creates an array of info about the piece movement. movesArr[0] is the name and [1] is the move itself.
             var newListing = Instantiate(mainSample, ListParent.transform);
 
+            string takenIndicator = "";
+
+            //check if a piece was taken that turn, then put an "x" in the string takenIndicator,
+            //which will, by default, always be included in the final move string, "x" or not
+            if(pieceTaken == true)
+            {
+                takenIndicator = "x";
+                pieceTaken = false;
+            }
+
+            //unique logic for if the skip button is activated
             if (element == "skip")
             {
                 GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
@@ -132,6 +146,7 @@ public class GameUI : MonoBehaviour
                 GameObject childText = newListing.transform.Find("TestText").gameObject;
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("SKIP");
             }
+            //logic for general moves
             else {
                 string[] movesArr = element.Split('|');
                 Debug.Log(movesArr[0]);
@@ -143,16 +158,31 @@ public class GameUI : MonoBehaviour
 
                 //move update
                 GameObject childText = newListing.transform.Find("TestText").gameObject;
-                childText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+                childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+                //if a piece was taken, make the color of the take stand out
+                if(takenIndicator.Equals("x")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
 
                 //sprite update
                 GameObject childImage = newListing.transform.Find("TestImage").gameObject;
-                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + movesArr[0]);
+                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
+                Debug.Log("Piece color for this turn: " + pieceColor);
             }
             turnCount++;
             newListing.SetActive(true);
         }
         //Debug.Log(newMoves);
+    }
+
+    //Swaps the color of the sprite's piece when called
+    public void SwapPieceColor()
+    {
+        if (pieceColor.Equals("White")) pieceColor = "Black";
+        else if (pieceColor.Equals("Black")) pieceColor = "White";
+    }
+
+    public void PieceWasTaken()
+    {
+        pieceTaken = true;
     }
 
     public bool GetMoveListState()

@@ -3583,7 +3583,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 50
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 50
@@ -3593,7 +3593,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Opponent
+  m_Text: OPPONENT
 --- !u!222 &1480050383
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3769,7 +3769,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -20}
+  m_SizeDelta: {x: -20, y: -48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1627954911
 GameObject:
@@ -3939,7 +3939,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 38, y: -15}
-  m_SizeDelta: {x: 198.8, y: 50.3}
+  m_SizeDelta: {x: 203, y: 50.3}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1668846072
 MonoBehaviour:
@@ -3964,7 +3964,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 50
-    m_FontStyle: 0
+    m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 50
@@ -3974,7 +3974,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Player
+  m_Text: PLAYER
 --- !u!222 &1668846073
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4628,6 +4628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1887818505}
   - component: {fileID: 1887818506}
+  - component: {fileID: 1887818507}
   m_Layer: 0
   m_Name: Content
   m_TagString: Untagged
@@ -4677,10 +4678,24 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 100, y: 20}
+  m_CellSize: {x: 93, y: 20}
   m_Spacing: {x: 0, y: 1}
   m_Constraint: 1
   m_ConstraintCount: 2
+--- !u!114 &1887818507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1887818504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 2
+  m_VerticalFit: 2
 --- !u!1 &1910887913
 GameObject:
   m_ObjectHideFlags: 0
