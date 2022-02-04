@@ -26,9 +26,12 @@ public class GameController : MonoBehaviour
         GameManager.StateChanged -= GameManager_StateChanged;
     }
 
-    private void GameManager_StateChanged(GameState obj)
+    private void GameManager_StateChanged(GameState state)
     {
-        ChangeActiveTeam();
+        if (state == GameState.PlayerTurn || state == GameState.EnemyTurn)
+        {
+            ChangeActiveTeam();
+        }
     }
 
     private void SetDependencies()
@@ -122,6 +125,18 @@ public class GameController : MonoBehaviour
     public void OnPieceRemoved(Piece piece)
     {
         Player pieceOwner = (piece.team == Team.White) ? whitePlayer : blackPlayer;
+        if (piece.GetComponent<King>()!=null)
+        {
+            Debug.Log("<color=red>King captured</color>");
+            if (piece.team == Team.White)
+            {
+                GameManager.Instance.UpdateGameState(GameState.Lose);
+            }
+            else if (piece.team == Team.Black) {
+                GameManager.Instance.UpdateGameState(GameState.Win);
+            }
+        }
+
         pieceOwner.RemovePiece(piece);
         Destroy(piece.gameObject);
     }
