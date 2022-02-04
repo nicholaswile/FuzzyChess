@@ -48,6 +48,8 @@ public class GameUI : MonoBehaviour
         winScreen.SetActive(state == GameState.Win);
         loseScreen.SetActive(state == GameState.Lose);
         rollScreen.SetActive(state == GameState.Rolling);
+
+        mainGameUI.SetActive(!(state == GameState.Win || state == GameState.Lose));
     }
 
     public void UI_CaptureTable()
@@ -165,5 +167,12 @@ public class GameUI : MonoBehaviour
             cam3d.SetActive(false);
             Debug.Log("Switched to 2D Cam");
         }
+    }
+
+    // Restarts the game 
+    public void UI_Retry()
+    {
+        GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+        SceneManager.LoadScene(1);
     }
 }
