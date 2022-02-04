@@ -88,6 +88,7 @@ public class GameUI : MonoBehaviour
         ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
         skippedTurn = true;
+        SwapPieceColor();
         updateMoveList();
     }
 
