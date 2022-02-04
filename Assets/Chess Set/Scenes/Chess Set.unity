@@ -4674,7 +4674,7 @@ MonoBehaviour:
     m_Left: -35
     m_Right: 0
     m_Top: 3
-    m_Bottom: 0
+    m_Bottom: 3
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
