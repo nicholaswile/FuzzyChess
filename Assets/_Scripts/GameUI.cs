@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample, ListParent;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, dice, movesList, mainSample, ListParent;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
     [SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
@@ -15,6 +15,7 @@ public class GameUI : MonoBehaviour
     private bool skippedTurn = false;
     private string pieceColor = "White";
     private bool pieceTaken = false;
+    public Camera DiceCamera;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -215,5 +216,18 @@ public class GameUI : MonoBehaviour
     {
         GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
         SceneManager.LoadScene(1);
+    }
+
+    public void RollDie()
+    {
+        if (rollScreen.activeSelf)
+        {
+            rollScreen.SetActive(false);
+        }
+        else 
+        { 
+            rollScreen.SetActive(true);
+        }
+
     }
 }
