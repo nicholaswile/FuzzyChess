@@ -10,6 +10,8 @@ public abstract class Piece : MonoBehaviour
     public ChessBoard board { protected get; set; }
     public Vector2Int occupiedSquare { get; set; }
     public Team team { get; set; }
+    public CorpType corpOriginal { get; set; }
+    public CorpType corpCurrent { get; set; }
     public bool hasMoved { get; private set; }
     public List<Vector2Int> AvailableMoves;
 
