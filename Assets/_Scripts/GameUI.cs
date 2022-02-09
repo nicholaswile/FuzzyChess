@@ -8,7 +8,7 @@ public class GameUI : MonoBehaviour
 {
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
-    [SerializeField] private Sprite ReplaceSprite;
+    //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     private int turnCount = 1;
     private List<int> skippedTurns = new List<int>();
@@ -51,7 +51,11 @@ public class GameUI : MonoBehaviour
 
     private void GameManager_StateChanged(GameState state)
     {
-        rollScreen.SetActive(!(state == GameState.Win || state == GameState.Lose));
+        // Makes sure to not go into a roll state
+        if (state == GameState.Win || state == GameState.Lose)
+        {
+            rollScreen.SetActive(false);
+        }
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
         skipButton.interactable = (state == GameState.PlayerTurn);
