@@ -15,6 +15,7 @@ public class GameUI : MonoBehaviour
     private bool skippedTurn = false;
     private string pieceColor = "White";
     private bool pieceTaken = false;
+    private bool pieceTakeFail = false;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -153,6 +154,14 @@ public class GameUI : MonoBehaviour
                 pieceTaken = false;
             }
 
+            //Check if a piece failed to take another piece this turn. If so, change takenindicator to
+            //"?", which denotes the failure of the piece to take its target.
+            if (pieceTakeFail == true)
+            {
+                takenIndicator = "?";
+                pieceTakeFail = false;
+            }
+
             //unique logic for if the skip button is activated
             if (element == "skip")
             {
@@ -177,6 +186,7 @@ public class GameUI : MonoBehaviour
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
                 //if a piece was taken, make the color of the take stand out
                 if(takenIndicator.Equals("x")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
+                if (takenIndicator.Equals("?")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
 
                 //sprite update
                 GameObject childImage = newListing.transform.Find("TestImage").gameObject;
@@ -196,9 +206,16 @@ public class GameUI : MonoBehaviour
         else if (pieceColor.Equals("Black")) pieceColor = "White";
     }
 
+    //Called by another function to indicate that a piece was taken successfully. Movelist functionality.
     public void PieceWasTaken()
     {
         pieceTaken = true;
+    }
+
+    // Called by another function to indicate a piece take has failed. Used for movelist functionality.
+    public void PieceTakeFailed()
+    {
+        pieceTakeFail = true;
     }
 
     public bool GetMoveListState()

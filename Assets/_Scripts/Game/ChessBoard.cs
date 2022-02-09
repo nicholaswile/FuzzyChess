@@ -220,7 +220,11 @@ public class ChessBoard : MonoBehaviour
             
             
             if (take) { willCapture = true; TakePiece(piece); }
-            else { willCapture = false; }
+            //edited by TW
+            else {
+                GameUI TheGameU = GameObject.Find("UI").GetComponent<GameUI>();
+                TheGameU.PieceTakeFailed();
+                willCapture = false; }
         }
     }
 
