@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, dice, movesList, mainSample, ListParent;
-    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
+    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton, diceButton;
     [SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     private int turnCount = 1;
@@ -17,13 +17,21 @@ public class GameUI : MonoBehaviour
     private bool pieceTaken = false;
     public Camera DiceCamera;
 
+    //private const string DICE = "GetRoll";
+
     private Vector3[,] camSwitch = new Vector3[2, 2];
+
+    /*[Range(0,1)]
+    private int roll;*/
 
     private void Awake()
     {
         mainGameUI.SetActive(true);
         captureTable.SetActive(false);
         movesList.SetActive(false);
+
+        diceButton.interactable = false;
+
         MakeChessNotation.Add("0", "a");
         MakeChessNotation.Add("1", "b");
         MakeChessNotation.Add("2", "c");
@@ -34,11 +42,20 @@ public class GameUI : MonoBehaviour
         MakeChessNotation.Add("7", "h");
 
         GameManager.StateChanged += GameManager_StateChanged;
+        GameManager.RollStateChanged += GameManager_RollStateChanged;
+    }
+
+    private void GameManager_RollStateChanged(RollState state)
+    {
+        diceButton.interactable = (state == RollState.TrueRoll);
+        rollScreen.SetActive(state == RollState.TrueRoll);
+
     }
 
     private void OnDestroy()
     {
         GameManager.StateChanged -= GameManager_StateChanged;
+        GameManager.RollStateChanged -= GameManager_RollStateChanged;
     }
 
     private void GameManager_StateChanged(GameState state)
@@ -50,9 +67,10 @@ public class GameUI : MonoBehaviour
         //camButton.interactable = (state == GameState.PlayerTurn);
         rollButton.interactable = (state == GameState.PlayerTurn);
 
+
         winScreen.SetActive(state == GameState.Win);
         loseScreen.SetActive(state == GameState.Lose);
-        rollScreen.SetActive(state == GameState.Rolling);
+       //rollScreen.SetActive(state == GameState.Rolling);
 
         mainGameUI.SetActive(!(state == GameState.Win || state == GameState.Lose));
     }
@@ -218,16 +236,56 @@ public class GameUI : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
-    public void RollDie()
+   /* public void RollDie()
     {
-        if (rollScreen.activeSelf)
-        {
-            rollScreen.SetActive(false);
-        }
-        else 
-        { 
-            rollScreen.SetActive(true);
-        }
+        if (roll < 1) { return; }
+        roll--;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        int result = Random.Range(1, 7);
 
+
+    }*/
+
+    public void ResultDie(int result)
+    {
+        GameManager.Instance.UpdateRollState(RollState.TrueRoll);
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        if (result == 1)
+        {
+            Debug.Log("Static 1");
+            rb.transform.rotation = Quaternion.Euler(0, 180, -90);
+        }
+        else if (result == 2)
+        {
+            Debug.Log("Static 2");
+            rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
+        }
+        else if (result == 3)
+        {
+            Debug.Log("Static 3");
+            rb.transform.rotation = Quaternion.Euler(0, 90, -90);
+        }
+        else if (result == 4)
+        {
+            Debug.Log("Static 4");
+            rb.transform.rotation = Quaternion.Euler(0, -90, -90);
+        }
+        else if (result == 5)
+        {
+            Debug.Log("Static 5");
+            rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
+        }
+        else if (result == 6)
+        {
+            Debug.Log("Static 6");
+            rb.transform.rotation = Quaternion.Euler(0, 0, 90);
+        }
+        StartCoroutine(IWait());
+    }
+
+    private IEnumerator IWait()
+    {
+        yield return new WaitForSeconds(2);
+        GameManager.Instance.UpdateRollState(RollState.FalseRoll);
     }
 }

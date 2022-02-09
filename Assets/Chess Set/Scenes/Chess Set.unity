@@ -1519,7 +1519,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &477241161
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1533,7 +1533,7 @@ RectTransform:
   m_Children:
   - {fileID: 498885508}
   m_Father: {fileID: 1224273033}
-  m_RootOrder: 7
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1583,19 +1583,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 477241163}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1110243825}
-        m_TargetAssemblyTypeName: GameUI, Assembly-CSharp
-        m_MethodName: RollDie
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &477241163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2365,18 +2353,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 75eecc178dcca4c4e971eb141f2ec67d, type: 3}
   m_PrefabInstance: {fileID: 379893827}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &698180414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 698180410}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5964703c16e4b64aa1cfc5b23c9fd7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &698180415
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2509,7 +2485,7 @@ RectTransform:
   - {fileID: 645789566}
   - {fileID: 1765784737}
   m_Father: {fileID: 1224273033}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3058,7 +3034,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &962418572
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3363,15 +3339,17 @@ MonoBehaviour:
   winScreen: {fileID: 348755305}
   loseScreen: {fileID: 20879522}
   rollScreen: {fileID: 1810378544}
-  dice: {fileID: 0}
+  diceObj: {fileID: 698180410}
   movesList: {fileID: 774084034}
   mainSample: {fileID: 899485762}
   ListParent: {fileID: 1887818504}
+  chessBoard: {fileID: 3251708720669913376}
   exitButton: {fileID: 1525626005}
   skipButton: {fileID: 585836507}
   moveButton: {fileID: 848162115}
   camButton: {fileID: 1361801914}
   rollButton: {fileID: 1627954913}
+  diceButton: {fileID: 477241162}
   ReplaceSprite: {fileID: 21300000, guid: 81d8b9e7c25bc3b49ae86f65d8d706ac, type: 3}
   DiceCamera: {fileID: 0}
 --- !u!1 &1118941302
@@ -3737,9 +3715,9 @@ Transform:
   - {fileID: 848162114}
   - {fileID: 1361801913}
   - {fileID: 1627954912}
+  - {fileID: 477241161}
   - {fileID: 1714242755}
   - {fileID: 774084035}
-  - {fileID: 477241161}
   m_Father: {fileID: 1110243824}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4026,7 +4004,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1263759304
 Transform:
   m_ObjectHideFlags: 0
@@ -5581,7 +5559,7 @@ Transform:
   m_Children:
   - {fileID: 448670478}
   m_Father: {fileID: 1224273033}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1728810010
 GameObject:
