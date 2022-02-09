@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour
 {
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
-    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton, diceButton;
+    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
     [SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     private int turnCount = 1;
@@ -15,22 +15,15 @@ public class GameUI : MonoBehaviour
     private bool skippedTurn = false;
     private string pieceColor = "White";
     private bool pieceTaken = false;
-    public Camera DiceCamera;
-
-    //private const string DICE = "GetRoll";
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
-    /*[Range(0,1)]
-    private int roll;*/
 
     private void Awake()
     {
         mainGameUI.SetActive(true);
         captureTable.SetActive(false);
         movesList.SetActive(false);
-
-        diceButton.interactable = false;
 
         MakeChessNotation.Add("0", "a");
         MakeChessNotation.Add("1", "b");
@@ -47,9 +40,7 @@ public class GameUI : MonoBehaviour
 
     private void GameManager_RollStateChanged(RollState state)
     {
-        diceButton.interactable = (state == RollState.TrueRoll);
         rollScreen.SetActive(state == RollState.TrueRoll);
-
     }
 
     private void OnDestroy()
@@ -60,6 +51,7 @@ public class GameUI : MonoBehaviour
 
     private void GameManager_StateChanged(GameState state)
     {
+        rollScreen.SetActive(!(state == GameState.Win || state == GameState.Lose));
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
         skipButton.interactable = (state == GameState.PlayerTurn);
@@ -235,16 +227,6 @@ public class GameUI : MonoBehaviour
         GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
         SceneManager.LoadScene(1);
     }
-
-   /* public void RollDie()
-    {
-        if (roll < 1) { return; }
-        roll--;
-        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
-        int result = Random.Range(1, 7);
-
-
-    }*/
 
     public void ResultDie(int result)
     {
