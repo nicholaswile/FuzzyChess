@@ -288,7 +288,7 @@ public class GameUI : MonoBehaviour
 
     private IEnumerator IWait()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         GameManager.Instance.UpdateRollState(RollState.FalseRoll);
     }
 }
