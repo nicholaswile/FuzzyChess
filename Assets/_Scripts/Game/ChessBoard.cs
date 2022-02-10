@@ -15,6 +15,10 @@ public class ChessBoard : MonoBehaviour
     private CreateHighlighters highlighter;
     private readonly List<String> pieceMoves = new List<String>();
 
+    private bool canCapture = false, willCapture = false;
+
+    private const string DICE = "ResultDie";
+
     private void Awake()
     {
         highlighter = GetComponent<CreateHighlighters>();
@@ -115,8 +119,13 @@ public class ChessBoard : MonoBehaviour
     private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
     {
         TryToTakeOppositePiece(coords);
-        UpdateBoardOnPieceMove(coords, piece.occupiedSquare, piece, null);
-        selectedPiece.MovePiece(coords);
+     
+        if (!canCapture || willCapture)
+        {
+            UpdateBoardOnPieceMove(coords, piece.occupiedSquare, piece, null);
+            selectedPiece.MovePiece(coords);
+        } 
+       
         DeselectPiece();
         EndTurn();
     }
@@ -124,9 +133,101 @@ public class ChessBoard : MonoBehaviour
     private void TryToTakeOppositePiece(Vector2Int coords)
     {
         Piece piece = GetPieceOnSquare(coords);
+        canCapture = false;
         if (piece != null && !selectedPiece.IsFromSameTeam(piece))
-            TakePiece(piece);
+        {
+            canCapture = true;
+            //GameManager.Instance.UpdateRollState(RollState.TrueRoll);
+
+            bool b1 = selectedPiece.GetComponent<King>();
+            bool b2 = selectedPiece.GetComponent<Queen>();
+            bool b3 = selectedPiece.GetComponent<Knight>();
+            bool b4 = selectedPiece.GetComponent<Rook>();
+            bool b5 = selectedPiece.GetComponent<Bishop>();
+            bool b6 = selectedPiece.GetComponent<Pawn>();
+
+            bool b7 = piece.GetComponent<King>();
+            bool b8 = piece.GetComponent <Queen>();
+            bool b9 = piece.GetComponent<Knight>();
+            bool b10 = piece.GetComponent<Rook>();
+            bool b11 = piece.GetComponent<Bishop>();
+            bool b12 = piece.GetComponent<Pawn>();
+
+            int result = UnityEngine.Random.Range(1, 7);
+            GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+            TheGameUI.SendMessage(DICE, result);
+
+            Debug.Log("Result: " + result);
+            bool take = false;
+
+            // Okay, hear me out. I know this is unreadable, but it works, and it was the quickest way I could bodge together a solution in time. Thank you for understanding. If we want to fix this in the next sprint, I can cover it - NW
+            
+            if (result == 6)
+            {
+                if (b6)
+                {
+                    if (b7 || b8 || b9 || b10) { take = true; }
+                }
+            }
+            if (result >= 5)
+            {
+                if (b10)
+                {
+                    if (b1 || b2 || b3 || b4 || b5) { take = true; }
+                }
+                if (b3)
+                {
+                    if (b7 || b8 || b9 || b11) { take = true; }
+                }
+                if (b5)
+                {
+                    if (b7 || b8 || b9) { take = true; }
+                }
+                if (b4)
+                {
+                    if (b5 || b12) { take = true; }
+                }
+                if (b6 && b11) { take = true; }
+            }
+            if (result >= 4)
+            {
+                if (b1 || b2)
+                {
+                    if (b7 || b8 || b9 || b11) { take = true; }
+                }
+                if (b5 && b11) { take = true; }
+                if (b4)
+                {
+                    if (b7 || b8 || b9) { take = true; }
+                }
+                if (b6 && b12) { take = true; }
+            }
+            if (result >= 3)
+            {
+                if (b5 && b12) { take = true; }
+            }
+            if (result >= 2)
+            {
+                if (b12)
+                {
+                    if (b2 || b3) { take = true; }
+                }
+            }
+            if (result >= 1)
+            {
+                if (b1 && b12) { take = true; }
+            }
+            
+            
+            if (take) { willCapture = true; TakePiece(piece); }
+            //edited by TW
+            else {
+                GameUI TheGameU = GameObject.Find("UI").GetComponent<GameUI>();
+                TheGameU.PieceTakeFailed();
+                willCapture = false; }
+        }
     }
+
 
     private void TakePiece(Piece piece)
     {
@@ -139,6 +240,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+  
     //modified to send a signal to the swapcolor function of GameUI in order to change the color of sprites per team
     private void EndTurn()
     {

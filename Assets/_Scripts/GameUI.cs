@@ -6,23 +6,26 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, movesList, mainSample, ListParent;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
-    [SerializeField] private Sprite ReplaceSprite;
+    //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     private int turnCount = 1;
     private List<int> skippedTurns = new List<int>();
     private bool skippedTurn = false;
     private string pieceColor = "White";
     private bool pieceTaken = false;
+    private bool pieceTakeFail = false;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
+
 
     private void Awake()
     {
         mainGameUI.SetActive(true);
         captureTable.SetActive(false);
         movesList.SetActive(false);
+
         MakeChessNotation.Add("0", "a");
         MakeChessNotation.Add("1", "b");
         MakeChessNotation.Add("2", "c");
@@ -33,15 +36,27 @@ public class GameUI : MonoBehaviour
         MakeChessNotation.Add("7", "h");
 
         GameManager.StateChanged += GameManager_StateChanged;
+        GameManager.RollStateChanged += GameManager_RollStateChanged;
+    }
+
+    private void GameManager_RollStateChanged(RollState state)
+    {
+        rollScreen.SetActive(state == RollState.TrueRoll);
     }
 
     private void OnDestroy()
     {
         GameManager.StateChanged -= GameManager_StateChanged;
+        GameManager.RollStateChanged -= GameManager_RollStateChanged;
     }
 
     private void GameManager_StateChanged(GameState state)
     {
+        // Makes sure to not go into a roll state
+        if (state == GameState.Win || state == GameState.Lose)
+        {
+            rollScreen.SetActive(false);
+        }
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
         skipButton.interactable = (state == GameState.PlayerTurn);
@@ -49,9 +64,10 @@ public class GameUI : MonoBehaviour
         //camButton.interactable = (state == GameState.PlayerTurn);
         rollButton.interactable = (state == GameState.PlayerTurn);
 
+
         winScreen.SetActive(state == GameState.Win);
         loseScreen.SetActive(state == GameState.Lose);
-        rollScreen.SetActive(state == GameState.Rolling);
+       //rollScreen.SetActive(state == GameState.Rolling);
 
         mainGameUI.SetActive(!(state == GameState.Win || state == GameState.Lose));
     }
@@ -138,6 +154,14 @@ public class GameUI : MonoBehaviour
                 pieceTaken = false;
             }
 
+            //Check if a piece failed to take another piece this turn. If so, change takenindicator to
+            //"?", which denotes the failure of the piece to take its target.
+            if (pieceTakeFail == true)
+            {
+                takenIndicator = "?";
+                pieceTakeFail = false;
+            }
+
             //unique logic for if the skip button is activated
             if (element == "skip")
             {
@@ -162,6 +186,7 @@ public class GameUI : MonoBehaviour
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
                 //if a piece was taken, make the color of the take stand out
                 if(takenIndicator.Equals("x")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
+                if (takenIndicator.Equals("?")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
 
                 //sprite update
                 GameObject childImage = newListing.transform.Find("TestImage").gameObject;
@@ -181,9 +206,16 @@ public class GameUI : MonoBehaviour
         else if (pieceColor.Equals("Black")) pieceColor = "White";
     }
 
+    //Called by another function to indicate that a piece was taken successfully. Movelist functionality.
     public void PieceWasTaken()
     {
         pieceTaken = true;
+    }
+
+    // Called by another function to indicate a piece take has failed. Used for movelist functionality.
+    public void PieceTakeFailed()
+    {
+        pieceTakeFail = true;
     }
 
     public bool GetMoveListState()
@@ -215,5 +247,48 @@ public class GameUI : MonoBehaviour
     {
         GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
         SceneManager.LoadScene(1);
+    }
+
+    public void ResultDie(int result)
+    {
+        GameManager.Instance.UpdateRollState(RollState.TrueRoll);
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        if (result == 1)
+        {
+            Debug.Log("Static 1");
+            rb.transform.rotation = Quaternion.Euler(0, 180, -90);
+        }
+        else if (result == 2)
+        {
+            Debug.Log("Static 2");
+            rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
+        }
+        else if (result == 3)
+        {
+            Debug.Log("Static 3");
+            rb.transform.rotation = Quaternion.Euler(0, 90, -90);
+        }
+        else if (result == 4)
+        {
+            Debug.Log("Static 4");
+            rb.transform.rotation = Quaternion.Euler(0, -90, -90);
+        }
+        else if (result == 5)
+        {
+            Debug.Log("Static 5");
+            rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
+        }
+        else if (result == 6)
+        {
+            Debug.Log("Static 6");
+            rb.transform.rotation = Quaternion.Euler(0, 0, 90);
+        }
+        StartCoroutine(IWait());
+    }
+
+    private IEnumerator IWait()
+    {
+        yield return new WaitForSeconds(3);
+        GameManager.Instance.UpdateRollState(RollState.FalseRoll);
     }
 }

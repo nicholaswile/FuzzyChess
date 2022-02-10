@@ -3,7 +3,25 @@ guid: 286fa85d4abdd924c9a373ed5af1ba61
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - mainGameUI: {instanceID: 0}
+  - captureTable: {instanceID: 0}
+  - cam2d: {instanceID: 0}
+  - cam3d: {instanceID: 0}
+  - winScreen: {instanceID: 0}
+  - loseScreen: {instanceID: 0}
+  - rollScreen: {instanceID: 0}
+  - dice: {fileID: 919132149155446097, guid: 75eecc178dcca4c4e971eb141f2ec67d, type: 3}
+  - movesList: {instanceID: 0}
+  - mainSample: {instanceID: 0}
+  - ListParent: {instanceID: 0}
+  - exitButton: {instanceID: 0}
+  - skipButton: {instanceID: 0}
+  - moveButton: {instanceID: 0}
+  - camButton: {instanceID: 0}
+  - rollButton: {instanceID: 0}
+  - ReplaceSprite: {instanceID: 0}
+  - DiceCamera: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
