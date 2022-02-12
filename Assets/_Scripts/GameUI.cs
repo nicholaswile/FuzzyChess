@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
@@ -286,11 +286,17 @@ public class GameUI : MonoBehaviour
             Debug.Log("Switched to 3D Cam");
         }
         // Vice versa
-        else
+        else if (cam3d.activeSelf)
         {
-            cam2d.SetActive(true);
+            cam360.SetActive(true);
             cam3d.SetActive(false);
             Debug.Log("Switched to 2D Cam");
+        }
+        else 
+        {
+            cam2d.SetActive(true);
+            cam360.SetActive(false);
+            Debug.Log("Switched to 360 Cam");
         }
     }
 
