@@ -246,7 +246,6 @@ public class ChessBoard : MonoBehaviour
     {
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
         TheGameUI.updateMoveList();
-        TheGameUI.SwapPieceColor();
         controller.EndTurn();
     }
 

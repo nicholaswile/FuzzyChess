@@ -107,11 +107,14 @@ public class GameController : MonoBehaviour
     {
         GenerateAllPlayerMoves(activePlayer);
         GenerateAllPlayerMoves(GetOppositePlayer(activePlayer));
-        if (GameManager.Instance.State == GameState.PlayerTurn)
+        GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+        int iteratorNum = TheGameUI.GetIteratorCount();
+
+        if (GameManager.Instance.State == GameState.PlayerTurn && iteratorNum % 3 == 0)
         {
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
         }
-        else if (GameManager.Instance.State == GameState.EnemyTurn)
+        else if (GameManager.Instance.State == GameState.EnemyTurn && iteratorNum % 3 == 0)
         {
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
         }

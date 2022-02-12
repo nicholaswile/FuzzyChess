@@ -10,7 +10,9 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
+    public const int NUMBER_OF_TURNS = 3;
     private int turnCount = 1;
+    private int turnIterator = 0;
     private List<int> skippedTurns = new List<int>();
     private bool skippedTurn = false;
     private string pieceColor = "White";
@@ -104,7 +106,6 @@ public class GameUI : MonoBehaviour
         ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
         skippedTurn = true;
-        SwapPieceColor();
         updateMoveList();
     }
 
@@ -116,6 +117,7 @@ public class GameUI : MonoBehaviour
         movesList.SetActive(!open);
         if (open != true)
         {
+            turnIterator--;
             updateMoveList();
         }
 
@@ -124,6 +126,11 @@ public class GameUI : MonoBehaviour
 
     public void updateMoveList()
     {
+        //There are 6 total turn iterations 1 - 3 being Player Turns and 4 - 6 being Opponent Turns
+        if (turnIterator == (NUMBER_OF_TURNS * 2))
+            turnIterator = 0;
+        turnIterator++;
+
         //Instantiate(mainSample, ListParent.transform);
         ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
@@ -136,6 +143,7 @@ public class GameUI : MonoBehaviour
             newMoves.Insert(skippedTurns[skippedTurns.Count - 1], "skip");
             skippedTurn = false;
         }
+        int numberOfSkips = 0;
 
         //Add each move to the list (This isn't needed anymore, as each move is added as it's taken.
         //However, it will be left in, in order to avoid breaking something.)
@@ -165,11 +173,20 @@ public class GameUI : MonoBehaviour
             //unique logic for if the skip button is activated
             if (element == "skip")
             {
-                GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
-                childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
+                if (turnIterator == 1)
+                    numberOfSkips = 3;
+                else if (turnIterator == 2)
+                    numberOfSkips = 2;
+
+                if (turnIterator == 1) 
+                {
+                    GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
+                    childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ". \t");
+                }
 
                 GameObject childText = newListing.transform.Find("TestText").gameObject;
-                childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("SKIP");
+                childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("");
+                turnIterator = 3;
             }
             //logic for general moves
             else {
@@ -177,9 +194,12 @@ public class GameUI : MonoBehaviour
                 Debug.Log(movesArr[0]);
                 Debug.Log(movesArr[1]);
 
-                //turn number update (to be changed later)
-                GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
-                childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ".");
+                //Apply turn number to only the beginning action for each player
+                if (turnIterator == 1 || turnIterator == 4)
+                {
+                    GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
+                    childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + ". \t");
+                }
 
                 //move update
                 GameObject childText = newListing.transform.Find("TestText").gameObject;
@@ -193,7 +213,33 @@ public class GameUI : MonoBehaviour
                 childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
                 Debug.Log("Piece color for this turn: " + pieceColor);
             }
-            turnCount++;
+
+            //If the turn is over there is an addition to the count as well as a color switch.
+            if (turnIterator % NUMBER_OF_TURNS == 0) 
+            {
+                SwapPieceColor();
+                turnCount++;
+            }
+
+            //Code to fill in X's for all turns skipped
+            if (numberOfSkips > 0) 
+            {
+                var skip1 = Instantiate(mainSample, ListParent.transform);
+                GameObject childText1 = skip1.transform.Find("TestText").gameObject;
+                childText1.GetComponent<TMPro.TextMeshProUGUI>().text = ("");
+
+                if (numberOfSkips == 3)
+                {
+                    var skip2 = Instantiate(mainSample, ListParent.transform);
+                    GameObject childText2 = skip2.transform.Find("TestText").gameObject;
+                    childText2.GetComponent<TMPro.TextMeshProUGUI>().text = ("");
+                    skip1.SetActive(true);
+                    skip2.SetActive(true);
+                }
+                else if (numberOfSkips == 2)
+                    skip1.SetActive(true);
+            }
+
             newListing.SetActive(true);
         }
         //Debug.Log(newMoves);
@@ -204,6 +250,12 @@ public class GameUI : MonoBehaviour
     {
         if (pieceColor.Equals("White")) pieceColor = "Black";
         else if (pieceColor.Equals("Black")) pieceColor = "White";
+    }
+
+    //Returns info on turn count
+    public int GetIteratorCount()
+    {
+        return turnIterator;
     }
 
     //Called by another function to indicate that a piece was taken successfully. Movelist functionality.
