@@ -84,6 +84,12 @@ public class GameController : MonoBehaviour
         board.SetPieceOnBoard(squareCoords, newPiece);
 
         Player currentPlayer = team == Team.White ? whitePlayer : blackPlayer;
+
+        if (currentPlayer == blackPlayer && type.ToString() == "Knight") 
+        {
+            newPiece.transform.Rotate(0.0f, 0.0f, 180.0f, Space.Self);
+        }
+        
         currentPlayer.AddPiece(newPiece);
     }
 
