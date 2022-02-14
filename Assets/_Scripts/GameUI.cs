@@ -290,13 +290,13 @@ public class GameUI : MonoBehaviour
         {
             cam360.SetActive(true);
             cam3d.SetActive(false);
-            Debug.Log("Switched to 2D Cam");
+            Debug.Log("Switched to 360 Cam");
         }
         else 
         {
             cam2d.SetActive(true);
             cam360.SetActive(false);
-            Debug.Log("Switched to 360 Cam");
+            Debug.Log("Switched to 2D Cam");
         }
     }
 
