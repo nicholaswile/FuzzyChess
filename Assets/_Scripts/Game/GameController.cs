@@ -65,17 +65,18 @@ public class GameController : MonoBehaviour
         {
             Vector2Int squareCoords = layout.GetCoordsAtIndex(i);
             Team team = layout.GetTeamColorAtIndex(i);
-            string typeName = layout.GetPieceTypeAtIndex(i);
+            string typeName = layout.GetPieceTypeStringAtIndex(i);
+            PieceType pieceType = layout.GetPieceTypeAtIndex(i);
             Type type = Type.GetType(typeName);
 
-            CreatePieceAndInitialize(squareCoords, team, type);
+            CreatePieceAndInitialize(squareCoords, team, type, pieceType);
         }
     }
 
-    private void CreatePieceAndInitialize(Vector2Int squareCoords, Team team, Type type)
+    private void CreatePieceAndInitialize(Vector2Int squareCoords, Team team, Type type, PieceType pieceType)
     {
         Piece newPiece = pieceCreator.CreatePiece(type).GetComponent<Piece>();
-        newPiece.SetData(squareCoords, team, board);
+        newPiece.SetData(squareCoords, team, board, pieceType);
 
         Material teamMaterial = pieceCreator.GetTeamMaterial(team);
         Material bottomMaterial = pieceCreator.GetBottomMaterial();

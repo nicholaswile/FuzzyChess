@@ -10,6 +10,7 @@ public abstract class Piece : MonoBehaviour
     public ChessBoard board { protected get; set; }
     public Vector2Int occupiedSquare { get; set; }
     public Team team { get; set; }
+    public PieceType pieceType { get; set; }
     public bool hasMoved { get; private set; }
     public List<Vector2Int> AvailableMoves;
 
@@ -68,9 +69,10 @@ public abstract class Piece : MonoBehaviour
         AvailableMoves.Add(coords);
     }
 
-    public void SetData(Vector2Int coords, Team team, ChessBoard board) 
+    public void SetData(Vector2Int coords, Team team, ChessBoard board, PieceType pieceType) 
     {
         this.team = team;
+        this.pieceType = pieceType;
         occupiedSquare = coords;
         this.board = board;
         transform.position = board.GetPositionFromCoords(coords);
@@ -176,6 +178,14 @@ public abstract class Piece : MonoBehaviour
             }
         }
         return adjacentEnemySquares;
+    }
+
+    public bool HasAdjacentEnemySquares(Vector2Int coords) 
+    {
+        List<Vector2Int>  adjacentEnemySquares = GetAdjacentEnemySquares(coords);
+        if (adjacentEnemySquares.Count == 0)
+            return false;
+        else return true;
     }
 
 }

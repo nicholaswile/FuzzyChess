@@ -16,6 +16,7 @@ public class ChessBoard : MonoBehaviour
     private readonly List<String> pieceMoves = new List<String>();
 
     private bool canCapture = false, willCapture = false;
+    private bool knightHasMoved = false, knightAttemptedKill = false;
 
     private const string DICE = "ResultDie";
 
@@ -54,34 +55,15 @@ public class ChessBoard : MonoBehaviour
         Piece piece = GetPieceOnSquare(coords);
         if (selectedPiece)
         {
-            if (piece != null && selectedPiece == piece)
+            if (piece != null && selectedPiece == piece && knightHasMoved == false)
                 DeselectPiece();
-            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team))
+
+            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team) && knightHasMoved == false)
                 SelectPiece(piece);
 
             else if (selectedPiece.CanMoveTo(coords))
             {
-                //Debug.Log("moved to" + coords);
-                //Debug.Log("Selected piece" + selectedPiece.GetType());
-                String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
-                //Debug.Log("concat: " + test);
-                pieceMoves.Add(test);
                 OnSelectedPieceMoved(coords, selectedPiece);
-
-                // NOTE TO MYSELF: Though the 3-turn logic isn't implemented yet, the functionality of piece colors could
-                // be rewritten simply by calling the color change function every 3 turns instead of every end turn,
-                // and checking the above for the "skip" button to be pressed. If pressed, change color immediately after
-                // the turn, no matter what
-                
-                //Call on the GameUI script to get an object from it. 
-                //Commented out since I realized you can just do this every time the turn ends,
-                //meaning waiting to live update each time the menu is opened is kind of pointless.
-                /**
-                GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
-                Boolean state = TheGameUI.GetMoveListState();
-                if (state)
-                    TheGameUI.updateMoveList();
-                **/
             }
         }
         else
@@ -105,6 +87,10 @@ public class ChessBoard : MonoBehaviour
         {
             Vector3 position = GetPositionFromCoords(selection[i]);
             bool isSquareFree = GetPieceOnSquare(selection[i]) == null;
+
+            if (position == GetPositionFromCoords(selectedPiece.occupiedSquare))
+                isSquareFree = true;
+
             squaresData.Add(position, isSquareFree);
         }
         highlighter.ShowAvailableMoves(squaresData);
@@ -119,15 +105,43 @@ public class ChessBoard : MonoBehaviour
     private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
     {
         TryToTakeOppositePiece(coords);
-     
+
+        //Adds move to the move list
+        if (selectedPiece.pieceType != PieceType.Knight || knightHasMoved || knightAttemptedKill || !selectedPiece.HasAdjacentEnemySquares(coords))
+        {
+            String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
+            pieceMoves.Add(test);
+        }
+
         if (!canCapture || willCapture)
         {
             UpdateBoardOnPieceMove(coords, piece.occupiedSquare, piece, null);
             selectedPiece.MovePiece(coords);
         } 
-       
+
         DeselectPiece();
-        EndTurn();
+
+        //If knight can move again, call the function to show the new available moves
+        if (piece.pieceType == PieceType.Knight && !knightHasMoved && !knightAttemptedKill && piece.HasAdjacentEnemySquares(coords))
+        {
+            ShowKnightSelectionAfterMoving(piece);
+        }
+        else 
+        {
+            EndTurn();
+            knightHasMoved = false;
+            knightAttemptedKill = false;
+        }
+    }
+
+    private void ShowKnightSelectionAfterMoving(Piece piece)
+    {
+        knightHasMoved = true;
+        piece.AvailableMoves.Clear();
+        List<Vector2Int> newKnightMoves = piece.GetAdjacentEnemySquares(piece.occupiedSquare);
+        piece.AvailableMoves.AddRange(newKnightMoves);
+        piece.AvailableMoves.Add(piece.occupiedSquare);
+        SelectPiece(piece);
     }
 
     private void TryToTakeOppositePiece(Vector2Int coords)
@@ -157,12 +171,18 @@ public class ChessBoard : MonoBehaviour
             GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
             TheGameUI.SendMessage(DICE, result);
 
+            //If knight does surprise attack add a +1 to the die roll
+            if (knightHasMoved) 
+            {
+                result++;
+            }
+
             Debug.Log("Result: " + result);
             bool take = false;
 
             // Okay, hear me out. I know this is unreadable, but it works, and it was the quickest way I could bodge together a solution in time. Thank you for understanding. If we want to fix this in the next sprint, I can cover it - NW
-            
-            if (result == 6)
+
+            if (result >= 6)
             {
                 if (b6)
                 {
@@ -217,8 +237,12 @@ public class ChessBoard : MonoBehaviour
             {
                 if (b1 && b12) { take = true; }
             }
-            
-            
+
+            if (selectedPiece.pieceType == PieceType.Knight) 
+            {
+                knightAttemptedKill = true;
+            }
+
             if (take) { willCapture = true; TakePiece(piece); }
             //edited by TW
             else {
@@ -240,8 +264,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
-  
-    //modified to send a signal to the swapcolor function of GameUI in order to change the color of sprites per team
+ 
     private void EndTurn()
     {
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
