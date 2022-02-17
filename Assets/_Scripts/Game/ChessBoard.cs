@@ -205,7 +205,7 @@ public class ChessBoard : MonoBehaviour
                 }
                 if (b4)
                 {
-                    if (b5 || b12) { take = true; }
+                    if (b11 || b12) { take = true; }
                 }
                 if (b6 && b11) { take = true; }
             }
