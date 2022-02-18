@@ -12,6 +12,7 @@ public class GameController : MonoBehaviour
     private Player whitePlayer;
     private Player blackPlayer;
     private Player activePlayer;
+    private int killCount = 0;
 
     private void Awake()
     {
@@ -108,6 +109,7 @@ public class GameController : MonoBehaviour
     {
         activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
         board.DeselectPiece();
+        killCount = 0;
     }
 
     public void EndTurn()
@@ -148,6 +150,12 @@ public class GameController : MonoBehaviour
         }
 
         pieceOwner.RemovePiece(piece);
-        Destroy(piece.gameObject);
+        killCount++;
+
+        int capturedPieces = 15 - pieceOwner.ActivePieces.Count;
+        if (piece.team == Team.White)
+            piece.MovePiece(new Vector2Int(-2 - (capturedPieces % 3), 7 - capturedPieces / 3));
+        else
+            piece.MovePiece(new Vector2Int(9 + (capturedPieces % 3), capturedPieces / 3));
     }
 }
