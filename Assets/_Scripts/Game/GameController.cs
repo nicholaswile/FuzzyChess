@@ -165,7 +165,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void OpenCorpSelection()
+    public void OpenCorpSelection()
     {
         leftCorpUsed = false;
         kingCorpUsed = false;

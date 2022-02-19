@@ -103,6 +103,9 @@ public class GameUI : MonoBehaviour
 
         GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
 
+        GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+        controller.OpenCorpSelection();
+
         ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
         skippedTurn = true;
