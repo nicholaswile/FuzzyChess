@@ -53,12 +53,16 @@ public class ChessBoard : MonoBehaviour
     {
         Vector2Int coords = GetCoordsFromPosition(inputPosition);
         Piece piece = GetPieceOnSquare(coords);
+
+        if (piece && controller.IsTeamTurnActive(piece.team))
+            controller.TryToChangeActiveCorp(piece.corpType);
+
         if (selectedPiece)
         {
             if (piece != null && selectedPiece == piece && knightHasMoved == false)
                 DeselectPiece();
 
-            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team) && knightHasMoved == false)
+            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false)
                 SelectPiece(piece);
 
             else if (selectedPiece.CanMoveTo(coords))
@@ -68,7 +72,7 @@ public class ChessBoard : MonoBehaviour
         }
         else
         {
-            if (piece != null && controller.IsTeamTurnActive(piece.team))
+            if (piece != null && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType))
                 SelectPiece(piece);
         }
     }

@@ -11,6 +11,7 @@ public abstract class Piece : MonoBehaviour
     public Vector2Int occupiedSquare { get; set; }
     public Team team { get; set; }
     public PieceType pieceType { get; set; }
+    public CorpType corpType { get; set; }
     public bool hasMoved { get; private set; }
     public List<Vector2Int> AvailableMoves;
 
@@ -69,10 +70,11 @@ public abstract class Piece : MonoBehaviour
         AvailableMoves.Add(coords);
     }
 
-    public void SetData(Vector2Int coords, Team team, ChessBoard board, PieceType pieceType) 
+    public void SetData(Vector2Int coords, Team team, ChessBoard board, PieceType pieceType, CorpType corpType) 
     {
         this.team = team;
         this.pieceType = pieceType;
+        this.corpType = corpType;
         occupiedSquare = coords;
         this.board = board;
         transform.position = board.GetPositionFromCoords(coords);

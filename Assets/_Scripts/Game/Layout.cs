@@ -9,6 +9,7 @@ public class Layout : ScriptableObject
     {
         public Vector2Int position;
         public PieceType pieceType;
+        public CorpType corpType;
         public Team teamColor;
     }
 
@@ -47,7 +48,15 @@ public class Layout : ScriptableObject
         }
         return boardSquares[index].pieceType;
     }
-
+    public CorpType GetCorpTypeAtIndex(int index)
+    {
+        if (boardSquares.Length <= index)
+        {
+            Debug.LogError("PIECE NOT IN RANGE");
+            return CorpType.Left;
+        }
+        return boardSquares[index].corpType;
+    }
     public Team GetTeamColorAtIndex(int index)
     {
         if (boardSquares.Length <= index)
