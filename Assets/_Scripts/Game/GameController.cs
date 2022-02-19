@@ -153,9 +153,6 @@ public class GameController : MonoBehaviour
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
         int iteratorNum = TheGameUI.GetIteratorCount();
         ChangeActiveCorp();
-        Debug.Log("LeftCorpUsed: " + leftCorpUsed);
-        Debug.Log("KingCorpUsed: " + kingCorpUsed);
-        Debug.Log("RightCorpUsed: " + rightCorpUsed);
 
         if (GameManager.Instance.State == GameState.PlayerTurn && iteratorNum % 3 == 0)
         {
