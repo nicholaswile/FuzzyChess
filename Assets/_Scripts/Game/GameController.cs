@@ -119,24 +119,25 @@ public class GameController : MonoBehaviour
     }
     private void ChangeActiveCorp()
     {
-        if (activePlayer.currentCorp == CorpType.Left && !leftCorpUsed)
-        {
-            activePlayer.currentCorp = CorpType.King;
+        //Marks the corp that is used
+        if (activePlayer.currentCorp == CorpType.Left)
             leftCorpUsed = true;
-        }
-        else if (activePlayer.currentCorp == CorpType.King && !kingCorpUsed)
-        {
-            activePlayer.currentCorp = CorpType.Right;
+        else if (activePlayer.currentCorp == CorpType.King)
             kingCorpUsed = true;
-        }
-        else if (activePlayer.currentCorp == CorpType.Right && !rightCorpUsed)
-        {
-            activePlayer.currentCorp = CorpType.Left;
+        else if (activePlayer.currentCorp == CorpType.Right)
             rightCorpUsed = true;
-        }
+
+        //Assigns the next new open corp
+        if (!leftCorpUsed)
+            activePlayer.currentCorp = CorpType.Left;
+        else if (!kingCorpUsed)
+            activePlayer.currentCorp = CorpType.King;
+        else if (!rightCorpUsed)
+            activePlayer.currentCorp = CorpType.Right;
     }
     public void TryToChangeActiveCorp(CorpType corpType)
     {
+        //attempts to change active corp when a new corp is clicked
         if (corpType == CorpType.Left && !leftCorpUsed)
             activePlayer.currentCorp = CorpType.Left;
         else if (corpType == CorpType.King && !kingCorpUsed)
@@ -152,6 +153,9 @@ public class GameController : MonoBehaviour
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
         int iteratorNum = TheGameUI.GetIteratorCount();
         ChangeActiveCorp();
+        Debug.Log("LeftCorpUsed: " + leftCorpUsed);
+        Debug.Log("KingCorpUsed: " + kingCorpUsed);
+        Debug.Log("RightCorpUsed: " + rightCorpUsed);
 
         if (GameManager.Instance.State == GameState.PlayerTurn && iteratorNum % 3 == 0)
         {
