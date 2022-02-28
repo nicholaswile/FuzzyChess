@@ -12,7 +12,11 @@ public class GameController : MonoBehaviour
     private Player whitePlayer;
     private Player blackPlayer;
     private Player activePlayer;
-    private bool leftCorpUsed = false, kingCorpUsed = false, rightCorpUsed = false;
+    private int leftCorpUsed = 0, kingCorpUsed = 0, rightCorpUsed = 0;
+    public int LeftCorpUsed { get { return leftCorpUsed; } }
+    public int KingCorpUsed { get { return kingCorpUsed; } }
+    public int RightCorpUsed { get { return rightCorpUsed; } }
+    public const int NUMBER_OF_ACTIONS = 6;
     private int killCount = 0;
 
     private void Awake()
@@ -121,28 +125,28 @@ public class GameController : MonoBehaviour
     {
         //Marks the corp that is used
         if (activePlayer.currentCorp == CorpType.Left)
-            leftCorpUsed = true;
+            leftCorpUsed++;
         else if (activePlayer.currentCorp == CorpType.King)
-            kingCorpUsed = true;
+            kingCorpUsed++;
         else if (activePlayer.currentCorp == CorpType.Right)
-            rightCorpUsed = true;
+            rightCorpUsed++;
 
         //Assigns the next new open corp
-        if (!leftCorpUsed)
+        if (leftCorpUsed < 2)
             activePlayer.currentCorp = CorpType.Left;
-        else if (!kingCorpUsed)
+        else if (kingCorpUsed < 2)
             activePlayer.currentCorp = CorpType.King;
-        else if (!rightCorpUsed)
+        else if (rightCorpUsed < 2)
             activePlayer.currentCorp = CorpType.Right;
     }
     public void TryToChangeActiveCorp(CorpType corpType)
     {
         //attempts to change active corp when a new corp is clicked
-        if (corpType == CorpType.Left && !leftCorpUsed)
+        if (corpType == CorpType.Left && leftCorpUsed < 2)
             activePlayer.currentCorp = CorpType.Left;
-        else if (corpType == CorpType.King && !kingCorpUsed)
+        else if (corpType == CorpType.King && kingCorpUsed < 2)
             activePlayer.currentCorp = CorpType.King;
-        else if (corpType == CorpType.Right && !rightCorpUsed)
+        else if (corpType == CorpType.Right && rightCorpUsed < 2)
             activePlayer.currentCorp = CorpType.Right;
     }
 
@@ -154,23 +158,39 @@ public class GameController : MonoBehaviour
         int iteratorNum = TheGameUI.GetIteratorCount();
         ChangeActiveCorp();
 
-        if (GameManager.Instance.State == GameState.PlayerTurn && iteratorNum % 3 == 0)
+        if (iteratorNum % NUMBER_OF_ACTIONS != 0)
+            SkipTurnIfPlayerCantMove(TheGameUI);
+
+        if (GameManager.Instance.State == GameState.PlayerTurn && iteratorNum % NUMBER_OF_ACTIONS == 0)
         {
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
             OpenCorpSelection();
         }
-        else if (GameManager.Instance.State == GameState.EnemyTurn && iteratorNum % 3 == 0)
+        else if (GameManager.Instance.State == GameState.EnemyTurn && iteratorNum % NUMBER_OF_ACTIONS == 0)
         {
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
             OpenCorpSelection();
         }
     }
 
+    public void SkipTurnIfPlayerCantMove(GameUI TheGameUI) 
+    {
+        int i = 0;
+        foreach (Piece piece in activePlayer.ActivePieces)
+        {
+            if ((piece.pieceType == PieceType.King || piece.pieceType == PieceType.Bishop) &&
+                ((piece.AvailableMoves.Count == 0 && piece.CorpMoveNumber() == 1) || piece.CorpMoveNumber() == 2))
+                i++;
+        }
+        if (i == 3)
+            TheGameUI.UI_Skip();
+    }
+
     public void OpenCorpSelection()
     {
-        leftCorpUsed = false;
-        kingCorpUsed = false;
-        rightCorpUsed = false;
+        leftCorpUsed = 0;
+        kingCorpUsed = 0;
+        rightCorpUsed = 0;
     }
 
     private Player GetOppositePlayer(Player player)

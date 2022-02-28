@@ -9,6 +9,7 @@ public class ChessBoard : MonoBehaviour
     [SerializeField] private Transform bottomLeftMarker;
     [SerializeField] private float squareSize;
     public const int BOARD_SIZE = 8;
+    public const int NUMBER_OF_ACTIONS = 6;
     private Piece[,] grid;
     private Piece selectedPiece;
     private GameController controller;
@@ -17,6 +18,10 @@ public class ChessBoard : MonoBehaviour
 
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false;
+    private bool leftBishopMovedOne = false, kingMovedOne = false, rightBishopMovedOne = false;
+    public bool LeftBishopMovedOne { get { return leftBishopMovedOne; } }
+    public bool KingMovedOne { get { return kingMovedOne; } }
+    public bool RightBishopMovedOne { get { return rightBishopMovedOne; } }
 
     private const string DICE = "ResultDie";
 
@@ -62,7 +67,8 @@ public class ChessBoard : MonoBehaviour
             if (piece != null && selectedPiece == piece && knightHasMoved == false)
                 DeselectPiece();
 
-            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false)
+            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false && 
+                (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
                 SelectPiece(piece);
 
             else if (selectedPiece.CanMoveTo(coords))
@@ -72,7 +78,8 @@ public class ChessBoard : MonoBehaviour
         }
         else
         {
-            if (piece != null && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType))
+            if (piece != null && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType) &&
+                (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
                 SelectPiece(piece);
         }
     }
@@ -81,6 +88,11 @@ public class ChessBoard : MonoBehaviour
     {
         selectedPiece = piece;
         List<Vector2Int> selection = selectedPiece.AvailableMoves;
+        if (selectedPiece.CorpMoveNumber() > 0 && !selectedPiece.CommanderMovedOne()) 
+        {
+            selection.Clear();
+            selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
+        }
         ShowSelectionSquares(selection);
     }
 
@@ -110,6 +122,13 @@ public class ChessBoard : MonoBehaviour
     {
         TryToTakeOppositePiece(coords);
 
+        if (selectedPiece.pieceType == PieceType.King && MovedOneSquare(coords) && selectedPiece.CorpMoveNumber() == 0)
+            kingMovedOne = true;
+        else if (selectedPiece.pieceType == PieceType.Bishop && selectedPiece.corpType == CorpType.Left && MovedOneSquare(coords) && selectedPiece.CorpMoveNumber() == 0)
+            leftBishopMovedOne = true;
+        else if (selectedPiece.pieceType == PieceType.Bishop && selectedPiece.corpType == CorpType.Right && MovedOneSquare(coords) && selectedPiece.CorpMoveNumber() == 0)
+            rightBishopMovedOne = true;
+
         //Adds move to the move list
         if (selectedPiece.pieceType != PieceType.Knight || knightHasMoved || knightAttemptedKill || !selectedPiece.HasAdjacentEnemySquares(coords))
         {
@@ -136,6 +155,35 @@ public class ChessBoard : MonoBehaviour
             knightHasMoved = false;
             knightAttemptedKill = false;
         }
+    }
+
+    private bool MovedOneSquare(Vector2Int coords) 
+    {
+        Vector2Int[] directions = new Vector2Int[]
+        {
+            new Vector2Int(-1, 1),
+            new Vector2Int(0, 1),
+            new Vector2Int(1, 1),
+            new Vector2Int(-1, 0),
+            new Vector2Int(1, 0),
+            new Vector2Int(-1, -1),
+            new Vector2Int(0, -1),
+            new Vector2Int(1, -1),
+        };
+        foreach (var direction in directions)
+        {
+            Vector2Int nextDirection = coords + direction;
+            if (nextDirection == selectedPiece.occupiedSquare)
+                return true;
+        }
+        return false;
+    }
+
+    public void ResetCommanderData() 
+    {
+        leftBishopMovedOne = false;
+        kingMovedOne = false;
+        rightBishopMovedOne = false;
     }
 
     private void ShowKnightSelectionAfterMoving(Piece piece)
@@ -273,6 +321,11 @@ public class ChessBoard : MonoBehaviour
     {
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
         TheGameUI.updateMoveList();
+        int iteratorNum = TheGameUI.GetIteratorCount();
+        if (iteratorNum % NUMBER_OF_ACTIONS == 0) 
+        {
+            ResetCommanderData();
+        }
         controller.EndTurn();
     }
 

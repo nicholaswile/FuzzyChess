@@ -36,6 +36,25 @@ public abstract class Piece : MonoBehaviour
         hasMoved = false;
     }
 
+    public int CorpMoveNumber()
+    {
+        GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+        if (corpType == CorpType.Left)
+            return controller.LeftCorpUsed;
+        else if (corpType == CorpType.King)
+            return controller.KingCorpUsed;
+        else return controller.RightCorpUsed;
+    }
+
+    public bool CommanderMovedOne() 
+    {
+        if (corpType == CorpType.Left)
+            return board.LeftBishopMovedOne;
+        else if (corpType == CorpType.King)
+            return board.KingMovedOne;
+        else return board.RightBishopMovedOne;
+    }
+
     public void SetMaterial(Material material, Material material2) 
     {
         materialSetter.SetPieceMaterials(material, material2);
@@ -180,6 +199,27 @@ public abstract class Piece : MonoBehaviour
             }
         }
         return adjacentEnemySquares;
+    }
+
+    public List<Vector2Int> GetAdjacentSquares(Vector2Int coords)
+    {
+        List<Vector2Int> adjacentSquares = new List<Vector2Int>();
+
+        foreach (var direction in directions)
+        {
+            Vector2Int nextDirection = coords + direction;
+            Piece piece = board.GetPieceOnSquare(nextDirection);
+            if (!board.CheckIfCoordsAreOnBoard(nextDirection))
+                continue;
+            else if (piece)
+                continue;
+            else if (piece == null)
+            {
+                adjacentSquares.Add(nextDirection);
+                continue;
+            }
+        }
+        return adjacentSquares;
     }
 
     public bool HasAdjacentEnemySquares(Vector2Int coords) 
