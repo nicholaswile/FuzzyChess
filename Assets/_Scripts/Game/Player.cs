@@ -13,7 +13,9 @@ public class Player
     public CorpType currentCorp { get; set; }
     public Team team { get; set; }
     public ChessBoard board { get; set; }
-
+    private bool leftBishopIsDead = false, rightBishopIsDead = false;
+    public bool LeftBishopIsDead { get { return leftBishopIsDead; } set { leftBishopIsDead = value; } }
+    public bool RightBishopIsDead { get { return rightBishopIsDead; } set { rightBishopIsDead = value; } }
     public Player(Team team, ChessBoard board, CorpType currentCorp) 
     {
         ActivePieces = new List<Piece>();

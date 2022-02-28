@@ -182,15 +182,26 @@ public class GameController : MonoBehaviour
                 ((piece.AvailableMoves.Count == 0 && piece.CorpMoveNumber() == 1) || piece.CorpMoveNumber() == 2))
                 i++;
         }
+        if (activePlayer.LeftBishopIsDead)
+            i++;
+        if (activePlayer.RightBishopIsDead)
+            i++;
+
         if (i == 3)
             TheGameUI.UI_Skip();
     }
 
     public void OpenCorpSelection()
     {
-        leftCorpUsed = 0;
+        if (!activePlayer.LeftBishopIsDead)
+            leftCorpUsed = 0;
+        else leftCorpUsed = 2;
+
+        if (!activePlayer.RightBishopIsDead)
+            rightCorpUsed = 0;
+        else rightCorpUsed = 2;
+
         kingCorpUsed = 0;
-        rightCorpUsed = 0;
     }
 
     private Player GetOppositePlayer(Player player)
@@ -213,6 +224,9 @@ public class GameController : MonoBehaviour
             }
         }
 
+        if (piece.pieceType == PieceType.Bishop)
+            OnBishopRemoved(piece, pieceOwner);
+
         pieceOwner.RemovePiece(piece);
         killCount++;
 
@@ -221,5 +235,32 @@ public class GameController : MonoBehaviour
             piece.MovePiece(new Vector2Int(-2 - (capturedPieces % 3), 7 - capturedPieces / 3));
         else
             piece.MovePiece(new Vector2Int(9 + (capturedPieces % 3), capturedPieces / 3));
+    }
+
+    private void OnBishopRemoved(Piece piece, Player player) 
+    {
+        if (piece.corpType == CorpType.Left) 
+        {
+            player.LeftBishopIsDead = true;
+
+            foreach (Piece leftCorpPiece in player.LeftCorpPieces) 
+            {
+                player.ActivePieces.Remove(leftCorpPiece);
+                leftCorpPiece.corpType = CorpType.King;
+                player.ActivePieces.Add(leftCorpPiece);
+            }
+        }
+
+        if (piece.corpType == CorpType.Right) 
+        {
+            player.RightBishopIsDead = true;
+
+            foreach (Piece rightCorpPiece in player.RightCorpPieces) 
+            {
+                player.ActivePieces.Remove(rightCorpPiece);
+                rightCorpPiece.corpType = CorpType.King;
+                player.ActivePieces.Add(rightCorpPiece);
+            }
+        }
     }
 }
