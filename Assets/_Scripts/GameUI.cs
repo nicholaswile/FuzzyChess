@@ -109,6 +109,7 @@ public class GameUI : MonoBehaviour
         controller.OpenCorpSelection();
 
         ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
+        cBoard.ResetCommanderData();
         skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
         skippedTurn = true;
         updateMoveList();
