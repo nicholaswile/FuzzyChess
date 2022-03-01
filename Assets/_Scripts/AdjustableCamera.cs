@@ -49,11 +49,6 @@ public class AdjustableCamera : MonoBehaviour
             else if (currentX < 270 + lockStrengthX && currentX > 270 - lockStrengthX)
                 currentX = -90;
 
-            //Lock Y if current Y is in range of these values
-            if (currentY < 40 + lockStrengthY && currentY > 40 - lockStrengthY)
-                currentY = 40;
-            else if (currentY < 89 + lockStrengthEdgeY && currentY > 89 - lockStrengthEdgeY)
-                currentY = 89;
             currentY = Mathf.Clamp(currentY, Y_ANGLE_MIN, Y_ANGLE_MAX);
         }
         if (Input.GetAxis ("Mouse ScrollWheel") > 0 && GetComponent<Camera>().fieldOfView > 36)
