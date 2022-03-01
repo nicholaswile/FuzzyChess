@@ -54,7 +54,7 @@ public class AdjustableCamera : MonoBehaviour
         {
             GetComponent<Camera>().fieldOfView -= scrollSensitivity;
         }
-        if (Input.GetAxis("Mouse ScrollWheel") < 0 && GetComponent<Camera>().fieldOfView < 60)
+        if (Input.GetAxis("Mouse ScrollWheel") < 0 && GetComponent<Camera>().fieldOfView < 80)
         {
             GetComponent<Camera>().fieldOfView += scrollSensitivity;
         }
