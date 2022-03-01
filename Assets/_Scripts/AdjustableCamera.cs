@@ -20,8 +20,7 @@ public class AdjustableCamera : MonoBehaviour
     private float sensitivityY = 2.3f;
     private float scrollSensitivity = 3.0f;
     private float lockStrengthX = 2.5f;
-    private float lockStrengthY = 1.5f;
-    private float lockStrengthEdgeY = 1.1f;
+
     private void Start()
     {
         camTransform = transform;
