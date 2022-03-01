@@ -110,6 +110,7 @@ public class GameUI : MonoBehaviour
 
         ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         cBoard.ResetCommanderData();
+
         skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
         skippedTurn = true;
         updateMoveList();
@@ -212,6 +213,12 @@ public class GameUI : MonoBehaviour
                 {
                     GameObject childCount = newListing.transform.Find("TurnNumb").gameObject;
                     childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + "<space=4.5>. ");
+                }
+                if (turnIterator == 4 || turnIterator == 10)
+                {
+                    GameObject childCount2 = newListing.transform.Find("TurnNumb").gameObject;
+                    childCount2.GetComponent<TMPro.TextMeshProUGUI>().color = new Color(1, 0, 0, 0);
+                    childCount2.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + "<space=4.5>. ");
                 }
 
                 //move update

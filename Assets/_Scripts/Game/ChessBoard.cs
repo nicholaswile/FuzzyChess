@@ -19,9 +19,9 @@ public class ChessBoard : MonoBehaviour
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
     private bool leftBishopMovedOne = false, kingMovedOne = false, rightBishopMovedOne = false;
-    public bool LeftBishopMovedOne { get { return leftBishopMovedOne; } }
-    public bool KingMovedOne { get { return kingMovedOne; } }
-    public bool RightBishopMovedOne { get { return rightBishopMovedOne; } }
+    public bool LeftBishopMovedOne { get { return leftBishopMovedOne; } set { leftBishopMovedOne = value; } }
+    public bool KingMovedOne { get { return kingMovedOne; } set { kingMovedOne = value; } }
+    public bool RightBishopMovedOne { get { return rightBishopMovedOne; } set { rightBishopMovedOne = value; } }
 
     private const string DICE = "ResultDie";
 
@@ -190,9 +190,9 @@ public class ChessBoard : MonoBehaviour
 
     public void ResetCommanderData() 
     {
-        leftBishopMovedOne = false;
-        kingMovedOne = false;
-        rightBishopMovedOne = false;
+        LeftBishopMovedOne = false;
+        KingMovedOne = false;
+        RightBishopMovedOne = false;
     }
 
     private void ShowKnightSelectionAfterMoving(Piece piece)
@@ -332,9 +332,8 @@ public class ChessBoard : MonoBehaviour
         TheGameUI.updateMoveList();
         int iteratorNum = TheGameUI.GetIteratorCount();
         if (iteratorNum % NUMBER_OF_ACTIONS == 0) 
-        {
             ResetCommanderData();
-        }
+
         controller.EndTurn();
     }
 
