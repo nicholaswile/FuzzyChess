@@ -13,6 +13,8 @@ public abstract class Piece : MonoBehaviour
     public PieceType pieceType { get; set; }
     public CorpType corpType { get; set; }
     public bool hasMoved { get; private set; }
+    private bool delegated = false;
+    public bool isDelegated { get { return delegated; } set { delegated = value; } }
     public List<Vector2Int> AvailableMoves;
 
     static Vector2Int[] directions = new Vector2Int[]

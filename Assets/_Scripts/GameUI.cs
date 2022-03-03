@@ -7,9 +7,10 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour
 {
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
-    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton;
+    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton, recallButton, delegateLeftButton, delegateRightButton;
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
+    [SerializeField] private ChessBoard board;
     public const int NUMBER_OF_ACTIONS = 6;
     private int turnCount = 1;
     private int turnIterator = 0;
@@ -39,6 +40,22 @@ public class GameUI : MonoBehaviour
 
         GameManager.StateChanged += GameManager_StateChanged;
         GameManager.RollStateChanged += GameManager_RollStateChanged;
+    }
+
+    private void Update()
+    {
+        if (board.selectedPiece != null)
+        {
+            delegateLeftButton.interactable = board.CanDelegate(CorpType.Left);
+            delegateRightButton.interactable = board.CanDelegate(CorpType.Right);
+            recallButton.interactable = board.CanRecall();
+        }
+        else if (board.selectedPiece == null) 
+        {
+            delegateLeftButton.interactable = false;
+            delegateRightButton.interactable = false;
+            recallButton.interactable = false;
+        }
     }
 
     private void GameManager_RollStateChanged(RollState state)
@@ -108,10 +125,9 @@ public class GameUI : MonoBehaviour
         GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
         controller.OpenCorpSelection();
 
-        ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
-        cBoard.ResetCommanderData();
+        board.ResetCommanderData();
 
-        skippedTurns.Add(cBoard.GetNumberOfPieceMoves());
+        skippedTurns.Add(board.GetNumberOfPieceMoves());
         skippedTurn = true;
         updateMoveList();
     }
@@ -131,6 +147,23 @@ public class GameUI : MonoBehaviour
         // Shows moves transcript
     }
 
+    public void UI_DelegateLeft()
+    {
+        CorpType corp = CorpType.Left;
+        board.Delegate(corp);
+    }
+
+    public void UI_DelegateRight()
+    {
+        CorpType corp = CorpType.Right;
+        board.Delegate(corp);
+    }
+
+    public void UI_Recall() 
+    {
+        board.Recall();
+    }
+
     public void updateMoveList()
     {
         //There are 12 total turn iterations 1 - 6 being Player Actions and 7 - 12 being Opponent Actions
@@ -139,9 +172,8 @@ public class GameUI : MonoBehaviour
         turnIterator++;
 
         //Instantiate(mainSample, ListParent.transform);
-        ChessBoard cBoard = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
-        List<string> newMoves = new List<string>(cBoard.GetNewPieceMoves());
+        List<string> newMoves = new List<string>(board.GetNewPieceMoves());
         //newMoves.ForEach(move => Debug.Log(move));
 
         //Add Skips Into newMoves list

@@ -11,7 +11,7 @@ public class ChessBoard : MonoBehaviour
     public const int BOARD_SIZE = 8;
     public const int NUMBER_OF_ACTIONS = 6;
     private Piece[,] grid;
-    private Piece selectedPiece;
+    public Piece selectedPiece;
     private GameController controller;
     private CreateHighlighters highlighter;
     private readonly List<String> pieceMoves = new List<String>();
@@ -19,6 +19,7 @@ public class ChessBoard : MonoBehaviour
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
     private bool leftBishopMovedOne = false, kingMovedOne = false, rightBishopMovedOne = false;
+    public bool pieceDelegatedThisTurn = false;
     public bool LeftBishopMovedOne { get { return leftBishopMovedOne; } set { leftBishopMovedOne = value; } }
     public bool KingMovedOne { get { return kingMovedOne; } set { kingMovedOne = value; } }
     public bool RightBishopMovedOne { get { return rightBishopMovedOne; } set { rightBishopMovedOne = value; } }
@@ -94,6 +95,87 @@ public class ChessBoard : MonoBehaviour
             selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
         }
         ShowSelectionSquares(selection);
+    }
+
+    public bool CanDelegate(CorpType corpType) 
+    {
+        Player player = controller.activePlayer;
+        if (selectedPiece.corpType == CorpType.King && selectedPiece.pieceType != PieceType.King
+            && knightHasMoved == false && pieceDelegatedThisTurn == false)
+        {
+            if (corpType == CorpType.Left && !player.LeftBishopIsDead && player.LeftCorpPieces.Count <= 6)
+                return true;
+            else if (corpType == CorpType.Right && !player.RightBishopIsDead && player.RightCorpPieces.Count <= 6)
+                return true;
+        }
+        return false;
+    }
+
+    public void Delegate(CorpType corpType) 
+    {
+        Player player = controller.activePlayer;
+        foreach (Piece corpPiece in player.KingCorpPieces) 
+        {
+            if (selectedPiece.Equals(corpPiece))
+            {
+                player.RemovePiece(selectedPiece);
+
+                if (corpType == CorpType.Left)
+                    selectedPiece.corpType = CorpType.Left;
+                else selectedPiece.corpType = CorpType.Right;
+                selectedPiece.isDelegated = true;
+
+                player.AddPiece(selectedPiece);
+                break;
+            }
+        }
+        pieceDelegatedThisTurn = true;
+        DeselectPiece();
+    }
+
+    public bool CanRecall() 
+    {
+        if (selectedPiece.corpType != CorpType.King && selectedPiece.pieceType != PieceType.Bishop
+            && knightHasMoved == false && pieceDelegatedThisTurn == false && selectedPiece.isDelegated)
+            return true;
+        else return false;
+    }
+
+    public void Recall()
+    {
+        Player player = controller.activePlayer;
+        if (selectedPiece.corpType == CorpType.Left)
+        {
+            foreach (Piece corpPiece in player.LeftCorpPieces)
+            {
+                if (selectedPiece.Equals(corpPiece))
+                {
+                    player.RemovePiece(selectedPiece);
+
+                    selectedPiece.corpType = CorpType.King;
+                    selectedPiece.isDelegated = false;
+
+                    player.AddPiece(selectedPiece);
+                    break;
+                }
+            }
+        }
+        else if (selectedPiece.corpType == CorpType.Right) 
+        {
+            foreach (Piece corpPiece in player.RightCorpPieces) 
+            {
+                if (corpPiece == selectedPiece) 
+                {
+                    player.RemovePiece(selectedPiece);
+                    selectedPiece.corpType = CorpType.King;
+                    selectedPiece.isDelegated = false;
+                    player.AddPiece(selectedPiece);
+                    break;
+                }
+            }
+        }
+        pieceDelegatedThisTurn = true;
+        DeselectPiece();
     }
 
     private void ShowSelectionSquares(List<Vector2Int> selection)
@@ -193,6 +275,7 @@ public class ChessBoard : MonoBehaviour
         LeftBishopMovedOne = false;
         KingMovedOne = false;
         RightBishopMovedOne = false;
+        pieceDelegatedThisTurn = false;
     }
 
     private void ShowKnightSelectionAfterMoving(Piece piece)

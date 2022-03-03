@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(CreatePieces))]
@@ -11,7 +12,7 @@ public class GameController : MonoBehaviour
     private CreatePieces pieceCreator;
     private Player whitePlayer;
     private Player blackPlayer;
-    private Player activePlayer;
+    public Player activePlayer;
     private int leftCorpUsed = 0, kingCorpUsed = 0, rightCorpUsed = 0;
     public int LeftCorpUsed { get { return leftCorpUsed; } }
     public int KingCorpUsed { get { return kingCorpUsed; } }
@@ -243,23 +244,22 @@ public class GameController : MonoBehaviour
         {
             player.LeftBishopIsDead = true;
 
-            foreach (Piece leftCorpPiece in player.LeftCorpPieces) 
+            foreach (Piece leftCorpPiece in player.LeftCorpPieces.ToList()) 
             {
-                player.ActivePieces.Remove(leftCorpPiece);
+                player.RemovePiece(leftCorpPiece);
                 leftCorpPiece.corpType = CorpType.King;
-                player.ActivePieces.Add(leftCorpPiece);
+                player.AddPiece(leftCorpPiece);
             }
         }
-
         if (piece.corpType == CorpType.Right) 
         {
             player.RightBishopIsDead = true;
 
-            foreach (Piece rightCorpPiece in player.RightCorpPieces) 
+            foreach (Piece rightCorpPiece in player.RightCorpPieces.ToList()) 
             {
-                player.ActivePieces.Remove(rightCorpPiece);
+                player.RemovePiece(rightCorpPiece);
                 rightCorpPiece.corpType = CorpType.King;
-                player.ActivePieces.Add(rightCorpPiece);
+                player.AddPiece(rightCorpPiece);
             }
         }
     }
