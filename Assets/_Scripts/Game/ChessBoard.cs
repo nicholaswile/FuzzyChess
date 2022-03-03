@@ -60,7 +60,8 @@ public class ChessBoard : MonoBehaviour
         Vector2Int coords = GetCoordsFromPosition(inputPosition);
         Piece piece = GetPieceOnSquare(coords);
 
-        if (piece && controller.IsTeamTurnActive(piece.team))
+        if (piece && controller.IsTeamTurnActive(piece.team) && 
+            (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
             controller.TryToChangeActiveCorp(piece.corpType);
 
         if (selectedPiece)
