@@ -367,6 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   State: 0
+  RollState: 0
 --- !u!1 &183072606
 GameObject:
   m_ObjectHideFlags: 0
@@ -1623,7 +1624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &629415126
 Transform:
   m_ObjectHideFlags: 0
@@ -3214,9 +3215,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Click on a piece. If highlighted tiles appear, click the highlighted tile
-    to move the piece to that tile. A dice roll determines whether capture is succesful.
-    Pieces are grouped in corps. Move at most three pieces per turn.
+  m_text: 'Click a piece then a highlighted tile to advance to that tile. A red tile
+    indicates a potential capture; success of capture is determined by a dice roll.
+    You may view the capture probability by pressing the ROLLS button. Pieces are
+    grouped in corps. If you select a piece you may delegate it left or right with
+    L and R buttons or recall it back to king with the K button. Move up to three
+    pieces per turn. Skip a turn by pressing SKIP. '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
@@ -3243,8 +3247,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
