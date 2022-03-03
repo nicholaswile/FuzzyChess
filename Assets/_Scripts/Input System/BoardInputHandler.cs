@@ -7,13 +7,16 @@ using UnityEngine;
 public class BoardInputHandler : MonoBehaviour, InputHandler
 {
     private ChessBoard board;
+    private GameController controller;
 
     private void Awake()
     {
         board = GetComponent<ChessBoard>();
+        controller = GameObject.Find("Game Controller").GetComponent<GameController>();
     }
     public void ProcessInput(Vector3 inputPosition, GameObject selectedObject, Action callback)
     {
-        board.OnSquareSelected(inputPosition);
+        if(controller.activePlayer == controller.whitePlayer)
+            board.OnSquareSelected(inputPosition);
     }
 }
