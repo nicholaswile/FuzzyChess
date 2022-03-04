@@ -118,22 +118,25 @@ public class GameUI : MonoBehaviour
         Debug.Log("Skip");
 
         GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
-        controller.OpenCorpSelection();
-
-        board.ResetCommanderData();
 
         skippedTurns.Add(board.GetNumberOfPieceMoves());
         skippedTurn = true;
         updateMoveList();
 
         // Code to handle what happens before the player can skip
-        if (GameManager.Instance.State == GameState.PlayerTurn) 
+        if (GameManager.Instance.State == GameState.PlayerTurn)
         {
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
+            controller.OpenCorpSelection();
+            board.ResetCommanderData();
             AIController.AI_TakeTurn();
         }
         else if (GameManager.Instance.State == GameState.EnemyTurn) 
+        {
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+            controller.OpenCorpSelection();
+            board.ResetCommanderData();
+        }
     }
 
     //Heavily modified - TW
