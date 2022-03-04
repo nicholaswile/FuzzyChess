@@ -1313,6 +1313,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   board: {fileID: 3251708720669913377}
   controller: {fileID: 1910887914}
+  gameUI: {fileID: 1110243825}
 --- !u!1 &448670477
 GameObject:
   m_ObjectHideFlags: 0
@@ -3160,6 +3161,7 @@ MonoBehaviour:
   delegateLeftButton: {fileID: 1477967673}
   delegateRightButton: {fileID: 300541674}
   board: {fileID: 3251708720669913377}
+  AIController: {fileID: 399369155}
 --- !u!1 &1118941302
 GameObject:
   m_ObjectHideFlags: 0
