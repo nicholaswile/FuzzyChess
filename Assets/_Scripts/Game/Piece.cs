@@ -62,6 +62,18 @@ public abstract class Piece : MonoBehaviour
         materialSetter.SetPieceMaterials(material, material2);
     }
 
+    //made for corp identification
+    public void SetColor()
+    {
+        materialSetter.ChangePieceColor();
+    }
+
+    //made for corp identification
+    public void RevertColor()
+    {
+        materialSetter.RevertPieceColor();
+    }
+
     public bool IsFromSameTeam(Piece piece) 
     {
         return team == piece.team;
