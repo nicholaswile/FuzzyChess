@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class MaterialSetter : MonoBehaviour
 {
+    private Color BlackColor = new Color(0.4056604f, 0.08824264f, 0.009567461f, 1f);
+    private Color WhiteColor = Color.white;
+    private Color CorpColor = new Color(.6f, .6f, .6f, 1f);
     private MeshRenderer _meshRenderer;
     private MeshRenderer meshRenderer
     {
@@ -27,13 +30,16 @@ public class MaterialSetter : MonoBehaviour
     //made for corp identification
     public void ChangePieceColor()
     {
-        meshRenderer.materials[1].color = Color.blue;
+        meshRenderer.materials[1].color = CorpColor;
     }
 
     //made for corp identification
-    public void RevertPieceColor()
+    public void RevertPieceColor(Piece piece)
     {
-        meshRenderer.materials[1].color = Color.white;
+        if (piece.team == Team.White)
+            meshRenderer.materials[1].color = WhiteColor;
+        else
+            meshRenderer.materials[1].color = BlackColor;
     }
 
     public void SetAnyMaterial(Material material)

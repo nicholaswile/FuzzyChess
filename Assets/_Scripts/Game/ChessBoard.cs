@@ -96,7 +96,7 @@ public class ChessBoard : MonoBehaviour
         {
             foreach (Piece corpPiece in player.RightCorpPieces)
             {
-                    corpPiece.SetColor();
+                corpPiece.SetColor();
             }
             foreach (Piece corpPiece in player.LeftCorpPieces)
             {

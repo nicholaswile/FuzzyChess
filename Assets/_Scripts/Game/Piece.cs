@@ -71,7 +71,7 @@ public abstract class Piece : MonoBehaviour
     //made for corp identification
     public void RevertColor()
     {
-        materialSetter.RevertPieceColor();
+        materialSetter.RevertPieceColor(this);
     }
 
     public bool IsFromSameTeam(Piece piece) 
