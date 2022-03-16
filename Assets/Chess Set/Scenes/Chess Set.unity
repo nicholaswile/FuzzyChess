@@ -6347,7 +6347,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bottomLeftMarker: {fileID: 1741964062}
   squareSize: 0.06
+  selectedPiece: {fileID: 0}
   pieceDelegatedThisTurn: 0
+  material1: {fileID: 0}
+  material2: {fileID: 0}
 --- !u!114 &3251708720669913378
 MonoBehaviour:
   m_ObjectHideFlags: 0
