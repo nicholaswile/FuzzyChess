@@ -11,6 +11,7 @@ public class GameUI : MonoBehaviour
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     [SerializeField] private ChessBoard board;
+    [SerializeField] private AIController AIController;
     public const int NUMBER_OF_ACTIONS = 6;
     private int turnCount = 1;
     private int turnIterator = 0;
@@ -116,20 +117,26 @@ public class GameUI : MonoBehaviour
     {
         Debug.Log("Skip");
 
-        // Code to handle what happens before the player can skip
-        if (GameManager.Instance.State == GameState.PlayerTurn)
-            GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
-        else if (GameManager.Instance.State == GameState.EnemyTurn)
-            GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
-
         GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
-        controller.OpenCorpSelection();
-
-        board.ResetCommanderData();
 
         skippedTurns.Add(board.GetNumberOfPieceMoves());
         skippedTurn = true;
         updateMoveList();
+
+        // Code to handle what happens before the player can skip
+        if (GameManager.Instance.State == GameState.PlayerTurn)
+        {
+            GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
+            controller.OpenCorpSelection();
+            board.ResetCommanderData();
+            AIController.AI_TakeTurn();
+        }
+        else if (GameManager.Instance.State == GameState.EnemyTurn)
+        {
+            GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+            controller.OpenCorpSelection();
+            board.ResetCommanderData();
+        }
     }
 
     //Heavily modified - TW

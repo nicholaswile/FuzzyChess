@@ -60,8 +60,7 @@ public class ChessBoard : MonoBehaviour
         Vector2Int coords = GetCoordsFromPosition(inputPosition);
         Piece piece = GetPieceOnSquare(coords);
 
-        if (piece && controller.IsTeamTurnActive(piece.team) && 
-            (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
+        if (isSelectable(piece) && piece)
             controller.TryToChangeActiveCorp(piece.corpType);
 
         if (selectedPiece)
@@ -69,8 +68,7 @@ public class ChessBoard : MonoBehaviour
             if (piece != null && selectedPiece == piece && knightHasMoved == false)
                 DeselectPiece();
 
-            else if (piece != null && selectedPiece != piece && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false && 
-                (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
+            else if (piece != null && selectedPiece != piece && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false && isSelectable(piece))
                 SelectPiece(piece, piece.corpType);
 
             else if (selectedPiece.CanMoveTo(coords))
@@ -80,8 +78,7 @@ public class ChessBoard : MonoBehaviour
         }
         else
         {
-            if (piece != null && controller.IsTeamTurnActive(piece.team) && controller.IsCorpTurnActive(piece.corpType) &&
-                (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
+            if (piece != null && controller.IsCorpTurnActive(piece.corpType) && isSelectable(piece))
                 SelectPiece(piece, piece.corpType);
         }
     }
@@ -145,6 +142,14 @@ public class ChessBoard : MonoBehaviour
             selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
         }
         ShowSelectionSquares(selection);
+    }
+
+    public bool isSelectable(Piece piece)
+    {
+        if (piece && controller.IsTeamTurnActive(piece.team) &&
+            (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
+            return true;
+        else return false;
     }
 
     public bool CanDelegate(CorpType corpType) 

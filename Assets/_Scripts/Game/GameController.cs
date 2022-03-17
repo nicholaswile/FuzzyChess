@@ -9,9 +9,10 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private Layout layoutAtStart;
     [SerializeField] private ChessBoard board;
+    [SerializeField] private AIController AIController;
     private CreatePieces pieceCreator;
-    private Player whitePlayer;
-    private Player blackPlayer;
+    public Player whitePlayer;
+    public Player blackPlayer;
     public Player activePlayer;
     private int leftCorpUsed = 0, kingCorpUsed = 0, rightCorpUsed = 0;
     public int LeftCorpUsed { get { return leftCorpUsed; } }
@@ -168,6 +169,7 @@ public class GameController : MonoBehaviour
         {
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
             OpenCorpSelection();
+            AIController.AI_TakeTurn();
         }
         else if (GameManager.Instance.State == GameState.EnemyTurn && iteratorNum % NUMBER_OF_ACTIONS == 0)
         {
