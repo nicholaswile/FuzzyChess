@@ -60,7 +60,6 @@ public class ChessBoard : MonoBehaviour
         Vector2Int coords = GetCoordsFromPosition(inputPosition);
         Piece piece = GetPieceOnSquare(coords);
 
-
         if (piece && controller.IsTeamTurnActive(piece.team) && 
             (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
             controller.TryToChangeActiveCorp(piece.corpType);
@@ -248,28 +247,30 @@ public class ChessBoard : MonoBehaviour
     public void DeselectPiece()
     {
         Player player = controller.activePlayer;
-        Debug.Log(selectedPiece.ToString());
 
         //removes color once a piece is deselected outside of changing to another piece
-        if (selectedPiece.corpType == CorpType.Right)
+        if (selectedPiece)
         {
-            foreach (Piece corpPiece in player.RightCorpPieces)
+            if (selectedPiece.corpType == CorpType.Right)
             {
-                corpPiece.RevertColor();
+                foreach (Piece corpPiece in player.RightCorpPieces)
+                {
+                    corpPiece.RevertColor();
+                }
             }
-        }
-        else if (selectedPiece.corpType == CorpType.King)
-        {
-            foreach (Piece corpPiece in player.KingCorpPieces)
+            else if (selectedPiece.corpType == CorpType.King)
             {
-                corpPiece.RevertColor();
+                foreach (Piece corpPiece in player.KingCorpPieces)
+                {
+                    corpPiece.RevertColor();
+                }
             }
-        }
-        else if (selectedPiece.corpType == CorpType.Left)
-        {
-            foreach (Piece corpPiece in player.LeftCorpPieces)
+            else if (selectedPiece.corpType == CorpType.Left)
             {
-                corpPiece.RevertColor();
+                foreach (Piece corpPiece in player.LeftCorpPieces)
+                {
+                    corpPiece.RevertColor();
+                }
             }
         }
 

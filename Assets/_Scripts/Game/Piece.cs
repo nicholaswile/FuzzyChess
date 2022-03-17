@@ -65,7 +65,7 @@ public abstract class Piece : MonoBehaviour
     //made for corp identification
     public void SetColor()
     {
-        materialSetter.ChangePieceColor();
+        materialSetter.ChangePieceColor(this);
     }
 
     //made for corp identification

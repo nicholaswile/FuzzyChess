@@ -9,7 +9,8 @@ public class MaterialSetter : MonoBehaviour
 {
     private Color BlackColor = new Color(0.4056604f, 0.08824264f, 0.009567461f, 1f);
     private Color WhiteColor = Color.white;
-    private Color CorpColor = new Color(.6f, .6f, .6f, 1f);
+    private Color BlackCorpColor = new Color(1, 1, 0, 1);
+    private Color WhiteCorpColor = new Color(.1f, .1f, 1, 1);
     private MeshRenderer _meshRenderer;
     private MeshRenderer meshRenderer
     {
@@ -28,9 +29,12 @@ public class MaterialSetter : MonoBehaviour
     }
 
     //made for corp identification
-    public void ChangePieceColor()
+    public void ChangePieceColor(Piece piece)
     {
-        meshRenderer.materials[1].color = CorpColor;
+        if (piece.team == Team.White)
+            meshRenderer.materials[1].color = WhiteCorpColor;
+        else
+            meshRenderer.materials[1].color = BlackCorpColor;
     }
 
     //made for corp identification
