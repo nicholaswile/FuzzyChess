@@ -69,7 +69,9 @@ public class ChessBoard : MonoBehaviour
                 DeselectPiece();
 
             else if (piece != null && selectedPiece != piece && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false && isSelectable(piece))
+
                 SelectPiece(piece, piece.corpType);
+
 
             else if (selectedPiece.CanMoveTo(coords))
             {
@@ -79,11 +81,13 @@ public class ChessBoard : MonoBehaviour
         else
         {
             if (piece != null && controller.IsCorpTurnActive(piece.corpType) && isSelectable(piece))
+
                 SelectPiece(piece, piece.corpType);
         }
     }
 
     private void SelectPiece(Piece piece, CorpType corpType)
+
     {
         selectedPiece = piece;
         Player player = controller.activePlayer;
@@ -144,12 +148,15 @@ public class ChessBoard : MonoBehaviour
         ShowSelectionSquares(selection);
     }
 
+
     public bool isSelectable(Piece piece)
+
     {
         if (piece && controller.IsTeamTurnActive(piece.team) &&
             (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
             return true;
         else return false;
+
     }
 
     public bool CanDelegate(CorpType corpType) 

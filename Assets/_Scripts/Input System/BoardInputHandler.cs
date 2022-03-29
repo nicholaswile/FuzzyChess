@@ -16,7 +16,9 @@ public class BoardInputHandler : MonoBehaviour, InputHandler
     }
     public void ProcessInput(Vector3 inputPosition, GameObject selectedObject, Action callback)
     {
+
         if (controller.activePlayer == controller.whitePlayer)
+
             board.OnSquareSelected(inputPosition);
     }
 }
