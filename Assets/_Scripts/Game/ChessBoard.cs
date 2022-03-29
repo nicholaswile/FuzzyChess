@@ -69,7 +69,9 @@ public class ChessBoard : MonoBehaviour
                 DeselectPiece();
 
             else if (piece != null && selectedPiece != piece && controller.IsCorpTurnActive(piece.corpType) && knightHasMoved == false && isSelectable(piece))
-                SelectPiece(piece);
+
+                SelectPiece(piece, piece.corpType);
+
 
             else if (selectedPiece.CanMoveTo(coords))
             {
@@ -79,13 +81,64 @@ public class ChessBoard : MonoBehaviour
         else
         {
             if (piece != null && controller.IsCorpTurnActive(piece.corpType) && isSelectable(piece))
-                SelectPiece(piece);
+
+                SelectPiece(piece, piece.corpType);
         }
     }
 
-    public void SelectPiece(Piece piece)
+    private void SelectPiece(Piece piece, CorpType corpType)
+
     {
         selectedPiece = piece;
+        Player player = controller.activePlayer;
+        
+        //changes color of selectedpiece's corp while removing the color of non corp pieces
+        if (selectedPiece.corpType == CorpType.Right)
+        {
+            foreach (Piece corpPiece in player.RightCorpPieces)
+            {
+                corpPiece.SetColor();
+            }
+            foreach (Piece corpPiece in player.LeftCorpPieces)
+            {
+                corpPiece.RevertColor();
+            }
+            foreach (Piece corpPiece in player.KingCorpPieces)
+            {
+                corpPiece.RevertColor();
+            }
+        }
+        else if (selectedPiece.corpType == CorpType.King)
+        {
+            foreach (Piece corpPiece in player.KingCorpPieces)
+            {
+                corpPiece.SetColor();
+            }
+            foreach (Piece corpPiece in player.LeftCorpPieces)
+            {
+                corpPiece.RevertColor();
+            }
+            foreach (Piece corpPiece in player.RightCorpPieces)
+            {
+                corpPiece.RevertColor();
+            }
+        }
+        else if (selectedPiece.corpType == CorpType.Left)
+        {
+            foreach (Piece corpPiece in player.LeftCorpPieces)
+            {
+                corpPiece.SetColor();
+            }
+            foreach (Piece corpPiece in player.KingCorpPieces)
+            {
+                corpPiece.RevertColor();
+            }
+            foreach (Piece corpPiece in player.RightCorpPieces)
+            {
+                corpPiece.RevertColor();
+            }
+        }
+
         List<Vector2Int> selection = selectedPiece.AvailableMoves;
         if (selectedPiece.CorpMoveNumber() > 0 && !selectedPiece.CommanderMovedOne()) 
         {
@@ -95,7 +148,9 @@ public class ChessBoard : MonoBehaviour
         ShowSelectionSquares(selection);
     }
 
-    public bool isSelectable(Piece piece) 
+
+    public bool isSelectable(Piece piece)
+
     {
         if (piece && controller.IsTeamTurnActive(piece.team) &&
             (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
@@ -203,6 +258,34 @@ public class ChessBoard : MonoBehaviour
 
     public void DeselectPiece()
     {
+        Player player = controller.activePlayer;
+
+        //removes color once a piece is deselected outside of changing to another piece
+        if (selectedPiece)
+        {
+            if (selectedPiece.corpType == CorpType.Right)
+            {
+                foreach (Piece corpPiece in player.RightCorpPieces)
+                {
+                    corpPiece.RevertColor();
+                }
+            }
+            else if (selectedPiece.corpType == CorpType.King)
+            {
+                foreach (Piece corpPiece in player.KingCorpPieces)
+                {
+                    corpPiece.RevertColor();
+                }
+            }
+            else if (selectedPiece.corpType == CorpType.Left)
+            {
+                foreach (Piece corpPiece in player.LeftCorpPieces)
+                {
+                    corpPiece.RevertColor();
+                }
+            }
+        }
+
         selectedPiece = null;
         highlighter.ClearMoves();
     }
@@ -292,7 +375,7 @@ public class ChessBoard : MonoBehaviour
         List<Vector2Int> newKnightMoves = piece.GetAdjacentEnemySquares(piece.occupiedSquare);
         piece.AvailableMoves.AddRange(newKnightMoves);
         piece.AvailableMoves.Add(piece.occupiedSquare);
-        SelectPiece(piece);
+        SelectPiece(piece, piece.corpType);
     }
 
     private void TryToTakeOppositePiece(Vector2Int coords)

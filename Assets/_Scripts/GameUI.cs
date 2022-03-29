@@ -131,7 +131,9 @@ public class GameUI : MonoBehaviour
             board.ResetCommanderData();
             AIController.AI_TakeTurn();
         }
-        else if (GameManager.Instance.State == GameState.EnemyTurn) 
+
+        else if (GameManager.Instance.State == GameState.EnemyTurn)
+
         {
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
             controller.OpenCorpSelection();

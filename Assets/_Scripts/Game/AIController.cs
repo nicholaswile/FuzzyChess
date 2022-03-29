@@ -8,14 +8,17 @@ public class AIController : MonoBehaviour
     [SerializeField] private ChessBoard board;
     [SerializeField] private GameController controller;
     [SerializeField] private GameUI gameUI;
+
     private List<Vector2Int> potentialCaptures = new List<Vector2Int>();
 
     //capturePairs<coordinates of piece in danger of being captured, list of coordinates of pieces that may capture the key piece> 
     private Dictionary<Vector2Int, List<Vector2Int>> capturePairs = new Dictionary<Vector2Int,List<Vector2Int>>();
 
+
     private IEnumerator AI_TakeTurn_Coroutine()
     {
         List<Piece> activeCorpPieces = controller.blackPlayer.KingCorpPieces;
+
         List<Piece> enemyPieces = controller.whitePlayer.ActivePieces;
 
         //use method PotentialCaptureFinder to determine which enemy pieces are able to capture friendly pieces
@@ -38,17 +41,21 @@ public class AIController : MonoBehaviour
         while (controller.activePlayer == controller.blackPlayer)
         {
                 foreach (Piece corpPiece in activeCorpPieces.ToList())
+
             {
                 Vector3 piecePosition = board.GetPositionFromCoords(corpPiece.occupiedSquare);
 
                 if (board.isSelectable(corpPiece) && corpPiece.AvailableMoves.Count > 0)
                 {
+
                     //Debug.Log(corpPiece.AvailableMoves.Count);
+
                     yield return new WaitForSeconds(1);
                     board.OnSquareSelected(piecePosition);
 
                     foreach (Vector2Int move in corpPiece.AvailableMoves.ToList())
                     {
+
                         //see if we can detect that a "take" is available.
                         //Debug.Log(move);
                         //Piece piece = board.GetPieceOnSquare(move);
@@ -58,6 +65,7 @@ public class AIController : MonoBehaviour
                         foreach (Vector2Int move in corpPiece.AvailableMoves.ToList())
                     {
                         //Debug.Log(move);
+
                         Vector3 movePosition = board.GetPositionFromCoords(move);
 
                         yield return new WaitForSeconds(1);
@@ -76,6 +84,7 @@ public class AIController : MonoBehaviour
                 activeCorpPieces = controller.blackPlayer.KingCorpPieces;
         }
     }
+
 
     //Creates a list of type Vector2Int which stores all the locations of pieces which a knight may roll a +1 on capture.
     //This was created because knight movement in AvailableMoves doesn't list places a knight may move to, then capture around.
@@ -190,6 +199,7 @@ public class AIController : MonoBehaviour
             }
         }
     }
+
 
     public void AI_TakeTurn() 
     {

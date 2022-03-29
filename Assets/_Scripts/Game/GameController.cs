@@ -38,6 +38,8 @@ public class GameController : MonoBehaviour
     {
         if (state == GameState.PlayerTurn || state == GameState.EnemyTurn)
         {
+            foreach (Piece piece in activePlayer.ActivePieces)
+                piece.RevertColor();
             ChangeActiveTeam();
         }
     }
