@@ -15,6 +15,8 @@ public class ChessBoard : MonoBehaviour
     private GameController controller;
     private CreateHighlighters highlighter;
     private readonly List<String> pieceMoves = new List<String>();
+    //same as the above list, but serves a different purpose
+    private List<Vector2Int> pieceMoves2 = new List<Vector2Int>();
 
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
@@ -301,6 +303,7 @@ public class ChessBoard : MonoBehaviour
         {
             String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
             pieceMoves.Add(test);
+            pieceMoves2.Add(coords);
         }
 
         if (!canCapture || willCapture)
@@ -324,6 +327,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+    //see if commander used its authority in its move or not
     private void CheckIfCommanderMovedOne(Vector2Int coords) 
     {
         if (selectedPiece.pieceType == PieceType.King && MovedOneSquare(coords) && selectedPiece.CorpMoveNumber() == 0 && commanderAttemptedKill == false)
@@ -336,6 +340,23 @@ public class ChessBoard : MonoBehaviour
             rightBishopMovedOne = true;
 
         commanderAttemptedKill = false;
+    }
+
+    //simply changes the commandermovedone bool to false
+    public void UndoCommanderMovedOne(Piece piece)
+    {
+        if (piece.corpType == CorpType.King)
+        {
+            kingMovedOne = false;
+        }
+        else if (piece.corpType == CorpType.Left)
+        {
+            leftBishopMovedOne = false;
+        }
+        else if (piece.corpType == CorpType.Right)
+        {
+            rightBishopMovedOne = false;
+        }
     }
 
     private bool MovedOneSquare(Vector2Int coords) 
@@ -535,6 +556,11 @@ public class ChessBoard : MonoBehaviour
         return pieceMoves.Count;
     }
 
+    public int GetNumberOfUndoPieceMoves()
+    {
+        return pieceMoves2.Count;
+    }
+
     public bool HasPiece(Piece piece)
     {
         for (int i = 0; i < BOARD_SIZE; i++)
@@ -552,6 +578,15 @@ public class ChessBoard : MonoBehaviour
     {
         if (CheckIfCoordsAreOnBoard(coords))
             grid[coords.x, coords.y] = piece;
+    }
+
+    //TW - same as below, but created to ensure compatibility. removes last entry from list when called.
+    public List<Vector2Int> GetUndoPieceMoves()
+    {
+
+        List<Vector2Int> newPieceMoves = new List<Vector2Int>(pieceMoves2);
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        return newPieceMoves;
     }
 
     //TW - public method to return array which only contains new piece movements, 

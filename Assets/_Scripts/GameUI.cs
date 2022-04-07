@@ -113,6 +113,35 @@ public class GameUI : MonoBehaviour
         // Quits to soft start / main menu
     }
 
+    //TW - 4/7/22
+    //add undo button, which will store the moves from the current player turn, allowing move-by-move undoing.
+    //Everything's a hurdle...
+    public void UI_Undo()
+    {
+        Debug.Log("Undo");
+
+        if(board.GetNumberOfUndoPieceMoves() >= 1)
+        {
+            //this isn't enough. need current position AND original position.
+            List<Vector2Int> movelist = new List<Vector2Int>(board.GetUndoPieceMoves());
+            Piece piece = board.GetPieceOnSquare(new Vector2Int(3, 2));
+            Debug.Log(piece);
+            //regenerate the list of available moves for the specified piece
+            piece.AvailableMoves = piece.FindAvailableSquares();
+            //reset the fact that the piece has moved
+            piece.setHasMoved(false);
+            //reduce the number of moves which the piece's corp has taken
+            piece.ReduceCorpMoveNumber();
+            //if the corp move number has been returned to 0, the commander may now use his "move 1 without expending authority" again.
+            if (piece.CorpMoveNumber() == 0)
+                board.UndoCommanderMovedOne(piece);
+            //reduce the turn iterator by 1 to indicate the active player has gained a move back
+            turnIterator--;
+            Debug.Log(piece.hasMoved);
+            Debug.Log(piece.CorpMoveNumber());
+        }
+    }
+
     public void UI_Skip()
     {
         Debug.Log("Skip");
