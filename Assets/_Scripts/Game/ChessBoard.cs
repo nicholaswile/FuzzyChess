@@ -17,6 +17,7 @@ public class ChessBoard : MonoBehaviour
     private readonly List<String> pieceMoves = new List<String>();
     //same as the above list, but serves a different purpose
     private List<Vector2Int> pieceMoves2 = new List<Vector2Int>();
+    private bool pieceTaken = false;
 
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
@@ -305,9 +306,16 @@ public class ChessBoard : MonoBehaviour
             pieceMoves.Add(test);
             //stores name of piece, the new coordinates, the old coordinates, in format: name|newcoords|oldcoords
             //String fullString = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare.ToString();
+
             //stores vector2int of new coords and original coords, in that order
-            pieceMoves2.Add(coords);
-            pieceMoves2.Add(piece.occupiedSquare);
+            //also checks to make sure the piece being added to the "undoable" list hasn't attacked. if it has, then it can't undo its move.
+            if(!pieceTaken)
+            {
+                pieceMoves2.Add(coords);
+                pieceMoves2.Add(piece.occupiedSquare);
+            }
+
+            pieceTaken = false;
         }
 
         if (!canCapture || willCapture)
@@ -503,6 +511,9 @@ public class ChessBoard : MonoBehaviour
             if (selectedPiece.pieceType == PieceType.Bishop || selectedPiece.pieceType == PieceType.King)
                 commanderAttemptedKill = true;
 
+            //this is a check for the undolist to indicate an attack was made on this move
+            pieceTaken = true;
+
             if (take) { willCapture = true; TakePiece(piece); }
             //edited by TW
             else {
@@ -529,8 +540,12 @@ public class ChessBoard : MonoBehaviour
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
         TheGameUI.updateMoveList();
         int iteratorNum = TheGameUI.GetIteratorCount();
-        if (iteratorNum % NUMBER_OF_ACTIONS == 0) 
+        if (iteratorNum % NUMBER_OF_ACTIONS == 0)
+        {
             ResetCommanderData();
+            //prevents the "undo" button from being used after a player's turn is up.
+            pieceMoves2.Clear();
+        }
 
         controller.EndTurn();
     }

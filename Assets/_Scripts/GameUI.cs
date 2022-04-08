@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour
 {
     [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
-    [SerializeField] private Button exitButton, skipButton, moveButton, camButton, rollButton, recallButton, delegateLeftButton, delegateRightButton;
+    [SerializeField] private Button exitButton, skipButton, undoButton, moveButton, camButton, rollButton, recallButton, delegateLeftButton, delegateRightButton;
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     [SerializeField] private ChessBoard board;
@@ -20,6 +20,7 @@ public class GameUI : MonoBehaviour
     private string pieceColor = "White";
     private bool pieceTaken = false;
     private bool pieceTakeFail = false;
+    private List<GameObject> moveListObjects = new List<GameObject> ();
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -80,6 +81,7 @@ public class GameUI : MonoBehaviour
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
         skipButton.interactable = (state == GameState.PlayerTurn);
+        undoButton.interactable = (state == GameState.PlayerTurn);
         //moveButton.interactable = (state == GameState.PlayerTurn);
         //camButton.interactable = (state == GameState.PlayerTurn);
         rollButton.interactable = (state == GameState.PlayerTurn);
@@ -98,8 +100,12 @@ public class GameUI : MonoBehaviour
         captureTable.SetActive(!open);
         exitButton.interactable = open;
         skipButton.interactable = open;
+        undoButton.interactable = open;
         moveButton.interactable = open;
         camButton.interactable = open;
+
+        //closes the moveslist in case its open, as it covers the rolls menu
+        movesList.SetActive(false);
     }
 
     public void UI_Exit()
@@ -115,7 +121,7 @@ public class GameUI : MonoBehaviour
 
     //TW - 4/7/22
     //add undo button, which will store the moves from the current player turn, allowing move-by-move undoing.
-    //Everything's a hurdle...
+    //Complete!
     public void UI_Undo()
     {
         Debug.Log("Undo");
@@ -124,23 +130,19 @@ public class GameUI : MonoBehaviour
         {
             //fetches a list of vector2ints containing the latest move, [0] = new, [1] = old
             List<Vector2Int> LatestMove = new List<Vector2Int>(board.GetUndoPieceMoves());
-            Debug.Log(LatestMove[0]);
-            Debug.Log(LatestMove[1]);
+
+
+            List<GameObject> moveListList = new List<GameObject>();
 
 
             Piece piece = board.GetPieceOnSquare(LatestMove[0]);
-            Debug.Log("name of piece gathered from list of moves: " + piece);
 
             //get the literal position in unity of the square the undo piece is on
             //Vector3 piecePosition = board.GetPositionFromCoords(piece.occupiedSquare);
+
             //send the standard command for moving the piece backwards
             board.UpdateBoardOnPieceMove(LatestMove[1], piece.occupiedSquare, piece, null);
             piece.MovePiece(LatestMove[1]);
-            //board.OnSquareSelected(piecePosition);
-            //board.OnSquareSelected(board.GetPositionFromCoords(LatestMove[1]));
-
-            //Piece piece = board.GetPieceOnSquare(new Vector2Int(3, 2));
-            //Debug.Log(piece);
 
             //regenerate the list of available moves for the specified piece
             piece.AvailableMoves = piece.FindAvailableSquares();
@@ -158,8 +160,23 @@ public class GameUI : MonoBehaviour
             //reduce the turn iterator by 1 to indicate the active player has gained a move back
             turnIterator--;
 
-            Debug.Log(piece.hasMoved);
-            Debug.Log(piece.CorpMoveNumber());
+            //delete the movelist entry for the undone move
+            //turn the information about the move into a string which matches the chess notation name of the move. I.E. a piece moved to [1, 2] would become "b3"
+            string moveCNotation = MakeChessNotation[LatestMove[0].x.ToString()] + (LatestMove[0].y + 1);
+
+            //searches through the list of gameobjects that directly reference the listings on the movelist. adds all objects with the specified name to a new list
+            foreach (GameObject CMove in moveListObjects)
+            {
+                if (CMove.name == moveCNotation)
+                {
+                    moveListList.Add(CMove);
+                }
+            }
+
+            //deletes the last found instance of the requested named game object
+            Destroy(moveListList[moveListList.Count - 1]);
+            moveListObjects.Remove(moveListList[moveListList.Count - 1]);
+
             Debug.Log("Successfully undone move by: " + piece.pieceType.ToString());
         }
     }
@@ -300,6 +317,10 @@ public class GameUI : MonoBehaviour
                 Debug.Log(movesArr[0]);
                 Debug.Log(movesArr[1]);
 
+                //sets the listing's name so it may be searched for easily.
+                newListing.name = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+                //newListing.tag = "MoveList";
+
                 //Apply turn number to only the beginning action for each player
                 if (turnIterator == 1 || turnIterator == 7)
                 {
@@ -351,6 +372,7 @@ public class GameUI : MonoBehaviour
             }
             if (numberOfSkips != 1)
                 newListing.SetActive(true);
+            moveListObjects.Add(newListing);
         }
         //Debug.Log(newMoves);
     }

@@ -2660,7 +2660,7 @@ GameObject:
   - component: {fileID: 899485764}
   m_Layer: 0
   m_Name: MainSample
-  m_TagString: Untagged
+  m_TagString: MoveList
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3287,6 +3287,7 @@ MonoBehaviour:
   chessBoard: {fileID: 3251708720669913376}
   exitButton: {fileID: 1525626005}
   skipButton: {fileID: 585836507}
+  undoButton: {fileID: 175460768}
   moveButton: {fileID: 848162115}
   camButton: {fileID: 1361801914}
   rollButton: {fileID: 1627954913}

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - floor
   - RollingCamera
+  - MoveList
   layers:
   - Default
   - TransparentFX
