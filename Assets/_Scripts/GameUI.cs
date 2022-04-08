@@ -122,23 +122,45 @@ public class GameUI : MonoBehaviour
 
         if(board.GetNumberOfUndoPieceMoves() >= 1)
         {
-            //this isn't enough. need current position AND original position.
-            List<Vector2Int> movelist = new List<Vector2Int>(board.GetUndoPieceMoves());
-            Piece piece = board.GetPieceOnSquare(new Vector2Int(3, 2));
-            Debug.Log(piece);
+            //fetches a list of vector2ints containing the latest move, [0] = new, [1] = old
+            List<Vector2Int> LatestMove = new List<Vector2Int>(board.GetUndoPieceMoves());
+            Debug.Log(LatestMove[0]);
+            Debug.Log(LatestMove[1]);
+
+
+            Piece piece = board.GetPieceOnSquare(LatestMove[0]);
+            Debug.Log("name of piece gathered from list of moves: " + piece);
+
+            //get the literal position in unity of the square the undo piece is on
+            //Vector3 piecePosition = board.GetPositionFromCoords(piece.occupiedSquare);
+            //send the standard command for moving the piece backwards
+            board.UpdateBoardOnPieceMove(LatestMove[1], piece.occupiedSquare, piece, null);
+            piece.MovePiece(LatestMove[1]);
+            //board.OnSquareSelected(piecePosition);
+            //board.OnSquareSelected(board.GetPositionFromCoords(LatestMove[1]));
+
+            //Piece piece = board.GetPieceOnSquare(new Vector2Int(3, 2));
+            //Debug.Log(piece);
+
             //regenerate the list of available moves for the specified piece
             piece.AvailableMoves = piece.FindAvailableSquares();
+
             //reset the fact that the piece has moved
             piece.setHasMoved(false);
+
             //reduce the number of moves which the piece's corp has taken
             piece.ReduceCorpMoveNumber();
+
             //if the corp move number has been returned to 0, the commander may now use his "move 1 without expending authority" again.
             if (piece.CorpMoveNumber() == 0)
                 board.UndoCommanderMovedOne(piece);
+
             //reduce the turn iterator by 1 to indicate the active player has gained a move back
             turnIterator--;
+
             Debug.Log(piece.hasMoved);
             Debug.Log(piece.CorpMoveNumber());
+            Debug.Log("Successfully undone move by: " + piece.pieceType.ToString());
         }
     }
 

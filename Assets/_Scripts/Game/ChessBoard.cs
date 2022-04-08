@@ -303,7 +303,11 @@ public class ChessBoard : MonoBehaviour
         {
             String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
             pieceMoves.Add(test);
+            //stores name of piece, the new coordinates, the old coordinates, in format: name|newcoords|oldcoords
+            //String fullString = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare.ToString();
+            //stores vector2int of new coords and original coords, in that order
             pieceMoves2.Add(coords);
+            pieceMoves2.Add(piece.occupiedSquare);
         }
 
         if (!canCapture || willCapture)
@@ -580,12 +584,21 @@ public class ChessBoard : MonoBehaviour
             grid[coords.x, coords.y] = piece;
     }
 
-    //TW - same as below, but created to ensure compatibility. removes last entry from list when called.
+    //TW - sends a vector2int list which contains new coords and old coords, in that order.
     public List<Vector2Int> GetUndoPieceMoves()
     {
 
-        List<Vector2Int> newPieceMoves = new List<Vector2Int>(pieceMoves2);
+        //List<String> newPieceMoves = new List<String>(pieceMoves2);
+        List<Vector2Int> newPieceMoves = new List<Vector2Int>();
+        newPieceMoves.Add(pieceMoves2[pieceMoves2.Count - 2]);
+        newPieceMoves.Add(pieceMoves2[pieceMoves2.Count - 1]);
         pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        Debug.Log("Printing all moves in move list:");
+        foreach(Vector2Int move in pieceMoves2)
+        {
+            Debug.Log(move.ToString());
+        }
         return newPieceMoves;
     }
 
