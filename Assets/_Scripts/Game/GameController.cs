@@ -242,6 +242,26 @@ public class GameController : MonoBehaviour
             piece.MovePiece(new Vector2Int(9 + (capturedPieces % 3), capturedPieces / 3));
     }
 
+    //reduces the corp move number by 1 to allow a reverted piece to move again
+    public void revertCorpMove(String a)
+    {
+        if( a == null)
+        {
+            return;
+        }
+        if(a.Equals("Left"))
+        {
+            leftCorpUsed--;
+        } else if(a.Equals("Right"))
+        {
+            rightCorpUsed--;
+        } else if (a.Equals("King"))
+        {
+            kingCorpUsed--;
+        }
+    }
+
+
     private void OnBishopRemoved(Piece piece, Player player) 
     {
         if (piece.corpType == CorpType.Left) 

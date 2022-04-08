@@ -48,6 +48,17 @@ public abstract class Piece : MonoBehaviour
         else return controller.RightCorpUsed;
     }
 
+    //reduces the number of the specified piece's corp moves by 1 to allow for another movement.
+    public void ReduceCorpMoveNumber()
+    {
+        GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+        if (corpType == CorpType.Left)
+            controller.revertCorpMove("Left");
+        else if (corpType == CorpType.King)
+            controller.revertCorpMove("King");
+        else controller.revertCorpMove("Right");
+    }
+
     public bool CommanderMovedOne() 
     {
         if (corpType == CorpType.Left)
@@ -96,6 +107,12 @@ public abstract class Piece : MonoBehaviour
         hasMoved = true;
 
         MoveTo(transform, targetPosition);
+    }
+
+    //a setter for hasMoved, since its private.
+    public void setHasMoved(bool a)
+    {
+        hasMoved = a;
     }
 
     protected void TryToAddMove(Vector2Int coords) 

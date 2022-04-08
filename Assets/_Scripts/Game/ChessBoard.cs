@@ -15,6 +15,9 @@ public class ChessBoard : MonoBehaviour
     private GameController controller;
     private CreateHighlighters highlighter;
     private readonly List<String> pieceMoves = new List<String>();
+    //same as the above list, but serves a different purpose
+    private List<Vector2Int> pieceMoves2 = new List<Vector2Int>();
+    private bool pieceTaken = false;
 
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
@@ -301,6 +304,18 @@ public class ChessBoard : MonoBehaviour
         {
             String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
             pieceMoves.Add(test);
+            //stores name of piece, the new coordinates, the old coordinates, in format: name|newcoords|oldcoords
+            //String fullString = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare.ToString();
+
+            //stores vector2int of new coords and original coords, in that order
+            //also checks to make sure the piece being added to the "undoable" list hasn't attacked. if it has, then it can't undo its move.
+            if(!pieceTaken)
+            {
+                pieceMoves2.Add(coords);
+                pieceMoves2.Add(piece.occupiedSquare);
+            }
+
+            pieceTaken = false;
         }
 
         if (!canCapture || willCapture)
@@ -324,6 +339,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+    //see if commander used its authority in its move or not
     private void CheckIfCommanderMovedOne(Vector2Int coords) 
     {
         if (selectedPiece.pieceType == PieceType.King && MovedOneSquare(coords) && selectedPiece.CorpMoveNumber() == 0 && commanderAttemptedKill == false)
@@ -336,6 +352,23 @@ public class ChessBoard : MonoBehaviour
             rightBishopMovedOne = true;
 
         commanderAttemptedKill = false;
+    }
+
+    //simply changes the commandermovedone bool to false
+    public void UndoCommanderMovedOne(Piece piece)
+    {
+        if (piece.corpType == CorpType.King)
+        {
+            kingMovedOne = false;
+        }
+        else if (piece.corpType == CorpType.Left)
+        {
+            leftBishopMovedOne = false;
+        }
+        else if (piece.corpType == CorpType.Right)
+        {
+            rightBishopMovedOne = false;
+        }
     }
 
     private bool MovedOneSquare(Vector2Int coords) 
@@ -478,6 +511,9 @@ public class ChessBoard : MonoBehaviour
             if (selectedPiece.pieceType == PieceType.Bishop || selectedPiece.pieceType == PieceType.King)
                 commanderAttemptedKill = true;
 
+            //this is a check for the undolist to indicate an attack was made on this move
+            pieceTaken = true;
+
             if (take) { willCapture = true; TakePiece(piece); }
             //edited by TW
             else {
@@ -504,8 +540,12 @@ public class ChessBoard : MonoBehaviour
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
         TheGameUI.updateMoveList();
         int iteratorNum = TheGameUI.GetIteratorCount();
-        if (iteratorNum % NUMBER_OF_ACTIONS == 0) 
+        if (iteratorNum % NUMBER_OF_ACTIONS == 0)
+        {
             ResetCommanderData();
+            //prevents the "undo" button from being used after a player's turn is up.
+            pieceMoves2.Clear();
+        }
 
         controller.EndTurn();
     }
@@ -535,6 +575,11 @@ public class ChessBoard : MonoBehaviour
         return pieceMoves.Count;
     }
 
+    public int GetNumberOfUndoPieceMoves()
+    {
+        return pieceMoves2.Count;
+    }
+
     public bool HasPiece(Piece piece)
     {
         for (int i = 0; i < BOARD_SIZE; i++)
@@ -552,6 +597,24 @@ public class ChessBoard : MonoBehaviour
     {
         if (CheckIfCoordsAreOnBoard(coords))
             grid[coords.x, coords.y] = piece;
+    }
+
+    //TW - sends a vector2int list which contains new coords and old coords, in that order.
+    public List<Vector2Int> GetUndoPieceMoves()
+    {
+
+        //List<String> newPieceMoves = new List<String>(pieceMoves2);
+        List<Vector2Int> newPieceMoves = new List<Vector2Int>();
+        newPieceMoves.Add(pieceMoves2[pieceMoves2.Count - 2]);
+        newPieceMoves.Add(pieceMoves2[pieceMoves2.Count - 1]);
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        Debug.Log("Printing all moves in move list:");
+        foreach(Vector2Int move in pieceMoves2)
+        {
+            Debug.Log(move.ToString());
+        }
+        return newPieceMoves;
     }
 
     //TW - public method to return array which only contains new piece movements, 
