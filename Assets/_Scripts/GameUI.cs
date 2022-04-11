@@ -310,7 +310,7 @@ public class GameUI : MonoBehaviour
                     childCount.GetComponent<TMPro.TextMeshProUGUI>().text = (turnCount.ToString() + "<space=4.5>. ");
                 }
 
-                GameObject childText = newListing.transform.Find("TestText").gameObject;
+                GameObject childText = newListing.transform.Find("MoverText").gameObject;
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = ("");
 
                 if (GameManager.Instance.State == GameState.PlayerTurn)
@@ -343,14 +343,14 @@ public class GameUI : MonoBehaviour
                 }
 
                 //move update
-                GameObject childText = newListing.transform.Find("TestText").gameObject;
+                GameObject childText = newListing.transform.Find("MoverText").gameObject;
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
                 //if a piece was taken, make the color of the take stand out
                 if(takenIndicator.Equals("x")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
                 if (takenIndicator.Equals("?")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
 
                 //sprite update
-                GameObject childImage = newListing.transform.Find("TestImage").gameObject;
+                GameObject childImage = newListing.transform.Find("MoverImage").gameObject;
                 childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
                 Debug.Log("Piece color for this turn: " + pieceColor);
             }
@@ -366,14 +366,14 @@ public class GameUI : MonoBehaviour
             if (numberOfSkips >= 2) 
             {
                 var skip1 = Instantiate(mainSample, ListParent.transform);
-                GameObject childText1 = skip1.transform.Find("TestText").gameObject;
+                GameObject childText1 = skip1.transform.Find("MoverText").gameObject;
                 childText1.GetComponent<TMPro.TextMeshProUGUI>().text = ("");
                 skip1.SetActive(true);
 
                 if (numberOfSkips == 3)
                 {
                     var skip2 = Instantiate(mainSample, ListParent.transform);
-                    GameObject childText2 = skip2.transform.Find("TestText").gameObject;
+                    GameObject childText2 = skip2.transform.Find("MoverText").gameObject;
                     childText2.GetComponent<TMPro.TextMeshProUGUI>().text = ("");
                     skip2.SetActive(true);
                 }
