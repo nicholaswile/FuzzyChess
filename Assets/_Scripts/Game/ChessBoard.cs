@@ -18,7 +18,8 @@ public class ChessBoard : MonoBehaviour
     //same as the above list, but serves a different purpose
     private List<Vector2Int> pieceMoves2 = new List<Vector2Int>();
     private bool pieceTaken = false;
-
+    //stores the piece which was delegated during this turn. var cleared when turn is over.
+    public Piece delegatedPiece = null;
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
     private bool leftBishopMovedOne = false, kingMovedOne = false, rightBishopMovedOne = false;
@@ -26,6 +27,8 @@ public class ChessBoard : MonoBehaviour
     public bool LeftBishopMovedOne { get { return leftBishopMovedOne; } set { leftBishopMovedOne = value; } }
     public bool KingMovedOne { get { return kingMovedOne; } set { kingMovedOne = value; } }
     public bool RightBishopMovedOne { get { return rightBishopMovedOne; } set { rightBishopMovedOne = value; } }
+    //this vector2int is used to store a delegated move in the piecemoves2 list, which will store delegations and allow for them to be undone in order.
+    public readonly Vector2Int delegatedMove = new Vector2Int(999, 999);
 
     private const string DICE = "ResultDie";
 
@@ -143,7 +146,7 @@ public class ChessBoard : MonoBehaviour
         }
 
         List<Vector2Int> selection = selectedPiece.AvailableMoves;
-        if (selectedPiece.CorpMoveNumber() > 0 && !selectedPiece.CommanderMovedOne()) 
+        if (selectedPiece.CorpMoveNumber() >= 0 && !selectedPiece.CommanderMovedOne()) 
         {
             selection.Clear();
             selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
@@ -183,6 +186,7 @@ public class ChessBoard : MonoBehaviour
         {
             if (selectedPiece.Equals(corpPiece))
             {
+                selectedPiece.prevCorpType = selectedPiece.corpType;
                 player.RemovePiece(selectedPiece);
 
                 if (corpType == CorpType.Left)
@@ -191,6 +195,11 @@ public class ChessBoard : MonoBehaviour
                 selectedPiece.isDelegated = true;
 
                 player.AddPiece(selectedPiece);
+                delegatedPiece = selectedPiece;
+
+                //add an entry into the moves list to allow for accurate reversion
+                pieceMoves2.Add(delegatedMove);
+                pieceMoves2.Add(delegatedMove);
                 break;
             }
         }
@@ -215,12 +224,18 @@ public class ChessBoard : MonoBehaviour
             {
                 if (selectedPiece.Equals(corpPiece))
                 {
+                    selectedPiece.prevCorpType = selectedPiece.corpType;
                     player.RemovePiece(selectedPiece);
 
                     selectedPiece.corpType = CorpType.King;
                     selectedPiece.isDelegated = false;
 
                     player.AddPiece(selectedPiece);
+                    delegatedPiece = selectedPiece;
+
+                    //add an entry into the moves list to allow for accurate reversion
+                    pieceMoves2.Add(delegatedMove);
+                    pieceMoves2.Add(delegatedMove);
                     break;
                 }
             }
@@ -231,15 +246,38 @@ public class ChessBoard : MonoBehaviour
             {
                 if (corpPiece == selectedPiece) 
                 {
+                    selectedPiece.prevCorpType = selectedPiece.corpType;
                     player.RemovePiece(selectedPiece);
                     selectedPiece.corpType = CorpType.King;
                     selectedPiece.isDelegated = false;
                     player.AddPiece(selectedPiece);
+                    delegatedPiece = selectedPiece;
+
+                    //add an entry into the moves list to allow for accurate reversion
+                    pieceMoves2.Add(delegatedMove);
+                    pieceMoves2.Add(delegatedMove);
                     break;
                 }
             }
         }
         pieceDelegatedThisTurn = true;
+        DeselectPiece();
+    }
+
+    //revert a delegation action of any kind on a single piece (works for both delegate and recall)
+    public void RevertDelegation(Piece piece)
+    {
+        selectedPiece = piece;
+        if(piece.prevCorpType == CorpType.Right || piece.prevCorpType == CorpType.Left)
+        {
+            Delegate(selectedPiece.prevCorpType);
+        }
+        else if (piece.prevCorpType == CorpType.King)
+        {
+            Recall();
+        }
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
         DeselectPiece();
     }
 
@@ -545,6 +583,7 @@ public class ChessBoard : MonoBehaviour
             ResetCommanderData();
             //prevents the "undo" button from being used after a player's turn is up.
             pieceMoves2.Clear();
+            delegatedPiece = null;
         }
 
         controller.EndTurn();

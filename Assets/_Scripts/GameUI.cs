@@ -131,6 +131,13 @@ public class GameUI : MonoBehaviour
             //fetches a list of vector2ints containing the latest move, [0] = new, [1] = old
             List<Vector2Int> LatestMove = new List<Vector2Int>(board.GetUndoPieceMoves());
 
+            //check if a piece was delegated this turn
+            if(LatestMove[0] == board.delegatedMove)
+            {
+                board.RevertDelegation(board.delegatedPiece);
+                board.pieceDelegatedThisTurn = false;
+                return;
+            }
 
             List<GameObject> moveListList = new List<GameObject>();
 
@@ -143,6 +150,7 @@ public class GameUI : MonoBehaviour
             //send the standard command for moving the piece backwards
             board.UpdateBoardOnPieceMove(LatestMove[1], piece.occupiedSquare, piece, null);
             piece.MovePiece(LatestMove[1]);
+            //Player.GenerateAllMoves();
 
             //regenerate the list of available moves for the specified piece
             piece.AvailableMoves = piece.FindAvailableSquares();

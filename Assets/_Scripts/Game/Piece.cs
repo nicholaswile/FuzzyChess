@@ -12,6 +12,9 @@ public abstract class Piece : MonoBehaviour
     public Team team { get; set; }
     public PieceType pieceType { get; set; }
     public CorpType corpType { get; set; }
+    //var to hold the name of the previous corp which a piece belonged to. used for reverting corp.
+    //public CorpType prevCorpType { get { return prevCorpType; } set { prevCorpType = value; } }
+    public CorpType prevCorpType { get; set; }
     public bool hasMoved { get; private set; }
     private bool delegated = false;
     public bool isDelegated { get { return delegated; } set { delegated = value; } }
@@ -58,6 +61,14 @@ public abstract class Piece : MonoBehaviour
             controller.revertCorpMove("King");
         else controller.revertCorpMove("Right");
     }
+
+    /**
+    //set the value of the previous corpType
+    public void SetPrevCorpType(CorpType setCorptype)
+    {
+        prevCorpType = setCorptype;
+    }
+    **/
 
     public bool CommanderMovedOne() 
     {
