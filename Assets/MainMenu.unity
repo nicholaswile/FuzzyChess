@@ -3818,7 +3818,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1539247882}
   - component: {fileID: 1539247881}
-  - component: {fileID: 1539247880}
   m_Layer: 0
   m_Name: CursorManager
   m_TagString: Untagged
@@ -3826,19 +3825,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1539247880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1539247879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e79d86382afbc347b4baf2133683377, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cursorType: 0
 --- !u!114 &1539247881
 MonoBehaviour:
   m_ObjectHideFlags: 0
