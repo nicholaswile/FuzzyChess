@@ -502,6 +502,11 @@ public class ChessBoard : MonoBehaviour
             GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
             TheGameUI.SendMessage(DICE, result);
 
+            //adding a dice roll sound isn't going to work unless we slow down the game for a few seconds
+            //since it will play at the same time as the capture/movement sounds anyway
+            
+            //SFXController.PlaySoundDiceRoll();
+
             //If knight does surprise attack add a +1 to the die roll
             if (knightHasMoved) 
             {
@@ -596,6 +601,7 @@ public class ChessBoard : MonoBehaviour
             TheGameUI.PieceWasTaken();
             grid[piece.occupiedSquare.x, piece.occupiedSquare.y] = null;
             controller.OnPieceRemoved(piece);
+            SFXController.PlaySoundCapture();
         }
     }
 

@@ -231,9 +231,11 @@ public class GameController : MonoBehaviour
             if (piece.team == Team.White)
             {
                 GameManager.Instance.UpdateGameState(GameState.Lose);
+                SFXController.PlaySoundGameLost();
             }
             else if (piece.team == Team.Black) {
                 GameManager.Instance.UpdateGameState(GameState.Win);
+                SFXController.PlaySoundGameWon();
             }
         }
 
