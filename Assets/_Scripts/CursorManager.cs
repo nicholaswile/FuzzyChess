@@ -17,7 +17,8 @@ public class CursorManager : MonoBehaviour
         Select,
         Place, 
         Grab,
-        Unavailable
+        Unavailable,
+        Kill
     }
 
     private void Awake()

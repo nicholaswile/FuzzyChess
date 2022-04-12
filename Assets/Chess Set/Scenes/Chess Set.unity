@@ -458,6 +458,8 @@ MonoBehaviour:
     textureArray: {fileID: 2800000, guid: 3a8cc57320e0ae845b320649249dd2d2, type: 3}
   - cursorType: 4
     textureArray: {fileID: 2800000, guid: 6fd6b996f6c1ed847be7d809bffad42c, type: 3}
+  - cursorType: 5
+    textureArray: {fileID: 2800000, guid: 125adffabf9d0be4fb4754e3f0afdd69, type: 3}
   cam: {fileID: 219652656}
 --- !u!4 &134015575
 Transform:

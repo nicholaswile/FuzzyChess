@@ -29,13 +29,26 @@ public class CursorObj : MonoBehaviour
             CursorManager.Instance.SetActiveCursorType(cursorType);
         else if (gameObject.name == "Highlighter(Clone)" && controller.activePlayer == controller.whitePlayer && !Input.GetMouseButton(1))
             CursorManager.Instance.SetActiveCursorType(cursorType);
-        else if (!board.isSelectable(gameObject.GetComponent<Piece>()) && controller.activePlayer == controller.whitePlayer && !Input.GetMouseButton(1))
+        else if (IsHoveringEnemy())
+            CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Kill);
+        else if ((!board.isSelectable(gameObject.GetComponent<Piece>()) || controller.activePlayer != controller.whitePlayer) && !Input.GetMouseButton(1))
             CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Unavailable);
     }
 
     private void OnMouseExit()
     {
         CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Default);
+    }
+
+    private bool IsHoveringEnemy() 
+    {
+        if(board.selectedPiece && gameObject.name != "Highlighter(Clone)")
+            foreach (Vector2Int move in board.selectedPiece.AvailableMoves) 
+            {
+                if (gameObject.GetComponent<Piece>().occupiedSquare == move)
+                    return true;
+            }
+        return false;
     }
 }
 

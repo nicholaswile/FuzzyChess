@@ -3840,14 +3840,6 @@ MonoBehaviour:
   cursorObjectList:
   - cursorType: 0
     textureArray: {fileID: 2800000, guid: 22805788b0cf54f4f8c754c4a9906070, type: 3}
-  - cursorType: 1
-    textureArray: {fileID: 2800000, guid: 2eab72b0529f3524e9bd81c0d2af5e59, type: 3}
-  - cursorType: 2
-    textureArray: {fileID: 2800000, guid: 2ab506e9cbf667a4f9fecc1a3e86b800, type: 3}
-  - cursorType: 3
-    textureArray: {fileID: 2800000, guid: 3a8cc57320e0ae845b320649249dd2d2, type: 3}
-  - cursorType: 4
-    textureArray: {fileID: 2800000, guid: 6fd6b996f6c1ed847be7d809bffad42c, type: 3}
   cam: {fileID: 0}
 --- !u!4 &1539247882
 Transform:
