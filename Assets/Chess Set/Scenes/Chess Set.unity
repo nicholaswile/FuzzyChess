@@ -471,7 +471,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &134015576
 MonoBehaviour:
@@ -1005,7 +1005,6 @@ GameObject:
   m_Component:
   - component: {fileID: 204396564}
   - component: {fileID: 204396565}
-  - component: {fileID: 204396566}
   m_Layer: 0
   m_Name: Cam 3D
   m_TagString: MainCamera
@@ -1070,14 +1069,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &204396566
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 204396563}
-  m_Enabled: 1
 --- !u!1 &219652653
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,7 +1080,6 @@ GameObject:
   - component: {fileID: 219652654}
   - component: {fileID: 219652656}
   - component: {fileID: 219652655}
-  - component: {fileID: 219652657}
   m_Layer: 0
   m_Name: Cam 360
   m_TagString: MainCamera
@@ -1169,14 +1159,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &219652657
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 219652653}
-  m_Enabled: 1
 --- !u!1 &300541673
 GameObject:
   m_ObjectHideFlags: 0
@@ -1806,6 +1788,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 382455519}
+  - component: {fileID: 382455520}
   m_Layer: 0
   m_Name: Render
   m_TagString: Untagged
@@ -1833,6 +1816,14 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &382455520
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382455518}
+  m_Enabled: 1
 --- !u!1 &448670477
 GameObject:
   m_ObjectHideFlags: 0
@@ -2740,7 +2731,6 @@ GameObject:
   m_Component:
   - component: {fileID: 701772141}
   - component: {fileID: 701772143}
-  - component: {fileID: 701772142}
   m_Layer: 0
   m_Name: Cam 2D
   m_TagString: MainCamera
@@ -2762,14 +2752,6 @@ Transform:
   m_Father: {fileID: 382455519}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 90.15, z: 0}
---- !u!81 &701772142
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 701772140}
-  m_Enabled: 1
 --- !u!20 &701772143
 Camera:
   m_ObjectHideFlags: 0
