@@ -29,6 +29,7 @@ public class ChessBoard : MonoBehaviour
     public bool RightBishopMovedOne { get { return rightBishopMovedOne; } set { rightBishopMovedOne = value; } }
     //this vector2int is used to store a delegated move in the piecemoves2 list, which will store delegations and allow for them to be undone in order.
     public readonly Vector2Int delegatedMove = new Vector2Int(999, 999);
+    private String saveKnightPos = "";
 
     private const string DICE = "ResultDie";
 
@@ -335,14 +336,37 @@ public class ChessBoard : MonoBehaviour
 
     private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
     {
+        Piece pieceOnSquare = GetPieceOnSquare(coords);
         TryToTakeOppositePiece(coords);
 
         CheckIfCommanderMovedOne(coords);
+        //String saveKnightPos = "";
+        String test = "";
+
+        if (selectedPiece.pieceType == PieceType.Knight && (!knightHasMoved || !knightAttemptedKill))
+        {
+            saveKnightPos = piece.occupiedSquare.ToString();
+        }
+
 
         //Adds move to the move list
         if (selectedPiece.pieceType != PieceType.Knight || knightHasMoved || knightAttemptedKill || !selectedPiece.HasAdjacentEnemySquares(coords))
         {
-            String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
+            //if there's something on the target square, send its name as well as the other info
+            if(pieceOnSquare != null)
+            test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare + "|" + pieceOnSquare.GetType().ToString();
+            else
+            //otherwise, send "empty" to signify there's nothing there
+            test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare + "|" + "empty";
+
+            if (knightHasMoved || knightAttemptedKill)
+            {
+                if (pieceOnSquare != null)
+                    test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + saveKnightPos + "|" + pieceOnSquare.GetType().ToString();
+                else
+                    test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + saveKnightPos + "|" + "empty";
+                saveKnightPos = "";
+            }
             pieceMoves.Add(test);
             //stores name of piece, the new coordinates, the old coordinates, in format: name|newcoords|oldcoords
             //String fullString = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare.ToString();

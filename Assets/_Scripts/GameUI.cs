@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System;
 
 public class GameUI : MonoBehaviour
 {
@@ -263,7 +264,6 @@ public class GameUI : MonoBehaviour
         //Instantiate(mainSample, ListParent.transform);
         //ChessBoard cBoard = GameObject.GetComponent<ChessBoard>();
         List<string> newMoves = new List<string>(board.GetNewPieceMoves());
-        //newMoves.ForEach(move => Debug.Log(move));
 
         //Add Skips Into newMoves list
         if (skippedTurn)
@@ -326,8 +326,11 @@ public class GameUI : MonoBehaviour
             //logic for general moves
             else {
                 string[] movesArr = element.Split('|');
+                //[0] = piece type, [1] = new location, [2] = old location, [3] = name of piece on new location
                 Debug.Log("Printing array 0: " + movesArr[0]);
                 Debug.Log("Printing array 1: " + movesArr[1]);
+                Debug.Log("Printing array 2: " + movesArr[2]);
+                Debug.Log("Printing array 2: " + movesArr[3]);
 
                 //sets the listing's name so it may be searched for easily.
                 newListing.name = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
@@ -347,26 +350,43 @@ public class GameUI : MonoBehaviour
                 }
 
                 //move update
-                GameObject childText = newListing.transform.Find("OpposerText").gameObject;
-                childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+                //update the text that will appear under the destination, be it an opposing piece or simply an empty square
+                GameObject opposerText = newListing.transform.Find("OpposerText").gameObject;
+                opposerText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
+                //update the text that will appear under the starting point.
+                GameObject moverText = newListing.transform.Find("MoverText").gameObject;
+                moverText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[2][1].ToString()] + (char.GetNumericValue(movesArr[2][4]) + 1));
+
+
                 //if a piece was taken, make the color of the take stand out
                 if (takenIndicator.Equals("x"))
                 {
-                    childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
+                    opposerText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
                     //update the action sprite as well
                     newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/swordicon");
                 }
                 if (takenIndicator.Equals("?"))
                 {
-                    childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
+                    opposerText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
                     //update the action sprite as well
                     newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/finalshieldblank");
                 }
 
                 //sprite update
-                GameObject childImage = newListing.transform.Find("MoverImage").gameObject;
-                childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
+                //update the image for the starter piece.
+                GameObject moverImage = newListing.transform.Find("MoverImage").gameObject;
+                moverImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
                     Debug.Log("Piece color for this turn: " + pieceColor);
+
+                //determine if there was a piece on the square. If so, give the transparent image a new icon.
+                if(takenIndicator.Equals("x") || takenIndicator.Equals("?"))
+                {
+                    GameObject opposerImage = newListing.transform.Find("OpposerImage").gameObject;
+                    SwapPieceColor();
+                    opposerImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[3]);
+                    SwapPieceColor();
+                }
+
             }
 
             //If the turn is over there is an addition to the count as well as a color switch.
