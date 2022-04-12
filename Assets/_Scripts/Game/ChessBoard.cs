@@ -151,7 +151,8 @@ public class ChessBoard : MonoBehaviour
         {
             selection.Clear();
             selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
-        }
+        } 
+        //else if (selectedPiece.CorpMoveNumber() >= 0 && !selectedPiece.CommanderMovedOne()) selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
         ShowSelectionSquares(selection);
     }
 

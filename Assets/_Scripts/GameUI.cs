@@ -172,6 +172,10 @@ public class GameUI : MonoBehaviour
             //turn the information about the move into a string which matches the chess notation name of the move. I.E. a piece moved to [1, 2] would become "b3"
             string moveCNotation = MakeChessNotation[LatestMove[0].x.ToString()] + (LatestMove[0].y + 1);
 
+            //regenerate moves for team white after every undo press. Prevents undone moves from blocking spaces.
+            GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+            controller.UndoGeneratePlayerMoves();
+
             //searches through the list of gameobjects that directly reference the listings on the movelist. adds all objects with the specified name to a new list
             foreach (GameObject CMove in moveListObjects)
             {
