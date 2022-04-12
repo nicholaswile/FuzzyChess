@@ -364,18 +364,24 @@ public class GameUI : MonoBehaviour
                     opposerText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
                     //update the action sprite as well
                     newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/swordicon");
+                    //set to scale 0.5. This is because the action image is default scale 2, to make the skip icon more easily readable.
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().transform.localScale = new Vector3(0.65f, 0.6f, 0.7f);
                 }
                 //if the attack was repelled, set the action image accordingly
                 else if (takenIndicator.Equals("?"))
                 {
                     opposerText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
                     //update the action sprite as well
-                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/finalshieldblank");
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/shield-deflect-beta");
+                    //set to scale 0.5
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().transform.localScale = new Vector3(0.65f, 0.7f, 0.5f);
                 }
                 //define default behavior for what to set the action image
                 else
                 {
-                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/mspaint_2022-04-11_17-05-35");
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/arrowmove");
+                    //set to scale 0.5
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().transform.localScale = new Vector3 (0.5f, 0.5f, 0.5f);
                 }    
 
                 //sprite update
