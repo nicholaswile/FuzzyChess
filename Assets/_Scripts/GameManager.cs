@@ -12,10 +12,13 @@ public class GameManager : MonoBehaviour
 
     public GameState State;
 
+    public RollState RollState;
+
     private const string WINS = "Wins", LOSS = "Losses";
 
     // Used to notify scripts who subscribed that state changed
     public static event Action<GameState> StateChanged;
+    public static event Action<RollState> RollStateChanged;
 
     private void Awake()
     {
@@ -34,6 +37,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         UpdateGameState(GameState.MainMenu);
+        UpdateRollState(RollState.FalseRoll);
     }
 
     public void UpdateGameState(GameState newState)
@@ -51,9 +55,6 @@ public class GameManager : MonoBehaviour
             case GameState.EnemyTurn:
                 HandleEnemyTurn();
                 break;
-            case GameState.Rolling:
-                HandleRolling();
-                break;
             case GameState.Win:
                 HandleWin();
                 break;
@@ -62,14 +63,37 @@ public class GameManager : MonoBehaviour
                 break;
             default:
                 throw new System.Exception("Argument out of range");
-                
         }
 
         // If there are subscribers, event trigger is called to notify them of state change
         StateChanged?.Invoke(newState);
     }
 
-    private void HandleRolling()
+    public void UpdateRollState(RollState rollState)
+    {
+        RollState = rollState;
+
+        switch(rollState)
+        {
+            case RollState.TrueRoll:
+                HandleTrueRoll();
+                break;
+
+            case RollState.FalseRoll:
+                HandleFalseRoll();
+                break;
+            default:
+                throw new System.Exception("Argument out of range");
+        }
+        RollStateChanged?.Invoke(rollState);
+    }
+
+    private void HandleFalseRoll()
+    {
+        Debug.Log("Stop Rolling");
+    }
+
+    private void HandleTrueRoll()
     {
         Debug.Log("Rolling");
     }
@@ -127,7 +151,12 @@ public enum GameState
     MainMenu,
     PlayerTurn,
     EnemyTurn,
-    Rolling,
     Win,
     Lose
+}
+
+public enum RollState
+{
+    TrueRoll,
+    FalseRoll
 }

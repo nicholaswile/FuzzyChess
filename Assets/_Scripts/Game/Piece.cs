@@ -10,9 +10,11 @@ public abstract class Piece : MonoBehaviour
     public ChessBoard board { protected get; set; }
     public Vector2Int occupiedSquare { get; set; }
     public Team team { get; set; }
-    public CorpType corpOriginal { get; set; }
-    public CorpType corpCurrent { get; set; }
+    public PieceType pieceType { get; set; }
+    public CorpType corpType { get; set; }
     public bool hasMoved { get; private set; }
+    private bool delegated = false;
+    public bool isDelegated { get { return delegated; } set { delegated = value; } }
     public List<Vector2Int> AvailableMoves;
 
     static Vector2Int[] directions = new Vector2Int[]
@@ -36,9 +38,51 @@ public abstract class Piece : MonoBehaviour
         hasMoved = false;
     }
 
+    public int CorpMoveNumber()
+    {
+        GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+        if (corpType == CorpType.Left)
+            return controller.LeftCorpUsed;
+        else if (corpType == CorpType.King)
+            return controller.KingCorpUsed;
+        else return controller.RightCorpUsed;
+    }
+
+    //reduces the number of the specified piece's corp moves by 1 to allow for another movement.
+    public void ReduceCorpMoveNumber()
+    {
+        GameController controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+        if (corpType == CorpType.Left)
+            controller.revertCorpMove("Left");
+        else if (corpType == CorpType.King)
+            controller.revertCorpMove("King");
+        else controller.revertCorpMove("Right");
+    }
+
+    public bool CommanderMovedOne() 
+    {
+        if (corpType == CorpType.Left)
+            return board.LeftBishopMovedOne;
+        else if (corpType == CorpType.King)
+            return board.KingMovedOne;
+        else return board.RightBishopMovedOne;
+    }
+
     public void SetMaterial(Material material, Material material2) 
     {
         materialSetter.SetPieceMaterials(material, material2);
+    }
+
+    //made for corp identification
+    public void SetColor()
+    {
+        materialSetter.ChangePieceColor(this);
+    }
+
+    //made for corp identification
+    public void RevertColor()
+    {
+        materialSetter.RevertPieceColor(this);
     }
 
     public bool IsFromSameTeam(Piece piece) 
@@ -54,6 +98,8 @@ public abstract class Piece : MonoBehaviour
     public void MoveTo(Transform transform, Vector3 targetPosition)
     {
         transform.position = targetPosition;
+
+        SFXController.PlaySoundMovement();
     }
 
     public virtual void MovePiece(Vector2Int coords) 
@@ -65,14 +111,22 @@ public abstract class Piece : MonoBehaviour
         MoveTo(transform, targetPosition);
     }
 
+    //a setter for hasMoved, since its private.
+    public void setHasMoved(bool a)
+    {
+        hasMoved = a;
+    }
+
     protected void TryToAddMove(Vector2Int coords) 
     {
         AvailableMoves.Add(coords);
     }
 
-    public void SetData(Vector2Int coords, Team team, ChessBoard board) 
+    public void SetData(Vector2Int coords, Team team, ChessBoard board, PieceType pieceType, CorpType corpType) 
     {
         this.team = team;
+        this.pieceType = pieceType;
+        this.corpType = corpType;
         occupiedSquare = coords;
         this.board = board;
         transform.position = board.GetPositionFromCoords(coords);
@@ -178,6 +232,35 @@ public abstract class Piece : MonoBehaviour
             }
         }
         return adjacentEnemySquares;
+    }
+
+    public List<Vector2Int> GetAdjacentSquares(Vector2Int coords)
+    {
+        List<Vector2Int> adjacentSquares = new List<Vector2Int>();
+
+        foreach (var direction in directions)
+        {
+            Vector2Int nextDirection = coords + direction;
+            Piece piece = board.GetPieceOnSquare(nextDirection);
+            if (!board.CheckIfCoordsAreOnBoard(nextDirection))
+                continue;
+            else if (piece)
+                continue;
+            else if (piece == null)
+            {
+                adjacentSquares.Add(nextDirection);
+                continue;
+            }
+        }
+        return adjacentSquares;
+    }
+
+    public bool HasAdjacentEnemySquares(Vector2Int coords) 
+    {
+        List<Vector2Int>  adjacentEnemySquares = GetAdjacentEnemySquares(coords);
+        if (adjacentEnemySquares.Count == 0)
+            return false;
+        else return true;
     }
 
 }

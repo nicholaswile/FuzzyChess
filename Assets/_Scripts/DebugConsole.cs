@@ -69,17 +69,6 @@ public class DebugConsole : MonoBehaviour
             case ("lose"):
                 GameManager.Instance.UpdateGameState(GameState.Lose);
                 break;
-            case ("roll"):
-                GameManager.Instance.UpdateGameState(GameState.Rolling);
-                break;
-/* These commands are commented out because they break the turn controller 
-            case ("player"):
-                GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
-                break;
-            case ("enemy"):
-                GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
-                break;
-*/
             case ("w_score"):
                 PlayerPrefs.SetString(WINS, parse[1]);
                 break;

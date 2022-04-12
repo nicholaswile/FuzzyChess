@@ -9,6 +9,7 @@ public class Layout : ScriptableObject
     {
         public Vector2Int position;
         public PieceType pieceType;
+        public CorpType corpType;
         public Team teamColor;
     }
 
@@ -29,7 +30,7 @@ public class Layout : ScriptableObject
         return new Vector2Int(boardSquares[index].position.x - 1, boardSquares[index].position.y - 1);
     }
 
-    public string GetPieceTypeAtIndex(int index)
+    public string GetPieceTypeStringAtIndex(int index)
     {
         if (boardSquares.Length <= index)
         {
@@ -38,7 +39,24 @@ public class Layout : ScriptableObject
         }
         return boardSquares[index].pieceType.ToString();
     }
-
+    public PieceType GetPieceTypeAtIndex(int index)
+    {
+        if (boardSquares.Length <= index)
+        {
+            Debug.LogError("PIECE NOT IN RANGE");
+            return PieceType.Pawn;
+        }
+        return boardSquares[index].pieceType;
+    }
+    public CorpType GetCorpTypeAtIndex(int index)
+    {
+        if (boardSquares.Length <= index)
+        {
+            Debug.LogError("PIECE NOT IN RANGE");
+            return CorpType.Left;
+        }
+        return boardSquares[index].corpType;
+    }
     public Team GetTeamColorAtIndex(int index)
     {
         if (boardSquares.Length <= index)
