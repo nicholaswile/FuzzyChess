@@ -69,6 +69,7 @@ public class MainMenu : MonoBehaviour
     {
         playScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
+        UI_ButtonSound();
     }
 
     public void UI_HumanMode()
@@ -89,12 +90,14 @@ public class MainMenu : MonoBehaviour
     {
         mainMenuScreen.SetActive(true);
         currentScreen.SetActive(false);
+        UI_ButtonSound();
     }
 
     public void UI_StatsMode()
     {
         statsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
+        UI_ButtonSound();
     }
 
     public void UI_ResetScore()
@@ -115,17 +118,29 @@ public class MainMenu : MonoBehaviour
     {
         rulesScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
+        UI_ButtonSound();
     }
     
     public void UI_CreditsMode()
     {
         creditsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
+        UI_ButtonSound();
     }
 
     public void UI_Exit()
     {
         Debug.Log("Quitting Application");
         Application.Quit();
+    }
+
+    private void UI_ButtonSound()
+    {
+        GameObject soundObject = new GameObject("SFX Object");
+
+        AudioClip clipMenuButton = Resources.Load<AudioClip> ("Audio/MenuButton");
+
+        AudioSource audioSource = soundObject.AddComponent<AudioSource>();
+        audioSource.PlayOneShot(clipMenuButton);
     }
 }

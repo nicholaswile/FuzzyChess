@@ -109,6 +109,8 @@ public abstract class Piece : MonoBehaviour
     public void MoveTo(Transform transform, Vector3 targetPosition)
     {
         transform.position = targetPosition;
+
+        SFXController.PlaySoundMovement();
     }
 
     public virtual void MovePiece(Vector2Int coords) 
