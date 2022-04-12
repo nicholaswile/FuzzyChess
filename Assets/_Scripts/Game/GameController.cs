@@ -110,6 +110,14 @@ public class GameController : MonoBehaviour
         player.GenerateAllMoves();
     }
 
+    //generates all player moves for team white ONLY (can be updated for team black later)
+    //used in undo function.
+    public void UndoGeneratePlayerMoves()
+    {
+        Player player = whitePlayer;
+        player.GenerateAllMoves();
+    }
+
     public bool IsTeamTurnActive(Team team)
     {
         return activePlayer.team == team;
