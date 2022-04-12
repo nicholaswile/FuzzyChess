@@ -322,8 +322,8 @@ public class GameUI : MonoBehaviour
             //logic for general moves
             else {
                 string[] movesArr = element.Split('|');
-                Debug.Log(movesArr[0]);
-                Debug.Log(movesArr[1]);
+                Debug.Log("Printing array 0: " + movesArr[0]);
+                Debug.Log("Printing array 1: " + movesArr[1]);
 
                 //sets the listing's name so it may be searched for easily.
                 newListing.name = (MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
@@ -343,16 +343,26 @@ public class GameUI : MonoBehaviour
                 }
 
                 //move update
-                GameObject childText = newListing.transform.Find("MoverText").gameObject;
+                GameObject childText = newListing.transform.Find("OpposerText").gameObject;
                 childText.GetComponent<TMPro.TextMeshProUGUI>().text = (takenIndicator + MakeChessNotation[movesArr[1][1].ToString()] + (char.GetNumericValue(movesArr[1][4]) + 1));
                 //if a piece was taken, make the color of the take stand out
-                if(takenIndicator.Equals("x")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
-                if (takenIndicator.Equals("?")) childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
+                if (takenIndicator.Equals("x"))
+                {
+                    childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
+                    //update the action sprite as well
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/swordicon");
+                }
+                if (takenIndicator.Equals("?"))
+                {
+                    childText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
+                    //update the action sprite as well
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/finalshieldblank");
+                }
 
                 //sprite update
                 GameObject childImage = newListing.transform.Find("MoverImage").gameObject;
                 childImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[0]);
-                Debug.Log("Piece color for this turn: " + pieceColor);
+                    Debug.Log("Piece color for this turn: " + pieceColor);
             }
 
             //If the turn is over there is an addition to the count as well as a color switch.

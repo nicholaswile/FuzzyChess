@@ -146,7 +146,8 @@ public class ChessBoard : MonoBehaviour
         }
 
         List<Vector2Int> selection = selectedPiece.AvailableMoves;
-        if (selectedPiece.CorpMoveNumber() >= 0 && !selectedPiece.CommanderMovedOne()) 
+        //FIX THIS to fix undoing a piece to turn 0 making it so this isn't updated, effectively blocking moves in the spot the piece was occupying.
+        if (selectedPiece.CorpMoveNumber() >= 1 && !selectedPiece.CommanderMovedOne()) 
         {
             selection.Clear();
             selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
