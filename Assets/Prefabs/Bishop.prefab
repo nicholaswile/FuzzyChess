@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 3834697359587558837}
   - component: {fileID: -8601701783982314363}
   - component: {fileID: -5544374938556885997}
+  - component: {fileID: -5964633156069204105}
+  - component: {fileID: 8251776142273793624}
   m_Layer: 0
   m_Name: Bishop
   m_TagString: Untagged
@@ -28,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312546584011049153}
   m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: 0.08999999, y: -0.000000029802322, z: 0.20999996}
+  m_LocalPosition: {x: 0.08999999, y: -0.0013, z: 0.20999996}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
@@ -110,3 +112,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   materialSetter: {fileID: -8601701783982314363}
   AvailableMoves: []
+--- !u!114 &-5964633156069204105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312546584011049153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e79d86382afbc347b4baf2133683377, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: 1
+--- !u!65 &8251776142273793624
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312546584011049153}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0006, y: 0.0006, z: 0.000023479466}
+  m_Center: {x: 3.7252902e-11, y: -5.5879353e-11, z: 0.000011739733}

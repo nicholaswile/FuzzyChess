@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8068117785364268043}
   - component: {fileID: -614572127644187718}
   - component: {fileID: -6140609784461085675}
+  - component: {fileID: 1302450843425003082}
+  - component: {fileID: -6307250851413326315}
   m_Layer: 0
   m_Name: Rook
   m_TagString: Untagged
@@ -110,3 +112,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   materialSetter: {fileID: -614572127644187718}
   AvailableMoves: []
+--- !u!114 &1302450843425003082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8263969905255460913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e79d86382afbc347b4baf2133683377, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: 1
+--- !u!65 &-6307250851413326315
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8263969905255460913}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0006, y: 0.0006, z: 0.0000260471}
+  m_Center: {x: 3.7252902e-11, y: -5.5879353e-11, z: 0.000013023785}

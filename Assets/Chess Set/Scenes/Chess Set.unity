@@ -417,6 +417,75 @@ Transform:
   m_Father: {fileID: 1110243824}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &134015573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 134015575}
+  - component: {fileID: 134015574}
+  - component: {fileID: 134015576}
+  m_Layer: 0
+  m_Name: CursorManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &134015574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134015573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d06c694c06821149a7127ccd6468db0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorObjectList:
+  - cursorType: 0
+    textureArray: {fileID: 2800000, guid: 22805788b0cf54f4f8c754c4a9906070, type: 3}
+  - cursorType: 1
+    textureArray: {fileID: 2800000, guid: 2eab72b0529f3524e9bd81c0d2af5e59, type: 3}
+  - cursorType: 2
+    textureArray: {fileID: 2800000, guid: 2ab506e9cbf667a4f9fecc1a3e86b800, type: 3}
+  - cursorType: 3
+    textureArray: {fileID: 2800000, guid: 3a8cc57320e0ae845b320649249dd2d2, type: 3}
+  - cursorType: 4
+    textureArray: {fileID: 2800000, guid: 6fd6b996f6c1ed847be7d809bffad42c, type: 3}
+  cam: {fileID: 219652656}
+--- !u!4 &134015575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134015573}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.026554786, y: 0.10848281, z: 0.035603523}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &134015576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134015573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e79d86382afbc347b4baf2133683377, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorType: 0
 --- !u!1 &137180760
 GameObject:
   m_ObjectHideFlags: 0

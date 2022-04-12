@@ -28,6 +28,7 @@ public class ChessBoard : MonoBehaviour
     public bool RightBishopMovedOne { get { return rightBishopMovedOne; } set { rightBishopMovedOne = value; } }
 
     private const string DICE = "ResultDie";
+    public bool selectedPieceMoved { get; set; }
 
     private void Awake()
     {
@@ -156,7 +157,8 @@ public class ChessBoard : MonoBehaviour
 
     {
         if (piece && controller.IsTeamTurnActive(piece.team) &&
-            (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || piece.pieceType == PieceType.King || piece.CommanderMovedOne()))
+            (piece.CorpMoveNumber() < 1 || piece.pieceType == PieceType.Bishop || 
+            piece.pieceType == PieceType.King || piece.CommanderMovedOne()) && piece.CorpMoveNumber() < 2)
             return true;
         else return false;
 
@@ -295,8 +297,9 @@ public class ChessBoard : MonoBehaviour
 
     private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
     {
-        TryToTakeOppositePiece(coords);
+        selectedPieceMoved = true;
 
+        TryToTakeOppositePiece(coords);
         CheckIfCommanderMovedOne(coords);
 
         //Adds move to the move list
