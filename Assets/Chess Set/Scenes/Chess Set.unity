@@ -936,6 +936,7 @@ GameObject:
   m_Component:
   - component: {fileID: 204396564}
   - component: {fileID: 204396565}
+  - component: {fileID: 204396566}
   m_Layer: 0
   m_Name: Cam 3D
   m_TagString: MainCamera
@@ -1000,6 +1001,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &204396566
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204396563}
+  m_Enabled: 1
 --- !u!1 &219652653
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,6 +1020,7 @@ GameObject:
   - component: {fileID: 219652654}
   - component: {fileID: 219652656}
   - component: {fileID: 219652655}
+  - component: {fileID: 219652657}
   m_Layer: 0
   m_Name: Cam 360
   m_TagString: MainCamera
@@ -1090,6 +1100,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &219652657
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219652653}
+  m_Enabled: 1
 --- !u!1 &300541673
 GameObject:
   m_ObjectHideFlags: 0
