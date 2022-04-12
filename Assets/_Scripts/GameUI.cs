@@ -358,19 +358,25 @@ public class GameUI : MonoBehaviour
                 moverText.GetComponent<TMPro.TextMeshProUGUI>().text = (MakeChessNotation[movesArr[2][1].ToString()] + (char.GetNumericValue(movesArr[2][4]) + 1));
 
 
-                //if a piece was taken, make the color of the take stand out
+                //if a piece was taken, set the action image accordingly
                 if (takenIndicator.Equals("x"))
                 {
                     opposerText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.red;
                     //update the action sprite as well
                     newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/swordicon");
                 }
-                if (takenIndicator.Equals("?"))
+                //if the attack was repelled, set the action image accordingly
+                else if (takenIndicator.Equals("?"))
                 {
                     opposerText.GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
                     //update the action sprite as well
                     newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/finalshieldblank");
                 }
+                //define default behavior for what to set the action image
+                else
+                {
+                    newListing.transform.Find("ActionImage").gameObject.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("MoveSprites/mspaint_2022-04-11_17-05-35");
+                }    
 
                 //sprite update
                 //update the image for the starter piece.
@@ -385,6 +391,12 @@ public class GameUI : MonoBehaviour
                     SwapPieceColor();
                     opposerImage.GetComponent<UnityEngine.UI.Image>().overrideSprite = Resources.Load<Sprite>("PieceSprites/" + pieceColor + movesArr[3]);
                     SwapPieceColor();
+                } else
+                {
+                    //adjust the scale and position of the opposer text so that it fills up the space where the piece icon would've been
+                    GameObject childOpposerText = newListing.transform.Find("OpposerText").gameObject;
+                    childOpposerText.GetComponent<TMPro.TextMeshProUGUI>().rectTransform.anchoredPosition = new Vector3(119, -38, 0);
+                    childOpposerText.GetComponent<TMPro.TextMeshProUGUI>().transform.localScale = Vector3.one;
                 }
 
             }
