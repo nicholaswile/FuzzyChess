@@ -18,7 +18,8 @@ public class ChessBoard : MonoBehaviour
     //same as the above list, but serves a different purpose
     private List<Vector2Int> pieceMoves2 = new List<Vector2Int>();
     private bool pieceTaken = false;
-
+    //stores the piece which was delegated during this turn. var cleared when turn is over.
+    public Piece delegatedPiece = null;
     private bool canCapture = false, willCapture = false;
     private bool knightHasMoved = false, knightAttemptedKill = false, commanderAttemptedKill = false;
     private bool leftBishopMovedOne = false, kingMovedOne = false, rightBishopMovedOne = false;
@@ -26,6 +27,9 @@ public class ChessBoard : MonoBehaviour
     public bool LeftBishopMovedOne { get { return leftBishopMovedOne; } set { leftBishopMovedOne = value; } }
     public bool KingMovedOne { get { return kingMovedOne; } set { kingMovedOne = value; } }
     public bool RightBishopMovedOne { get { return rightBishopMovedOne; } set { rightBishopMovedOne = value; } }
+    //this vector2int is used to store a delegated move in the piecemoves2 list, which will store delegations and allow for them to be undone in order.
+    public readonly Vector2Int delegatedMove = new Vector2Int(999, 999);
+    private String saveKnightPos = "";
 
     private const string DICE = "ResultDie";
     public bool selectedPieceMoved { get; set; }
@@ -144,11 +148,13 @@ public class ChessBoard : MonoBehaviour
         }
 
         List<Vector2Int> selection = selectedPiece.AvailableMoves;
-        if (selectedPiece.CorpMoveNumber() > 0 && !selectedPiece.CommanderMovedOne()) 
+        //FIX THIS to fix undoing a piece to turn 0 making it so this isn't updated, effectively blocking moves in the spot the piece was occupying.
+        if (selectedPiece.CorpMoveNumber() >= 1 && !selectedPiece.CommanderMovedOne()) 
         {
             selection.Clear();
             selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
-        }
+        } 
+        //else if (selectedPiece.CorpMoveNumber() >= 0 && !selectedPiece.CommanderMovedOne()) selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
         ShowSelectionSquares(selection);
     }
 
@@ -185,6 +191,7 @@ public class ChessBoard : MonoBehaviour
         {
             if (selectedPiece.Equals(corpPiece))
             {
+                selectedPiece.prevCorpType = selectedPiece.corpType;
                 player.RemovePiece(selectedPiece);
 
                 if (corpType == CorpType.Left)
@@ -193,6 +200,11 @@ public class ChessBoard : MonoBehaviour
                 selectedPiece.isDelegated = true;
 
                 player.AddPiece(selectedPiece);
+                delegatedPiece = selectedPiece;
+
+                //add an entry into the moves list to allow for accurate reversion
+                pieceMoves2.Add(delegatedMove);
+                pieceMoves2.Add(delegatedMove);
                 break;
             }
         }
@@ -217,12 +229,18 @@ public class ChessBoard : MonoBehaviour
             {
                 if (selectedPiece.Equals(corpPiece))
                 {
+                    selectedPiece.prevCorpType = selectedPiece.corpType;
                     player.RemovePiece(selectedPiece);
 
                     selectedPiece.corpType = CorpType.King;
                     selectedPiece.isDelegated = false;
 
                     player.AddPiece(selectedPiece);
+                    delegatedPiece = selectedPiece;
+
+                    //add an entry into the moves list to allow for accurate reversion
+                    pieceMoves2.Add(delegatedMove);
+                    pieceMoves2.Add(delegatedMove);
                     break;
                 }
             }
@@ -233,15 +251,38 @@ public class ChessBoard : MonoBehaviour
             {
                 if (corpPiece == selectedPiece) 
                 {
+                    selectedPiece.prevCorpType = selectedPiece.corpType;
                     player.RemovePiece(selectedPiece);
                     selectedPiece.corpType = CorpType.King;
                     selectedPiece.isDelegated = false;
                     player.AddPiece(selectedPiece);
+                    delegatedPiece = selectedPiece;
+
+                    //add an entry into the moves list to allow for accurate reversion
+                    pieceMoves2.Add(delegatedMove);
+                    pieceMoves2.Add(delegatedMove);
                     break;
                 }
             }
         }
         pieceDelegatedThisTurn = true;
+        DeselectPiece();
+    }
+
+    //revert a delegation action of any kind on a single piece (works for both delegate and recall)
+    public void RevertDelegation(Piece piece)
+    {
+        selectedPiece = piece;
+        if(piece.prevCorpType == CorpType.Right || piece.prevCorpType == CorpType.Left)
+        {
+            Delegate(selectedPiece.prevCorpType);
+        }
+        else if (piece.prevCorpType == CorpType.King)
+        {
+            Recall();
+        }
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
+        pieceMoves2.RemoveAt(pieceMoves2.Count - 1);
         DeselectPiece();
     }
 
@@ -297,15 +338,38 @@ public class ChessBoard : MonoBehaviour
 
     private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
     {
-        selectedPieceMoved = true;
-
+        Piece pieceOnSquare = GetPieceOnSquare(coords);
         TryToTakeOppositePiece(coords);
+
+        //TryToTakeOppositePiece(coords);
         CheckIfCommanderMovedOne(coords);
+        //String saveKnightPos = "";
+        String test = "";
+
+        if (selectedPiece.pieceType == PieceType.Knight && (!knightHasMoved || !knightAttemptedKill))
+        {
+            saveKnightPos = piece.occupiedSquare.ToString();
+        }
+
 
         //Adds move to the move list
         if (selectedPiece.pieceType != PieceType.Knight || knightHasMoved || knightAttemptedKill || !selectedPiece.HasAdjacentEnemySquares(coords))
         {
-            String test = selectedPiece.GetType().ToString() + "|" + coords.ToString();
+            //if there's something on the target square, send its name as well as the other info
+            if(pieceOnSquare != null)
+            test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare + "|" + pieceOnSquare.GetType().ToString();
+            else
+            //otherwise, send "empty" to signify there's nothing there
+            test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare + "|" + "empty";
+
+            if (knightHasMoved || knightAttemptedKill)
+            {
+                if (pieceOnSquare != null)
+                    test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + saveKnightPos + "|" + pieceOnSquare.GetType().ToString();
+                else
+                    test = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + saveKnightPos + "|" + "empty";
+                saveKnightPos = "";
+            }
             pieceMoves.Add(test);
             //stores name of piece, the new coordinates, the old coordinates, in format: name|newcoords|oldcoords
             //String fullString = selectedPiece.GetType().ToString() + "|" + coords.ToString() + "|" + piece.occupiedSquare.ToString();
@@ -554,6 +618,7 @@ public class ChessBoard : MonoBehaviour
             ResetCommanderData();
             //prevents the "undo" button from being used after a player's turn is up.
             pieceMoves2.Clear();
+            delegatedPiece = null;
         }
 
         controller.EndTurn();
