@@ -17,11 +17,26 @@ public class AIController : MonoBehaviour
         {PieceType.Rook, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 5}, {PieceType.Rook, 5}, {PieceType.Pawn, 5}}},
         {PieceType.Pawn, new Dictionary<PieceType, int>() {{PieceType.King, 6}, {PieceType.Queen, 6}, {PieceType.Knight, 6}, {PieceType.Bishop, 5}, {PieceType.Rook, 6}, {PieceType.Pawn, 4}}}
     };
+    private Dictionary<PieceType, int> captureWorth = new Dictionary<PieceType, int>() {
+        {PieceType.King, 5000},
+        {PieceType.Queen, 80},
+        {PieceType.Knight, 50},
+        {PieceType.Bishop, 60},
+        {PieceType.Rook, 20},
+        {PieceType.Pawn, 10}
+    };
+    private Dictionary<PieceType, int> defenseWorth = new Dictionary<PieceType, int>() {
+        {PieceType.King, 5000},
+        {PieceType.Queen, 75},
+        {PieceType.Knight, 50},
+        {PieceType.Bishop, 70},
+        {PieceType.Rook, 10},
+        {PieceType.Pawn, 5}
+    };
+    private float threshold = 10.0f; //A move must be greater than or equal to this threshold to be chosen
 
-    private int baseCostPerMove = 50; //Base "cost" that a move takes. The AI will attempt to search for the lowest cost. Prevents unnecessary movements.
-
-    private List<ArrayList> potentialDangers = new List<ArrayList>(); //Team AI Defending Piece, Opponent Attacking Piece, Roll Requirement
-    private List<ArrayList> potentialAttacks = new List<ArrayList>(); //Team AI Attacking Piece, Opponent Defending Piece, Roll Requirement
+    private List<ArrayList> potentialDangers = new List<ArrayList>(); //Team AI Defending Piece, Opponent Attacking Piece, Roll Requirement, Value of the Piece Under Attack
+    private List<ArrayList> potentialAttacks = new List<ArrayList>(); //Team AI Attacking Piece, Opponent Defending Piece, Roll Requirement, Value of the Piece the AI is Attacking
 
     private IEnumerator AI_TakeTurn_Coroutine()
     {
