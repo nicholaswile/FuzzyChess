@@ -9,39 +9,35 @@ public class AIController : MonoBehaviour
     [SerializeField] private GameController controller;
     [SerializeField] private GameUI gameUI;
 
-    private List<Vector2Int> potentialCaptures = new List<Vector2Int>();
+    private int baseCostPerMove = 50; //Base "cost" that a move takes. The AI will attempt to search for the lowest cost. Prevents unnecessary movements.
 
-    //capturePairs<coordinates of piece in danger of being captured, list of coordinates of pieces that may capture the key piece> 
-    private Dictionary<Vector2Int, List<Vector2Int>> capturePairs = new Dictionary<Vector2Int,List<Vector2Int>>();
-
+    private List<ArrayList> potentialDangers = new List<ArrayList>(); //First item is the defending piece, second item is the attacking piece.
+    private List<ArrayList> potentialAttacks = new List<ArrayList>(); //First item is the attacking piece, second item is the defending piece.
 
     private IEnumerator AI_TakeTurn_Coroutine()
     {
-        List<Piece> activeCorpPieces = controller.blackPlayer.KingCorpPieces;
-
+        List<Piece> aiPieces = controller.blackPlayer.ActivePieces; 
         List<Piece> enemyPieces = controller.whitePlayer.ActivePieces;
 
-        //use method PotentialCaptureFinder to determine which enemy pieces are able to capture friendly pieces
-        PotentialCaptureFinder(enemyPieces);
+        List<Piece> activeCorpPieces = controller.blackPlayer.KingCorpPieces;
 
-        foreach(Vector2Int potcap in potentialCaptures.ToList())
-        {
-            //Debug.Log(potcap + " Name of piece " + board.GetPieceOnSquare(potcap).pieceType);
-            if(capturePairs.ContainsKey(potcap))
-            {
-                foreach (Vector2Int contCoords in capturePairs[potcap].ToList())
-                {
-                    Debug.Log("Friendly " + board.GetPieceOnSquare(potcap).pieceType + " at " + potcap + 
-                        " contested by : " + board.GetPieceOnSquare(contCoords).pieceType + " at " + contCoords);
-                }
-            }
-        }
-        Debug.Log("There are " + potentialCaptures.Count + " pieces that could be captured this turn.");
+        //Update potential danger from enemy captures and potential attacks that could be made.
+        updatePotentialDanger(enemyPieces);
+        updatePotentialAttacks(aiPieces);
+
+        Debug.Log("There are " + potentialDangers.Count + " attacking moves the non-AI team could make.");
+        foreach (ArrayList a in potentialDangers)
+            Debug.Log("AI " + ((Piece)a[0]).pieceType + " is being attacked by Player" + ((Piece)a[1]).pieceType);
+
+        Debug.Log("There are " + potentialAttacks.Count + " attacking moves the AI can make.");
+        foreach (ArrayList a in potentialAttacks)
+            Debug.Log("AI " + ((Piece)a[0]).pieceType + " attacking Player" + ((Piece)a[1]).pieceType);
+
+        yield return new WaitForSeconds(30);
 
         while (controller.activePlayer == controller.blackPlayer)
         {
-                foreach (Piece corpPiece in activeCorpPieces.ToList())
-
+            foreach (Piece corpPiece in activeCorpPieces.ToList())
             {
                 Vector3 piecePosition = board.GetPositionFromCoords(corpPiece.occupiedSquare);
 
@@ -125,82 +121,63 @@ public class AIController : MonoBehaviour
         return dangerSpots;
     }
 
-    //function to handle both updating the capture list, and updating the dict.
-    private void AddToCaptureList(Vector2Int dz, Piece piece)
-    {
-        if(!(potentialCaptures.Contains(dz)))
-        potentialCaptures.Add(dz);
-
-        //check to make sure that the piece isn't in the dict already (i.e. in danger of capture by another piece)
-        //and decide on which logic needs to be used to add to the list of vulnerabilities.
-        if (capturePairs.ContainsKey(dz))
-        {
-            capturePairs[dz].Add(piece.occupiedSquare);
-        }
-        else
-        {
-            List<Vector2Int> starterList = new List<Vector2Int>
-                            {
-                                piece.occupiedSquare
-                            };
-            capturePairs.Add(dz, starterList);
-        }
-    }
-
-    //written to generate a list of pieces in danger, and a dictionary which links the list of pieces to 
-    //each piece that could potentially capture the pieces in danger.
-    //designed with defense in mind, but could probably be useful to offense applications as well.
-
     //INPUT: a list of pieces from the attacking team (example: controller.whitePlayer.ActivePieces)
-    //OUTPUT: modifies List<Vector2Int> potentialCaptures and dictionary capturePairs to contain all potential offensive moves for the attacking team.
-    private void PotentialCaptureFinder(List<Piece> pieces)
+    //OUTPUT: Update potentialDangers list of potential attacking moves by the non-AI team.
+    private void updatePotentialDanger(List<Piece> enemyPieces)
     {
-        //ensure these two are emptied before each run of PotentialCaptureFinder.
-        potentialCaptures.Clear();
-        capturePairs.Clear();
-        foreach (Piece corpPiece in pieces.ToList())
+        potentialDangers.Clear();
+        foreach (Piece enemyPiece in enemyPieces) //For every non-AI piece
         {
-            //Debug.Log("Reached inside of enemypieces");
-            //Debug.Log("Number of enemy pieces: " + enemyPieces.Count);
-            //Debug.Log("Available moves: " + corpPiece.AvailableMoves.Count);
-            Vector3 piecePosition = board.GetPositionFromCoords(corpPiece.occupiedSquare);
-            Debug.Log("Checking potential for movements from enemy piece " + corpPiece.pieceType + " at coordinate " + corpPiece.occupiedSquare);
-
-            if (corpPiece.AvailableMoves.Count > 0)
+            if (enemyPiece.AvailableMoves.Count > 0)
             {
                 //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
-                if (corpPiece.pieceType.ToString().Equals("Knight"))
+                if (enemyPiece.pieceType == PieceType.Knight)
                 {
-                    Debug.Log("Found special rule for " + corpPiece.pieceType);
-                    List<Vector2Int> knightDangerZone = KnightHighDangerZone(corpPiece);
-                    Debug.Log("Now listing places knight can capture");
-                    foreach (Vector2Int dz in knightDangerZone.ToList())
-                    {
-                        Debug.Log(dz);
-                        AddToCaptureList(dz, corpPiece);
-
-                    }
-                    Debug.Log("End of List.");
+                    foreach (Vector2Int dz in KnightHighDangerZone(enemyPiece))
+                        //Add all additional knight moves.
+                        potentialDangers.Add(new ArrayList() {board.GetPieceOnSquare(dz), enemyPiece});
                 }
 
-
-                foreach (Vector2Int move in corpPiece.AvailableMoves.ToList())
+                //For every move that a non-AI piece can make
+                foreach (Vector2Int move in enemyPiece.AvailableMoves)
                 {
-                    //see if we can detect that a "take" is available.
-                    //Debug.Log("Reached inside of availablemoves");
-                    Debug.Log(move);
-                    Piece piece = board.GetPieceOnSquare(move);
-                    if (piece != null && !corpPiece.IsFromSameTeam(piece))
-                    {
-                        Debug.Log("Found cap");
-                        AddToCaptureList(move, corpPiece);
-                    }
-
+                    Piece aiPiece = board.GetPieceOnSquare(move);
+                    //Add a potentialDanger if there is a piece and it is from the AI's team.
+                    if (aiPiece != null && !enemyPiece.IsFromSameTeam(aiPiece))
+                        potentialDangers.Add(new ArrayList() {aiPiece, enemyPiece});
                 }
             }
         }
     }
 
+    //INPUT: a list of pieces from the attacking team (example: controller.whitePlayer.ActivePieces)
+    //OUTPUT: Update potentialAttacks list of potential attacking moves by the AI team.
+    private void updatePotentialAttacks(List<Piece> aiPieces)
+    {
+        potentialAttacks.Clear();
+        foreach (Piece aiPiece in aiPieces) //For every AI piece
+        {
+            if (aiPiece.AvailableMoves.Count > 0)
+            {
+                //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
+                if (aiPiece.pieceType == PieceType.Knight)
+                {
+                    foreach (Vector2Int dz in KnightHighDangerZone(aiPiece))
+                        //Add all additional knight moves.
+                        potentialAttacks.Add(new ArrayList() {aiPiece, board.GetPieceOnSquare(dz)});
+                }
+
+                //For every move that an AI piece can make
+                foreach (Vector2Int move in aiPiece.AvailableMoves)
+                {
+                    Piece enemyPiece = board.GetPieceOnSquare(move);
+                    //Add a potentialAttack if there is a piece and it is from the enemy's team.
+                    if (enemyPiece != null && !aiPiece.IsFromSameTeam(enemyPiece))
+                        potentialAttacks.Add(new ArrayList() {aiPiece, enemyPiece});
+                }
+            }
+        }
+    }
 
     public void AI_TakeTurn() 
     {
