@@ -25,15 +25,13 @@ public class AIController : MonoBehaviour
         updatePotentialDanger(enemyPieces);
         updatePotentialAttacks(aiPieces);
 
+        /*//DEBUG: Output to determine who is attacking what.
         Debug.Log("There are " + potentialDangers.Count + " attacking moves the non-AI team could make.");
         foreach (ArrayList a in potentialDangers)
-            Debug.Log("AI " + ((Piece)a[0]).pieceType + " is being attacked by Player" + ((Piece)a[1]).pieceType);
-
+            Debug.Log("AI " + ((Piece)a[0]).pieceType + " is being attacked by Player " + ((Piece)a[1]).pieceType);
         Debug.Log("There are " + potentialAttacks.Count + " attacking moves the AI can make.");
         foreach (ArrayList a in potentialAttacks)
-            Debug.Log("AI " + ((Piece)a[0]).pieceType + " attacking Player" + ((Piece)a[1]).pieceType);
-
-        yield return new WaitForSeconds(30);
+            Debug.Log("AI " + ((Piece)a[0]).pieceType + " attacking Player " + ((Piece)a[1]).pieceType);*/
 
         while (controller.activePlayer == controller.blackPlayer)
         {
@@ -83,45 +81,31 @@ public class AIController : MonoBehaviour
     }
 
 
-    //Creates a list of type Vector2Int which stores all the locations of pieces which a knight may roll a +1 on capture.
-    //This was created because knight movement in AvailableMoves doesn't list places a knight may move to, then capture around.
-    //Pieces stored in this list are at a heightened risk of capture, as knights get +1 on their roll for these.
-    private List<Vector2Int> KnightHighDangerZone(Piece piece)
+    //INPUT: A knight piece
+    //OUTPUT: A list of all the locations where the input knight may roll a +1 on capture.
+    private List<Vector2Int> getKnightMoves(Piece knight)
     {
         List<Vector2Int> dangerSpots = new List<Vector2Int>();
-        foreach (Vector2Int move in piece.AvailableMoves.ToList())
+        foreach (Vector2Int move in knight.AvailableMoves)
         {
-            Debug.Log("Knight first move location: " + move);
-            //gather a list of new knight moves at each location that the knight could potentially land.
-            Piece contestedPiece = board.GetPieceOnSquare(move);
+            Piece piece = board.GetPieceOnSquare(move);
 
-            //check to make sure we're not looking at already-occupied squares. knight can't move after killing.
-            if (contestedPiece != null && !piece.IsFromSameTeam(contestedPiece))
-            {
+            //Check to make sure we're not looking at already-occupied squares. Knight can't move after killing.
+            if (piece != null && !knight.IsFromSameTeam(piece))
                 continue;
-            }
             else
             {
-                List<Vector2Int> newKnightMoves = piece.GetAdjacentEnemySquares(move);
-                foreach (Vector2Int futureSpot in newKnightMoves)
-                {
-                    //unneeded, since GetAdjacentEnemySquares already checks if there's a piece and if it's an enemy on the square.
-                    //Piece possiblePiece = board.GetPieceOnSquare(futureSpot);
-
-                    //go through the usual checks to see if something may be captured, but also check to avoid duplicates. Dupes are unneeded.
-                    if (!(dangerSpots.Contains(futureSpot)))
-                    {
-                        Debug.Log("Added danger spot from knight at " + futureSpot);
-                        dangerSpots.Add(futureSpot);
-                    }
-                }
+                //Run through each secondary move and add it if it is new. 
+                foreach (Vector2Int doubleMove in knight.GetAdjacentEnemySquares(move))
+                    if (!(dangerSpots.Contains(doubleMove)))
+                        dangerSpots.Add(doubleMove);
             }
 
         }
         return dangerSpots;
     }
 
-    //INPUT: a list of pieces from the attacking team (example: controller.whitePlayer.ActivePieces)
+    //INPUT: A list of pieces from the attacking team (example: controller.whitePlayer.ActivePieces)
     //OUTPUT: Update potentialDangers list of potential attacking moves by the non-AI team.
     private void updatePotentialDanger(List<Piece> enemyPieces)
     {
@@ -133,9 +117,9 @@ public class AIController : MonoBehaviour
                 //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
                 if (enemyPiece.pieceType == PieceType.Knight)
                 {
-                    foreach (Vector2Int dz in KnightHighDangerZone(enemyPiece))
+                    foreach (Vector2Int move in getKnightMoves(enemyPiece))
                         //Add all additional knight moves.
-                        potentialDangers.Add(new ArrayList() {board.GetPieceOnSquare(dz), enemyPiece});
+                        potentialDangers.Add(new ArrayList() {board.GetPieceOnSquare(move), enemyPiece});
                 }
 
                 //For every move that a non-AI piece can make
@@ -162,9 +146,9 @@ public class AIController : MonoBehaviour
                 //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
                 if (aiPiece.pieceType == PieceType.Knight)
                 {
-                    foreach (Vector2Int dz in KnightHighDangerZone(aiPiece))
+                    foreach (Vector2Int move in getKnightMoves(aiPiece))
                         //Add all additional knight moves.
-                        potentialAttacks.Add(new ArrayList() {aiPiece, board.GetPieceOnSquare(dz)});
+                        potentialAttacks.Add(new ArrayList() {aiPiece, board.GetPieceOnSquare(move)});
                 }
 
                 //For every move that an AI piece can make
