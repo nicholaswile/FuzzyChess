@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,16 +20,16 @@ public class AIController : MonoBehaviour
     };
     private Dictionary<PieceType, int> captureWorth = new Dictionary<PieceType, int>() {
         {PieceType.King, 5000},
-        {PieceType.Queen, 80},
-        {PieceType.Knight, 50},
-        {PieceType.Bishop, 60},
-        {PieceType.Rook, 20},
+        {PieceType.Queen, 70},
+        {PieceType.Knight, 65},
+        {PieceType.Bishop, 80},
+        {PieceType.Rook, 25},
         {PieceType.Pawn, 10}
     };
     private Dictionary<PieceType, int> defenseWorth = new Dictionary<PieceType, int>() {
         {PieceType.King, 5000},
         {PieceType.Queen, 75},
-        {PieceType.Knight, 50},
+        {PieceType.Knight, 55},
         {PieceType.Bishop, 70},
         {PieceType.Rook, 10},
         {PieceType.Pawn, 5}
@@ -52,10 +53,10 @@ public class AIController : MonoBehaviour
         //DEBUG: Output to determine who is attacking what.
         Debug.Log("There are " + potentialDangers.Count + " attacking moves the non-AI team could make.");
         foreach (ArrayList a in potentialDangers)
-            Debug.Log("AI " + ((Piece)a[0]).pieceType + " is being attacked by Player " + ((Piece)a[1]).pieceType + ". A roll of " + a[2] + " will capture.");
+            Debug.Log("AI " + ((Piece)a[0]).pieceType + " is being attacked by Player " + ((Piece)a[1]).pieceType + ". A roll of " + a[2] + " will capture. The value of this piece is " + a[3] + ". Cost: " + a[4]);
         Debug.Log("There are " + potentialAttacks.Count + " attacking moves the AI can make.");
         foreach (ArrayList a in potentialAttacks)
-            Debug.Log("AI " + ((Piece)a[0]).pieceType + " attacking Player " + ((Piece)a[1]).pieceType+ ". A roll of " + a[2] + " will capture.");
+            Debug.Log("AI " + ((Piece)a[0]).pieceType + " attacking Player " + ((Piece)a[1]).pieceType+ ". A roll of " + a[2] + " will capture. The value of this piece is " + a[3] + ". Cost: " + a[4]);
 
         while (controller.activePlayer == controller.blackPlayer)
         {
@@ -141,9 +142,11 @@ public class AIController : MonoBehaviour
                 //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
                 if (enemyPiece.pieceType == PieceType.Knight)
                 {
-                    foreach (Vector2Int move in getKnightMoves(enemyPiece))
+                    foreach (Vector2Int move in getKnightMoves(enemyPiece)) {
                         //Add all additional knight moves.
-                        potentialDangers.Add(new ArrayList() {board.GetPieceOnSquare(move), enemyPiece, getMinRoll(enemyPiece, board.GetPieceOnSquare(move)) - 1});
+                        Piece aiPiece = board.GetPieceOnSquare(move);
+                        potentialDangers.Add(new ArrayList() {aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType])});
+                    }
                 }
 
                 //For every move that a non-AI piece can make
@@ -152,7 +155,7 @@ public class AIController : MonoBehaviour
                     Piece aiPiece = board.GetPieceOnSquare(move);
                     //Add a potentialDanger if there is a piece and it is from the AI's team.
                     if (aiPiece != null && !enemyPiece.IsFromSameTeam(aiPiece))
-                        potentialDangers.Add(new ArrayList() {aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece)});
+                        potentialDangers.Add(new ArrayList() {aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType])});
                 }
             }
         }
@@ -170,9 +173,11 @@ public class AIController : MonoBehaviour
                 //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
                 if (aiPiece.pieceType == PieceType.Knight)
                 {
-                    foreach (Vector2Int move in getKnightMoves(aiPiece))
+                    foreach (Vector2Int move in getKnightMoves(aiPiece)) {
                         //Add all additional knight moves.
-                        potentialAttacks.Add(new ArrayList() {aiPiece, board.GetPieceOnSquare(move), getMinRoll(aiPiece, board.GetPieceOnSquare(move)) - 1});
+                        Piece enemyPiece = board.GetPieceOnSquare(move);
+                        potentialAttacks.Add(new ArrayList() {aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType])});
+                    }
                 }
 
                 //For every move that an AI piece can make
@@ -181,7 +186,7 @@ public class AIController : MonoBehaviour
                     Piece enemyPiece = board.GetPieceOnSquare(move);
                     //Add a potentialAttack if there is a piece and it is from the enemy's team.
                     if (enemyPiece != null && !aiPiece.IsFromSameTeam(enemyPiece))
-                        potentialAttacks.Add(new ArrayList() {aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece)});
+                        potentialAttacks.Add(new ArrayList() {aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType])});
                 }
             }
         }
@@ -189,6 +194,10 @@ public class AIController : MonoBehaviour
 
     private int getMinRoll(Piece attacking, Piece defending) {
         return captureTable[attacking.pieceType][defending.pieceType];
+    }
+
+    private float getMoveCost(int minRoll, int pieceValue) {
+        return ((float)1/minRoll * 1.5f) * pieceValue;
     }
 
     public void AI_TakeTurn() 
