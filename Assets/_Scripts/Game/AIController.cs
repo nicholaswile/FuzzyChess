@@ -9,6 +9,7 @@ public class AIController : MonoBehaviour
     [SerializeField] private ChessBoard board;
     [SerializeField] private GameController controller;
     [SerializeField] private GameUI gameUI;
+    private GameState state;
 
     private Dictionary<PieceType, Dictionary<PieceType, int>> captureTable = new Dictionary<PieceType, Dictionary<PieceType, int>>() {
         {PieceType.King, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 4}, {PieceType.Rook, 5}, {PieceType.Pawn, 1}}},
@@ -48,6 +49,10 @@ public class AIController : MonoBehaviour
 
         while (controller.activePlayer == controller.blackPlayer)
         {
+            //TEMP FIX FOR INFINITE LOOP AT END OF GAME
+            if (state == GameState.Win || state == GameState.Lose)
+                break;
+
             updateMoveList(aiPieces, enemyPieces);
             moveList.Sort(sortMoveList);
 
@@ -287,5 +292,15 @@ public class AIController : MonoBehaviour
     public void AI_TakeTurn() 
     {
         StartCoroutine(AI_TakeTurn_Coroutine());
+    }
+
+    private void Awake()
+    {
+        GameManager.StateChanged += GameManager_StateChanged;
+    }
+
+    private void GameManager_StateChanged(GameState state)
+    {
+        this.state = state;
     }
 }
