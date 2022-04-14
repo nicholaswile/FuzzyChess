@@ -3215,12 +3215,13 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Click a piece then a highlighted tile to advance to that tile. A red tile
-    indicates a potential capture; success of capture is determined by a dice roll.
-    You may view the capture probability by pressing the ROLLS button. Pieces are
-    grouped in corps. If you select a piece you may delegate it left or right with
-    L and R buttons or recall it back to king with the K button. Move up to three
-    pieces per turn. Skip a turn by pressing SKIP. '
+  m_text: "Click a piece and select a highlighted tile to move the piece to that
+    space. If an enemy piece occupies that space, then the tile will be highlighted
+    red. To capture a piece, you must roll a value that varies among piece types.
+    Capture probabilities can be viewed by pressing ROLLS.\n\nEvery piece belongs
+    to a corps. Click a piece; if the piece is movable, then its corps will be highlighted.
+    You may delegate a piece to the left corps by pressing L, right by pressing R,
+    and back to the king's corps by pressing K.\n\n "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
@@ -3247,8 +3248,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -1790,6 +1790,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 382455519}
+  - component: {fileID: 382455520}
   m_Layer: 0
   m_Name: Render
   m_TagString: Untagged
@@ -1817,6 +1818,14 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &382455520
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 382455518}
+  m_Enabled: 1
 --- !u!1 &448339916
 GameObject:
   m_ObjectHideFlags: 0
@@ -2916,7 +2925,6 @@ GameObject:
   m_Component:
   - component: {fileID: 701772141}
   - component: {fileID: 701772143}
-  - component: {fileID: 701772142}
   m_Layer: 0
   m_Name: Cam 2D
   m_TagString: MainCamera
@@ -2938,14 +2946,6 @@ Transform:
   m_Father: {fileID: 382455519}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 90.15, z: 0}
---- !u!81 &701772142
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 701772140}
-  m_Enabled: 1
 --- !u!20 &701772143
 Camera:
   m_ObjectHideFlags: 0
