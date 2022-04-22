@@ -26,18 +26,52 @@ public class CursorObj : MonoBehaviour
     private void OnMouseOver()
     {
         if (board.isSelectable(gameObject.GetComponent<Piece>()) && controller.activePlayer == controller.whitePlayer && !Input.GetMouseButton(1))
+        {
             CursorManager.Instance.SetActiveCursorType(cursorType);
+            Tooltip.ShowTooltip_Static("Piece: " + gameObject.GetComponent<Piece>().pieceType.ToString() + "\n" +
+                "Corp: " + gameObject.GetComponent<Piece>().corpType.ToString());
+        }
         else if (gameObject.name == "Highlighter(Clone)" && controller.activePlayer == controller.whitePlayer && !Input.GetMouseButton(1))
+        {
+            List<Vector2Int> adjacentSquares = board.selectedPiece.GetAdjacentSquares();
+            Vector2Int highlighterPosition = board.GetCoordsFromPosition(gameObject.transform.position);
             CursorManager.Instance.SetActiveCursorType(cursorType);
+            Tooltip.ShowTooltip_Static("Spend " + board.selectedPiece.corpType.ToString() + " Corp's Command Authority");
+            foreach (Vector2Int square in adjacentSquares)
+            {
+                if (square == highlighterPosition && !board.selectedPiece.CommanderMovedOne() && (board.selectedPiece.pieceType == PieceType.King || board.selectedPiece.pieceType == PieceType.Bishop))
+                {
+                    if (board.selectedPiece.pieceType == PieceType.King)
+                    {
+                        Tooltip.ShowTooltip_Static("Use King's Extra Move");
+                        break;
+                    }
+                    else
+                    {
+                        Tooltip.ShowTooltip_Static("Use " + board.selectedPiece.corpType.ToString() + " Bishop's Extra Move");
+                        break;
+                    }
+                }
+            }
+        }
         else if (IsHoveringEnemy())
+        {
             CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Kill);
-        else if ((!board.isSelectable(gameObject.GetComponent<Piece>()) || controller.activePlayer != controller.whitePlayer) && !Input.GetMouseButton(1))
+
+            Piece enemyPiece = gameObject.GetComponent<Piece>();
+
+            Tooltip.ShowTooltip_Static("Spend " + board.selectedPiece.corpType.ToString() + " Corp's Command Authority" + "\n" +
+                "Roll Needed To Capture " + enemyPiece.pieceType.ToString() + ": " + board.GetRollNeeded(board.selectedPiece, enemyPiece) + "+");
+
+        }
+        else if ((!board.isSelectable(gameObject.GetComponent<Piece>()) || controller.activePlayer != controller.whitePlayer) && !Input.GetMouseButton(1)) 
             CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Unavailable);
     }
 
     private void OnMouseExit()
     {
         CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Default);
+        Tooltip.HideTooltip_Static();
     }
 
     private bool IsHoveringEnemy() 

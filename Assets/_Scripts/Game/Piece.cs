@@ -245,13 +245,13 @@ public abstract class Piece : MonoBehaviour
         return adjacentEnemySquares;
     }
 
-    public List<Vector2Int> GetAdjacentSquares(Vector2Int coords)
+    public List<Vector2Int> GetAdjacentSquares()
     {
         List<Vector2Int> adjacentSquares = new List<Vector2Int>();
 
         foreach (var direction in directions)
         {
-            Vector2Int nextDirection = coords + direction;
+            Vector2Int nextDirection = occupiedSquare + direction;
             Piece piece = board.GetPieceOnSquare(nextDirection);
             if (!board.CheckIfCoordsAreOnBoard(nextDirection))
                 continue;
