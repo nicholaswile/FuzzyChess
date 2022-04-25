@@ -217,7 +217,7 @@ public class GameController : MonoBehaviour
         kingCorpUsed = 0;
     }
 
-    private Player GetOppositePlayer(Player player)
+    public Player GetOppositePlayer(Player player)
     {
         return player == whitePlayer ? blackPlayer : whitePlayer;
     }
