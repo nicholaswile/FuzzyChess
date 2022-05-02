@@ -43,6 +43,9 @@ public class AIController : MonoBehaviour
         {PieceType.Rook, 50},
         {PieceType.Pawn, 5}
     };
+    private float threateningMoveMultiplier = .75f;
+    private float fleeMultiplier = 1.15f;
+    private float attackMultiplier = 1.175f;
 
     //Is Attack Move | AI Piece | Movement Location | Value of Move
     private List<ArrayList> aiMoves = new List<ArrayList>();
@@ -50,12 +53,13 @@ public class AIController : MonoBehaviour
     //AI Piece | Opponent Piece | Value of Move
     private List<ArrayList> threateningMoves = new List<ArrayList>();
 
-    private IEnumerator AI_TakeTurn_Coroutine() //TODO: Make AI better select which pieces to move (when the AI can only make a movement) e.g. deciding between pawns. Use threateningMoves to detrmine whether to flee or attack a threatening piece. Extra Corp Movements. Avoid Areas that could be capturable next turn.
+    private IEnumerator AI_TakeTurn_Coroutine() //TODO: Make AI better select which pieces to move (when the AI can only make a movement) e.g. deciding between pawns. Avoid Areas that could be capturable next turn.
     {
         List<Piece> aiPieces = controller.activePlayer.ActivePieces; 
         List<Piece> enemyPieces = controller.GetOppositePlayer(controller.activePlayer).ActivePieces;
 
-        updateMoveLists(aiPieces, enemyPieces);
+        aiMoves = updateAiMoves(aiPieces, enemyPieces);
+        threateningMoves = updateThreateningMoves(aiPieces, enemyPieces);
 
         while (aiMoves.Count > 0)
         {
@@ -63,17 +67,17 @@ public class AIController : MonoBehaviour
             if (state == GameState.Win || state == GameState.Lose)
                 break;
 
-            /*//DEBUG: Output number of moves avaliable, what's attacking, what's being attacked, and all values related to movement.
+            //DEBUG: Output number of moves avaliable, what's attacking, what's being attacked, and all values related to movement.
             Debug.Log("There are " + aiMoves.Count + " AI moves that can be made this turn, and " + threateningMoves.Count + " opponent moves that are threatining the AI.");
             foreach (ArrayList a in aiMoves)
             {
                 if ((bool)a[0])
                     Debug.Log("AI " + ((Piece)a[1]).pieceType + " attacking Player " + board.GetPieceOnSquare(board.GetCoordsFromPosition((Vector3)a[2])) + ". Move Value: " + a[3]);
                 else
-                    Debug.Log("AI " + ((Piece)a[1]).pieceType + " moving to " + ((Vector3)a[2]) + ". Move Value: " + a[3]);
+                    Debug.Log("AI " + ((Piece)a[1]).pieceType + " moving to " + board.GetCoordsFromPosition((Vector3)a[2]) + ". Move Value: " + a[3]);
             }
-            foreach (ArrayList a in threateningMoves)
-                Debug.Log("AI " + ((Piece)a[0]).pieceType + " is threatened by opponent " + ((Piece)a[1]) + ". Move Value: " + a[2]);*/
+            //foreach (ArrayList a in threateningMoves)
+                //Debug.Log("AI " + ((Piece)a[0]).pieceType + " is threatened by opponent " + ((Piece)a[1]) + ". Move Value: " + a[2]);
 
             Piece attackingPiece = (Piece)aiMoves.ElementAt(0)[1];
             Vector3 piecePosition = board.GetPositionFromCoords(attackingPiece.occupiedSquare);
@@ -125,7 +129,8 @@ public class AIController : MonoBehaviour
                 SFXController.PlaySoundMovement();
             }
 
-            updateMoveLists(aiPieces, enemyPieces);
+            aiMoves = updateAiMoves(aiPieces, enemyPieces);
+            threateningMoves = updateThreateningMoves(aiPieces, enemyPieces);
         }
 
         //Skip turn when there are no more moves to make.
@@ -157,15 +162,12 @@ public class AIController : MonoBehaviour
     }
 
     //INPUT: A list of pieces from the AI team and a list from the enemy team
-    //OUTPUT: Update aiMoves and threatingingMoves lists
+    //OUTPUT: Sorted list of moves the AI can make
     //FORMAT: aiMoves = {Is Attack Move | AI Piece | Movement Location | Value of Move}
-    //        threateningMoves = {AI Piece | Opponent Piece | Value of Move}
-    private void updateMoveLists(List<Piece> aiPieces, List<Piece> enemyPieces)
+    private List<ArrayList> updateAiMoves(List<Piece> aiPieces, List<Piece> enemyPieces)
     {
-        aiMoves.Clear();
-        threateningMoves.Clear();
+        List<ArrayList> newAiMoves = new List<ArrayList>();
 
-        //For every AI piece
         foreach (Piece aiPiece in aiPieces)
         {
             if (aiPiece.AvailableMoves.Count > 0)
@@ -177,7 +179,7 @@ public class AIController : MonoBehaviour
                     {
                         //Add all additional knight moves.
                         Piece enemyPiece = board.GetPieceOnSquare(move);
-                        aiMoves.Add(new ArrayList() { true, aiPiece, board.GetPositionFromCoords(enemyPiece.occupiedSquare), getCaptureValue(getMinRoll(aiPiece, enemyPiece) - 1, captureValue[enemyPiece.pieceType]) });
+                        newAiMoves.Add(new ArrayList() { true, aiPiece, board.GetPositionFromCoords(enemyPiece.occupiedSquare), getMoveValue(true, move, aiPiece, enemyPiece) - 1 });
                     }
                 }
 
@@ -187,15 +189,33 @@ public class AIController : MonoBehaviour
                     Piece enemyPiece = board.GetPieceOnSquare(move);
                     if (enemyPiece != null && !aiPiece.IsFromSameTeam(enemyPiece))
                         //Add an aiMove capture if there is a piece and it is from the enemy's team.
-                        aiMoves.Add(new ArrayList() { true, aiPiece, board.GetPositionFromCoords(enemyPiece.occupiedSquare), getCaptureValue(getMinRoll(aiPiece, enemyPiece), captureValue[enemyPiece.pieceType]) });
+                        newAiMoves.Add(new ArrayList() { true, aiPiece, board.GetPositionFromCoords(enemyPiece.occupiedSquare), getMoveValue(true, move, aiPiece, enemyPiece) });
                     else if (enemyPiece == null)
+                    {
                         //Add an aiMove movement if there no piece in an avaliable move spot
-                        aiMoves.Add(new ArrayList() { false, aiPiece, board.GetPositionFromCoords(move), getMoveValue(move, aiPiece) });
+                        newAiMoves.Add(new ArrayList() { false, aiPiece, board.GetPositionFromCoords(move), getMoveValue(false, move, aiPiece, null) });
+                    }
                 }
             }
         }
 
-        //For every non-AI piece
+        //Remove all AI moves where the corp has already moved
+        //TODO: May not work
+        newAiMoves.RemoveAll(corpMoved);
+
+        //Sort all moves by Value
+        newAiMoves.Sort(sortMoveList);
+
+        return newAiMoves;
+    }
+
+    //INPUT: A list of pieces from the AI team and a list from the enemy team
+    //OUTPUT: Sorted list of moves that are threatening the AI
+    //FORMAT: threateningMoves = {AI Piece | Opponent Piece | Value of Move}
+    private List<ArrayList> updateThreateningMoves(List<Piece> aiPieces, List<Piece> enemyPieces)
+    {
+        List<ArrayList> newThreateningMoves = new List<ArrayList>();
+
         foreach (Piece enemyPiece in enemyPieces)
         {
             if (enemyPiece.AvailableMoves.Count > 0)
@@ -207,7 +227,7 @@ public class AIController : MonoBehaviour
                     {
                         //Add all additional knight moves.
                         Piece aiPiece = board.GetPieceOnSquare(move);
-                        threateningMoves.Add(new ArrayList() { aiPiece, enemyPiece, getCaptureValue(getMinRoll(enemyPiece, aiPiece) - 1, threatenedValue[aiPiece.pieceType]) });
+                        newThreateningMoves.Add(new ArrayList() { aiPiece, enemyPiece });//, getCaptureValue(getMinRoll(enemyPiece, aiPiece) - 1, threatenedValue[aiPiece.pieceType]) });
                     }
                 }
 
@@ -217,39 +237,59 @@ public class AIController : MonoBehaviour
                     Piece aiPiece = board.GetPieceOnSquare(move);
                     //Add a threateningMove if there is a piece and it is from the AI's team.
                     if (aiPiece != null && !enemyPiece.IsFromSameTeam(aiPiece))
-                        threateningMoves.Add(new ArrayList() { aiPiece, enemyPiece, getCaptureValue(getMinRoll(enemyPiece, aiPiece), threatenedValue[aiPiece.pieceType]) });
+                        newThreateningMoves.Add(new ArrayList() { aiPiece, enemyPiece });//, getCaptureValue(getMinRoll(enemyPiece, aiPiece), threatenedValue[aiPiece.pieceType]) });
                 }
             }
         }
 
-        //Remove all AI moves where the corp has already moved
-        //TODO: May not work
-        aiMoves.RemoveAll(corpMoved);
-
         //Sort all moves by Value
-        aiMoves.Sort(sortMoveList);
-        threateningMoves.Sort(sortMoveList);
+        //newThreateningMoves.Sort(sortMoveList);
+
+        return newThreateningMoves;
     }
 
-    private int getMinRoll(Piece attacking, Piece defending)
+    private float getMoveValue(bool isCapture, Vector2Int moveLocation, Piece aiPiece, Piece enemyPiece)
     {
-        return captureTable[attacking.pieceType][defending.pieceType];
-    }
+        float moveValue = 0f;
 
-    private float getCaptureValue(int minRoll, int pieceValue)
-    {
-        return ((float)1/minRoll) * pieceValue;
-    }
-
-    private float getMoveValue(Vector2Int moveLocation, Piece piece)
-    {
-        int yAim;
-        if (controller.activePlayer == controller.blackPlayer)
-            yAim = 1;
+        if (isCapture)
+        {
+            if (isThreatenedBy(aiPiece, enemyPiece))
+                moveValue = (float)1 / captureTable[aiPiece.pieceType][enemyPiece.pieceType] * captureValue[enemyPiece.pieceType] * attackMultiplier;
+            else
+                moveValue = (float)1 / captureTable[aiPiece.pieceType][enemyPiece.pieceType] * captureValue[enemyPiece.pieceType];
+        }
         else
-            yAim = -1;
+        {
+            int yAim;
+            if (controller.activePlayer == controller.blackPlayer)
+                yAim = 1;
+            else
+                yAim = -1;
 
-        return (float)baseMoveValue[piece.pieceType] + (piece.occupiedSquare.y - moveLocation.y) * yAim;
+            if(isThreatened(aiPiece))
+                moveValue = (float)baseMoveValue[aiPiece.pieceType] + (aiPiece.occupiedSquare.y - moveLocation.y) * yAim * fleeMultiplier;
+            else
+                moveValue = (float)baseMoveValue[aiPiece.pieceType] + (aiPiece.occupiedSquare.y - moveLocation.y) * yAim;
+        }
+
+        //if (willBeThreatened (Piece or location)) then multiply the move value by threateningMoveMultiplier
+    }
+
+    private bool isThreatened (Piece aiPiece)
+    {
+        foreach(ArrayList move in threateningMoves)
+            if (move[0].Equals(aiPiece))
+                return true;
+        return false;
+    }
+
+    private bool isThreatenedBy (Piece aiPiece, Piece enemyPiece)
+    {
+        foreach (ArrayList move in threateningMoves)
+            if (move[0].Equals(aiPiece) && move[1].Equals(enemyPiece))
+                return true;
+        return false;
     }
 
     private int sortMoveList(ArrayList x, ArrayList y)
