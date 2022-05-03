@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private GameObject softScreen,mainMenuScreen, playScreen, statsScreen, rulesScreen, creditsScreen;
+    [SerializeField] private GameObject softScreen,mainMenuScreen, playScreen, statsScreen, settingsScreen, rulesScreen, creditsScreen;
     [SerializeField] private TextMeshProUGUI winText, loseText;
     [SerializeField] private Button aiVsAiButton;
 
@@ -21,6 +21,7 @@ public class MainMenu : MonoBehaviour
         statsScreen.SetActive(false);
         rulesScreen.SetActive(false);
         creditsScreen.SetActive(false);
+        settingsScreen.SetActive(false);
 
         // Will comment the following out once ai vs ai mode is complete
         aiVsAiButton.interactable = false;
@@ -112,6 +113,46 @@ public class MainMenu : MonoBehaviour
 
         PlayerPrefs.SetString(WINS, "000");
         PlayerPrefs.SetString(LOSS, "000");
+        UI_ButtonSound();
+    }
+
+    public void UI_SettingsMode()
+    {
+        settingsScreen.SetActive(true);
+        mainMenuScreen.SetActive(false);
+        UI_ButtonSound();
+    }
+
+    public void UI_AgressiveAI()
+    {
+        // Modify AI script values here
+        Debug.Log("AI set to attack more often.");
+    }
+
+    public void UI_DefensiveAI()
+    {
+        // Modify AI script values here
+        Debug.Log("AI set to protect itself.");
+    }
+
+    public void UI_BalancedAI()
+    {
+        // Modify AI script values here
+        Debug.Log("AI set to default profile.");
+    }
+
+    public void UI_VolumeSFX()
+    {
+        //figuring out how to link SFXController with the slider in settings still
+    }
+
+    public void UI_VolumeMusic()
+    {
+        //figuring out how to link Background Music gameObject with the slider in settings still
+    }
+    public void UI_Animations()
+    {
+        //toggle Piece.animationsEnabled which controls the correct moveTo() pathway
     }
 
     public void UI_RulesMode()
