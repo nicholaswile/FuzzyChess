@@ -19,6 +19,7 @@ public abstract class Piece : MonoBehaviour
     private bool delegated = false;
     public bool isDelegated { get { return delegated; } set { delegated = value; } }
     public List<Vector2Int> AvailableMoves;
+    public bool animationsEnabled = true;
 
     static Vector2Int[] directions = new Vector2Int[]
     {
@@ -108,9 +109,13 @@ public abstract class Piece : MonoBehaviour
 
     public void MoveTo(Transform transform, Vector3 targetPosition)
     {
-        //transform.position = targetPosition;
-        //SFXController.PlaySoundMovement();
-        StartCoroutine(MoveAtoB(transform.gameObject, transform.position, targetPosition));
+        if(animationsEnabled)
+        {
+            StartCoroutine(MoveAtoB(transform.gameObject, transform.position, targetPosition));
+        } else {
+            transform.position = targetPosition;
+            SFXController.PlaySoundMovement();
+        }
     }
 
     public virtual void MovePiece(Vector2Int coords) 
