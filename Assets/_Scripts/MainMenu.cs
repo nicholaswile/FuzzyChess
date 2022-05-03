@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class MainMenu : MonoBehaviour
 {
@@ -70,7 +71,7 @@ public class MainMenu : MonoBehaviour
     {
         playScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_HumanMode()
@@ -91,14 +92,14 @@ public class MainMenu : MonoBehaviour
     {
         mainMenuScreen.SetActive(true);
         currentScreen.SetActive(false);
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_StatsMode()
     {
         statsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_ResetScore()
@@ -113,75 +114,60 @@ public class MainMenu : MonoBehaviour
 
         PlayerPrefs.SetString(WINS, "000");
         PlayerPrefs.SetString(LOSS, "000");
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_SettingsMode()
     {
         settingsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_AgressiveAI()
     {
         // Modify AI script values here
         Debug.Log("AI set to attack more often.");
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_DefensiveAI()
     {
         // Modify AI script values here
         Debug.Log("AI set to protect itself.");
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_BalancedAI()
     {
         // Modify AI script values here
         Debug.Log("AI set to default profile.");
+        SFXController.PlaySoundMenuButton();
     }
 
-    public void UI_VolumeSFX()
-    {
-        //figuring out how to link SFXController with the slider in settings still
-    }
-
-    public void UI_VolumeMusic()
-    {
-        //figuring out how to link Background Music gameObject with the slider in settings still
-    }
     public void UI_Animations()
     {
-        //toggle Piece.animationsEnabled which controls the correct moveTo() pathway
+        //Piece.animationsEnabled
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_RulesMode()
     {
         rulesScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
     
     public void UI_CreditsMode()
     {
         creditsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
-        UI_ButtonSound();
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_Exit()
     {
         Debug.Log("Quitting Application");
         Application.Quit();
-    }
-
-    private void UI_ButtonSound()
-    {
-        GameObject soundObject = new GameObject("SFX Object");
-
-        AudioClip clipMenuButton = Resources.Load<AudioClip> ("Audio/MenuButton");
-
-        AudioSource audioSource = soundObject.AddComponent<AudioSource>();
-        audioSource.PlayOneShot(clipMenuButton);
     }
 }

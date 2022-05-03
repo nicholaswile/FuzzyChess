@@ -113,13 +113,11 @@ public class AIController : MonoBehaviour
                     {
                         yield return new WaitForSeconds(1.25f);
                         board.OnSquareSelected(board.GetPositionFromCoords(preAttackSquare));
-                        SFXController.PlaySoundMovement();
                     }
 
                     //Knight Attack (Begins Roll with +1)
                     yield return new WaitForSeconds(1.25f);
                     board.OnSquareSelected(movePosition);
-                    SFXController.PlaySoundMovement();
                 }
             }
             else
@@ -138,7 +136,6 @@ public class AIController : MonoBehaviour
 
                             yield return new WaitForSeconds(1.25f);
                             board.OnSquareSelected(movePosition);
-                            SFXController.PlaySoundMovement();
 
                             break;
                         }
