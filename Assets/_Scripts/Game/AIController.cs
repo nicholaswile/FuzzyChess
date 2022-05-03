@@ -86,7 +86,6 @@ public class AIController : MonoBehaviour
                     //Attack (Begins Roll)
                     yield return new WaitForSeconds(1.25f);
                     board.OnSquareSelected(movePosition);
-                    SFXController.PlaySoundMovement();
                 }
                 else
                 {
