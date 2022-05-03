@@ -147,7 +147,13 @@ public class MainMenu : MonoBehaviour
 
     public void UI_Animations()
     {
-        //Piece.animationsEnabled
+        //Piece.animationsEnabled edit somehow
+        SFXController.PlaySoundMenuButton();
+    }
+
+    public void UI_CameraSpin()
+    {
+        //edit here
         SFXController.PlaySoundMenuButton();
     }
 
