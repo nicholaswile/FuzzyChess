@@ -41,6 +41,7 @@ public abstract class Piece : MonoBehaviour
         materialSetter = GetComponent<MaterialSetter>();
         hasMoved = false;
     }
+    
     private void Start()
     {
         animationsEnabled = Convert.ToBoolean(PlayerPrefs.GetInt("AnimationsEnabled"));

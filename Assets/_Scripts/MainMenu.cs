@@ -13,6 +13,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button aiVsAiButton;
 
     private const string WINS = "Wins", LOSS = "Losses";
+    private GameObject greyscale;
+    private GameObject tanscale;
 
     private void Awake()
     {
@@ -122,26 +124,52 @@ public class MainMenu : MonoBehaviour
         settingsScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
         SFXController.PlaySoundMenuButton();
+
+        //display AI style setting
+        switch (PlayerPrefs.GetInt("AIStyle"))
+        {
+            case 1:
+                tanscale = GameObject.Find("Aggressive Button");
+                tanscale.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+                break;
+            case 2:
+                tanscale = GameObject.Find("Defensive Button");
+                tanscale.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+                break;
+            default:
+                tanscale = GameObject.Find("Balanced Button");
+                tanscale.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+                break;
+        }
     }
 
     public void UI_AgressiveAI()
     {
-        // Modify AI script values here
-        Debug.Log("AI set to attack more often.");
+        PlayerPrefs.SetInt("AIStyle", 1);
+        AI_Style_Recolor();
+        tanscale = GameObject.Find("Aggressive Button");
+        tanscale.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+        Debug.Log("AI style set to attack more often.");
         SFXController.PlaySoundMenuButton();
     }
 
     public void UI_DefensiveAI()
     {
-        // Modify AI script values here
-        Debug.Log("AI set to protect itself.");
+        PlayerPrefs.SetInt("AIStyle", 2);
+        AI_Style_Recolor();
+        tanscale = GameObject.Find("Defensive Button");
+        tanscale.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+        Debug.Log("AI style set to protect itself.");
         SFXController.PlaySoundMenuButton();
     }
 
     public void UI_BalancedAI()
     {
-        // Modify AI script values here
-        Debug.Log("AI set to default profile.");
+        PlayerPrefs.SetInt("AIStyle", 0);
+        AI_Style_Recolor();
+        tanscale = GameObject.Find("Balanced Button");
+        tanscale.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+        Debug.Log("AI style set to balanced.");
         SFXController.PlaySoundMenuButton();
     }
 
@@ -174,5 +202,15 @@ public class MainMenu : MonoBehaviour
     {
         Debug.Log("Quitting Application");
         Application.Quit();
+    }
+
+    public void AI_Style_Recolor()
+    {
+        greyscale = GameObject.Find("Balanced Button");
+        greyscale.GetComponent<Image>().color = new Color32(244, 231, 192, 100);
+        greyscale = GameObject.Find("Aggressive Button");
+        greyscale.GetComponent<Image>().color = new Color32(244, 231, 192, 100);
+        greyscale = GameObject.Find("Defensive Button");
+        greyscale.GetComponent<Image>().color = new Color32(244, 231, 192, 100);
     }
 }

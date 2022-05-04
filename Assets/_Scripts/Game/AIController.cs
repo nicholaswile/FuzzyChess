@@ -10,6 +10,7 @@ public class AIController : MonoBehaviour
     [SerializeField] private GameController controller;
     [SerializeField] private GameUI gameUI;
     private GameState state;
+    private int aiStyle = 0;
 
     private Dictionary<PieceType, Dictionary<PieceType, int>> captureTable = new Dictionary<PieceType, Dictionary<PieceType, int>>() {
         {PieceType.King, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 4}, {PieceType.Rook, 5}, {PieceType.Pawn, 1}}},
@@ -34,6 +35,22 @@ public class AIController : MonoBehaviour
         {PieceType.Bishop, 70},
         {PieceType.Rook, 50},
         {PieceType.Pawn, 5}
+    };
+    private Dictionary<PieceType, int> captureWorthMultiplied = new Dictionary<PieceType, int>() {
+        {PieceType.King, 505},
+        {PieceType.Queen, 200},
+        {PieceType.Knight, 300},
+        {PieceType.Bishop, 350},
+        {PieceType.Rook, 250},
+        {PieceType.Pawn, 25}
+    };
+    private Dictionary<PieceType, int> defenseWorthMultiplied = new Dictionary<PieceType, int>() {
+        {PieceType.King, 500},
+        {PieceType.Queen, 200},
+        {PieceType.Knight, 300},
+        {PieceType.Bishop, 350},
+        {PieceType.Rook, 250},
+        {PieceType.Pawn, 25}
     };
 
     //IsAIAttacking | AI Piece | Opponent Piece | Roll Requirement | Value of the Piece Under Attack | Cost of Move
@@ -196,7 +213,14 @@ public class AIController : MonoBehaviour
                     {
                         //Add all additional knight moves.
                         Piece enemyPiece = board.GetPieceOnSquare(move);
-                        moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType]) });
+
+                        //AI offensive modification if selected
+                        if (aiStyle == 1)
+                        {
+                            moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece) - 1, captureWorthMultiplied[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece) - 1, captureWorthMultiplied[enemyPiece.pieceType]) });
+                        } else {
+                            moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType]) });
+                        }
                     }
                 }
 
@@ -206,7 +230,14 @@ public class AIController : MonoBehaviour
                     Piece enemyPiece = board.GetPieceOnSquare(move);
                     //Add a potentialAttack if there is a piece and it is from the enemy's team.
                     if (enemyPiece != null && !aiPiece.IsFromSameTeam(enemyPiece))
-                        moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType]) });
+
+                        //AI offensive modification if selected
+                        if (aiStyle == 1)
+                        {
+                            moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece), captureWorthMultiplied[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece), captureWorthMultiplied[enemyPiece.pieceType]) });
+                        } else {
+                            moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType]) });
+                        }
                 }
             }
         }
@@ -223,7 +254,14 @@ public class AIController : MonoBehaviour
                     {
                         //Add all additional knight moves.
                         Piece aiPiece = board.GetPieceOnSquare(move);
-                        moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType]) });
+
+                        //AI defensive modification if selected
+                        if (aiStyle == 2)
+                        {
+                            moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece) - 1, defenseWorthMultiplied[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece) - 1, defenseWorthMultiplied[aiPiece.pieceType]) });
+                        } else {
+                            moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType]) });
+                        }
                     }
                 }
 
@@ -233,7 +271,14 @@ public class AIController : MonoBehaviour
                     Piece aiPiece = board.GetPieceOnSquare(move);
                     //Add a potentialDanger if there is a piece and it is from the AI's team.
                     if (aiPiece != null && !enemyPiece.IsFromSameTeam(aiPiece))
-                        moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType]) });
+                        
+                        //AI defensive modification if selected
+                        if (aiStyle == 2)
+                        {
+                            moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece), defenseWorthMultiplied[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece), defenseWorthMultiplied[aiPiece.pieceType]) });
+                        } else {
+                            moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType]) });
+                        }
                 }
             }
         }
@@ -293,6 +338,11 @@ public class AIController : MonoBehaviour
     private void Awake()
     {
         GameManager.StateChanged += GameManager_StateChanged;
+    }
+
+    private void Start()
+    {
+        aiStyle = PlayerPrefs.GetInt("AIStyle");
     }
 
     private void GameManager_StateChanged(GameState state)
