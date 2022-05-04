@@ -22,6 +22,8 @@ public class GameUI : MonoBehaviour
     private bool pieceTaken = false;
     private bool pieceTakeFail = false;
     private List<GameObject> moveListObjects = new List<GameObject> ();
+    private MenuInfo menuInfo;
+    private int modeChoice;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
@@ -43,6 +45,9 @@ public class GameUI : MonoBehaviour
 
         GameManager.StateChanged += GameManager_StateChanged;
         GameManager.RollStateChanged += GameManager_RollStateChanged;
+
+        menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
+        modeChoice = menuInfo.modeNumber;
     }
 
     private void Update()
@@ -81,11 +86,11 @@ public class GameUI : MonoBehaviour
         }
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
-        skipButton.interactable = (state == GameState.PlayerTurn);
+        skipButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
         undoButton.interactable = (state == GameState.PlayerTurn);
         //moveButton.interactable = (state == GameState.PlayerTurn);
         //camButton.interactable = (state == GameState.PlayerTurn);
-        rollButton.interactable = (state == GameState.PlayerTurn);
+        rollButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
 
 
         winScreen.SetActive(state == GameState.Win);
@@ -210,7 +215,8 @@ public class GameUI : MonoBehaviour
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
             controller.OpenCorpSelection();
             board.ResetCommanderData();
-            AIController.AI_TakeTurn();
+            if (modeChoice != 2)
+                AIController.AI_TakeTurn();
         }
 
         else if (GameManager.Instance.State == GameState.EnemyTurn)

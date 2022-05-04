@@ -7,11 +7,15 @@ public class CursorObj : MonoBehaviour
     [SerializeField] private CursorManager.CursorType cursorType;
     private GameController controller;
     private ChessBoard board;
+    private MenuInfo menuInfo;
+    private int modeChoice;
 
     private void Awake()
     {
         board = GameObject.Find("Chess Board").GetComponent<ChessBoard>();
         controller = GameObject.Find("Game Controller").GetComponent<GameController>();
+        menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
+        modeChoice = menuInfo.modeNumber;
     }
 
     private void Update()
@@ -25,13 +29,13 @@ public class CursorObj : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (board.isSelectable(gameObject.GetComponent<Piece>()) && controller.activePlayer == controller.whitePlayer && !Input.GetMouseButton(1))
+        if (board.isSelectable(gameObject.GetComponent<Piece>()) && (controller.activePlayer == controller.whitePlayer || modeChoice == 2) && !Input.GetMouseButton(1))
         {
             CursorManager.Instance.SetActiveCursorType(cursorType);
             Tooltip.ShowTooltip_Static("Piece: " + gameObject.GetComponent<Piece>().pieceType.ToString() + "\n" +
                 "Corp: " + gameObject.GetComponent<Piece>().corpType.ToString());
         }
-        else if (gameObject.name == "Highlighter(Clone)" && controller.activePlayer == controller.whitePlayer && !Input.GetMouseButton(1))
+        else if (gameObject.name == "Highlighter(Clone)" && (controller.activePlayer == controller.whitePlayer || modeChoice == 2) && !Input.GetMouseButton(1))
         {
             List<Vector2Int> adjacentSquares = board.selectedPiece.GetAdjacentSquares();
             Vector2Int highlighterPosition = board.GetCoordsFromPosition(gameObject.transform.position);
@@ -54,7 +58,7 @@ public class CursorObj : MonoBehaviour
                 }
             }
         }
-        else if (IsHoveringEnemy())
+        else if (IsHoveringEnemy() && (controller.activePlayer == controller.whitePlayer || modeChoice == 2) )
         {
             CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Kill);
 
@@ -64,7 +68,7 @@ public class CursorObj : MonoBehaviour
                 "Roll Needed To Capture " + enemyPiece.pieceType.ToString() + ": " + board.GetRollNeeded(board.selectedPiece, enemyPiece) + "+");
 
         }
-        else if ((!board.isSelectable(gameObject.GetComponent<Piece>()) || controller.activePlayer != controller.whitePlayer) && !Input.GetMouseButton(1)) 
+        else if ((!board.isSelectable(gameObject.GetComponent<Piece>()) || (controller.activePlayer != controller.whitePlayer || modeChoice == 2)) && !Input.GetMouseButton(1)) 
             CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Unavailable);
     }
 

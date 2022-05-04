@@ -20,6 +20,8 @@ public class GameController : MonoBehaviour
     public int RightCorpUsed { get { return rightCorpUsed; } }
     public const int NUMBER_OF_ACTIONS = 6;
     private int killCount = 0;
+    private MenuInfo menuInfo;
+    private int modeChoice;
 
     private void Awake()
     {
@@ -58,6 +60,8 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         StartNewGame();
+        menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
+        modeChoice = menuInfo.modeNumber;
     }
 
     private void StartNewGame()
@@ -177,7 +181,8 @@ public class GameController : MonoBehaviour
         {
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
             OpenCorpSelection();
-            AIController.AI_TakeTurn();
+            if(modeChoice != 2)
+                AIController.AI_TakeTurn();
         }
         else if (GameManager.Instance.State == GameState.EnemyTurn && iteratorNum % NUMBER_OF_ACTIONS == 0)
         {

@@ -8,9 +8,10 @@ using UnityEngine.Audio;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private GameObject softScreen,mainMenuScreen, playScreen, statsScreen, settingsScreen, rulesScreen, creditsScreen;
+    [SerializeField] private GameObject softScreen,mainMenuScreen, playScreen, statsScreen, settingsScreen, rulesScreen, creditsScreen, mapScreen;
     [SerializeField] private TextMeshProUGUI winText, loseText;
     [SerializeField] private Button aiVsAiButton;
+    public MenuInfo mapChoice;
 
     private const string WINS = "Wins", LOSS = "Losses";
     private GameObject greyscale;
@@ -71,29 +72,74 @@ public class MainMenu : MonoBehaviour
     }
     public void UI_PlayMode()
     {
-        playScreen.SetActive(true);
+        mapScreen.SetActive(true);
         mainMenuScreen.SetActive(false);
         SFXController.PlaySoundMenuButton();
     }
 
     public void UI_HumanMode()
     {
-        Debug.Log("Human vs AI Play Mode");
+        Debug.Log("Player vs AI Play Mode");
+        mapChoice.modeNumber = 1;
         // Start game in Human Mode
         GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
         SceneManager.LoadScene(1);
+        SFXController.PlaySoundMenuButton();
+    }
+
+    public void UI_PvPMode()
+    {
+        Debug.Log("Player vs Player Play Mode");
+        mapChoice.modeNumber = 2;
+        // Start game in PvP Mode
+        GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+        SceneManager.LoadScene(1);
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_AIMode()
     {
         Debug.Log("AI vs AI Play Mode");
+        mapChoice.modeNumber = 3;
         // Start game in AI Mode
+        GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
+        SceneManager.LoadScene(1);
+        SFXController.PlaySoundMenuButton();
     }
 
     public void UI_Back(GameObject currentScreen)
     {
         mainMenuScreen.SetActive(true);
         currentScreen.SetActive(false);
+        SFXController.PlaySoundMenuButton();
+    }
+
+    public void UI_Back_PlayScreen()
+    {
+        mapScreen.SetActive(true);
+        playScreen.SetActive(false);
+        SFXController.PlaySoundMenuButton();
+    }
+
+    public void UI_Clouds()
+    {
+        mapChoice.mapNumber = 1;
+        playScreen.SetActive(true);
+        mapScreen.SetActive(false);
+        SFXController.PlaySoundMenuButton();
+    }
+    public void UI_Galaxy()
+    {
+        mapChoice.mapNumber = 2;
+        playScreen.SetActive(true);
+        mapScreen.SetActive(false);
+        SFXController.PlaySoundMenuButton();
+    }
+    public void UI_Mars()
+    {
+        mapChoice.mapNumber = 3;
+        playScreen.SetActive(true);
+        mapScreen.SetActive(false);
         SFXController.PlaySoundMenuButton();
     }
 
@@ -180,7 +226,6 @@ public class MainMenu : MonoBehaviour
 
     public void UI_CameraSpin()
     {
-        //edit here
         SFXController.PlaySoundMenuButton();
     }
 

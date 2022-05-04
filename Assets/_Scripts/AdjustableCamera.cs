@@ -14,25 +14,53 @@ public class AdjustableCamera : MonoBehaviour
     private Camera cam;
 
     private float distance = 0.60f;
-    private float currentX = 0.0f;
-    private float currentY = 40.0f;
+    private float currentX = -70.0f;
+    private float currentY = 15.0f;
     private float sensitivityX = 2.9f;
     private float sensitivityY = 2.3f;
     private float scrollSensitivity = 3.0f;
     private float lockStrengthX = 2.5f;
+    private bool xAnimation;
+    private bool yAnimation;
+    private bool zoomAnimation;
 
     private void Start()
     {
         camTransform = transform;
         cam = mainCam;
+        xAnimation = true;
+        yAnimation = true;
+        zoomAnimation = true;
     }
 
     private void Update()
     {
-        if (Input.GetMouseButton(1))
-        { 
-            currentX += Input.GetAxis("Mouse X")*sensitivityX;
-            currentY += -Input.GetAxis("Mouse Y")*sensitivityY;
+
+        if (xAnimation)
+        {
+            currentX += .5f;
+            if (currentX == 0f)
+                xAnimation = false;
+        }
+        if (yAnimation)
+        {
+            currentY += .20f;
+            if (currentY >= 40f)
+                yAnimation = false;
+        }
+        if (zoomAnimation)
+        {
+            GetComponent<Camera>().fieldOfView -= .25f;
+            if (GetComponent<Camera>().fieldOfView == 60)
+                zoomAnimation = false;
+        }
+
+
+
+        if (Input.GetMouseButton(1) && !xAnimation)
+        {
+            currentX += Input.GetAxis("Mouse X") * sensitivityX;
+            currentY += -Input.GetAxis("Mouse Y") * sensitivityY;
 
             //Lock X if current X is in range of these values
             if (currentX < lockStrengthX && currentX > -lockStrengthX)
@@ -50,7 +78,7 @@ public class AdjustableCamera : MonoBehaviour
 
             currentY = Mathf.Clamp(currentY, Y_ANGLE_MIN, Y_ANGLE_MAX);
         }
-        if (Input.GetAxis ("Mouse ScrollWheel") > 0 && GetComponent<Camera>().fieldOfView > 36)
+        if (Input.GetAxis("Mouse ScrollWheel") > 0 && GetComponent<Camera>().fieldOfView > 36)
         {
             GetComponent<Camera>().fieldOfView -= scrollSensitivity;
         }
