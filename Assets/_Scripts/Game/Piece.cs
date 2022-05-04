@@ -19,7 +19,7 @@ public abstract class Piece : MonoBehaviour
     private bool delegated = false;
     public bool isDelegated { get { return delegated; } set { delegated = value; } }
     public List<Vector2Int> AvailableMoves;
-    public bool animationsEnabled = true;
+    public bool animationsEnabled;
 
     static Vector2Int[] directions = new Vector2Int[]
     {
@@ -40,6 +40,10 @@ public abstract class Piece : MonoBehaviour
         AvailableMoves = new List<Vector2Int>();
         materialSetter = GetComponent<MaterialSetter>();
         hasMoved = false;
+    }
+    private void Start()
+    {
+        animationsEnabled = Convert.ToBoolean(PlayerPrefs.GetInt("AnimationsEnabled"));
     }
 
     public int CorpMoveNumber()
