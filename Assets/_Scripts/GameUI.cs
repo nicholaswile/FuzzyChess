@@ -48,6 +48,8 @@ public class GameUI : MonoBehaviour
 
         menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
         modeChoice = menuInfo.modeNumber;
+        if (modeChoice == 2)
+            undoButton.interactable = false;
     }
 
     private void Update()
@@ -87,7 +89,7 @@ public class GameUI : MonoBehaviour
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
         skipButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
-        undoButton.interactable = (state == GameState.PlayerTurn);
+        undoButton.interactable = (state == GameState.PlayerTurn && modeChoice != 2);
         //moveButton.interactable = (state == GameState.PlayerTurn);
         //camButton.interactable = (state == GameState.PlayerTurn);
         rollButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
