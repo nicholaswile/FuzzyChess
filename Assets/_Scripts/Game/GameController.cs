@@ -167,7 +167,9 @@ public class GameController : MonoBehaviour
         GenerateAllPlayerMoves(activePlayer);
         GenerateAllPlayerMoves(GetOppositePlayer(activePlayer));
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+
         int iteratorNum = TheGameUI.GetIteratorCount();
+
         ChangeActiveCorp();
 
         if (iteratorNum % NUMBER_OF_ACTIONS != 0)

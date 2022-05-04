@@ -117,6 +117,7 @@ public class AIController : MonoBehaviour
 
         //Skip turn when there are no more moves to make.
         GameObject.Find("UI").GetComponent<GameUI>().UI_Skip();
+
     }
 
     //INPUT: A knight piece

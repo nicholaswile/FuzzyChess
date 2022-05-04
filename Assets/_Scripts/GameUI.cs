@@ -211,6 +211,7 @@ public class GameUI : MonoBehaviour
             controller.OpenCorpSelection();
             board.ResetCommanderData();
             AIController.AI_TakeTurn();
+            board.ClearUndoPieceMoves();
         }
 
         else if (GameManager.Instance.State == GameState.EnemyTurn)
@@ -219,6 +220,7 @@ public class GameUI : MonoBehaviour
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
             controller.OpenCorpSelection();
             board.ResetCommanderData();
+            board.ClearUndoPieceMoves();
         }
     }
 

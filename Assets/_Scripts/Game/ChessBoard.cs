@@ -625,6 +625,12 @@ public class ChessBoard : MonoBehaviour
         controller.EndTurn();
     }
 
+    //this simply exists to allow external methods to clear the list of piece moves for the undo function. Needed for endturn() in gamecontroller
+    public void ClearUndoPieceMoves()
+    {
+        pieceMoves2.Clear();
+    }
+
     public void UpdateBoardOnPieceMove(Vector2Int newCoords, Vector2Int oldCoords, Piece newPiece, Piece oldPiece)
     {
         grid[oldCoords.x, oldCoords.y] = oldPiece;
