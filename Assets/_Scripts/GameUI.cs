@@ -7,7 +7,7 @@ using System;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard, scrollBar;
     [SerializeField] private Button exitButton, skipButton, undoButton, moveButton, camButton, rollButton, recallButton, delegateLeftButton, delegateRightButton;
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
@@ -434,7 +434,15 @@ public class GameUI : MonoBehaviour
                 newListing.SetActive(true);
             moveListObjects.Add(newListing);
         }
+        //LayoutRebuilder.ForceRebuildLayoutImmediate(movesList.transform.Find("Viewport").GetComponent<RectTransform>());
+        //scrollBar.GetComponent<Scrollbar>().value = 0;
+
         //Debug.Log(newMoves);
+    }
+
+    public void ScrollToBottom()
+    {
+        scrollBar.GetComponent<Scrollbar>().value = 0;
     }
 
     //Swaps the color of the sprite's piece when called

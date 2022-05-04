@@ -88,6 +88,15 @@ public class GameManager : MonoBehaviour
         RollStateChanged?.Invoke(rollState);
     }
 
+    void LateUpdate()
+    {
+        if(GameObject.Find("Chess Set") != null)
+        {
+            GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+            TheGameUI.ScrollToBottom();
+        }
+    }
+
     private void HandleFalseRoll()
     {
         Debug.Log("Stop Rolling");
@@ -160,3 +169,4 @@ public enum RollState
     TrueRoll,
     FalseRoll
 }
+
