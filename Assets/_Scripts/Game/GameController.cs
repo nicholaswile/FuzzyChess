@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CreatePieces))]
 public class GameController : MonoBehaviour
@@ -22,6 +23,9 @@ public class GameController : MonoBehaviour
     private int killCount = 0;
     private MenuInfo menuInfo;
     private int modeChoice;
+    private GameObject turnDisplayTextObject;
+    private GameObject turnDisplayButtonObject;
+    private string turnDisplayText;
 
     private void Awake()
     {
@@ -131,6 +135,23 @@ public class GameController : MonoBehaviour
 
     private void ChangeActiveTeam()
     {
+        //Turn Display
+        turnDisplayTextObject = GameObject.Find("TurnDisplayText");
+        turnDisplayButtonObject = GameObject.Find("Turn Display");
+        turnDisplayText = turnDisplayTextObject.GetComponent<TMPro.TextMeshProUGUI>().text;
+
+        if (turnDisplayText.Equals("WHITE TO MOVE"))
+        {
+            turnDisplayTextObject.GetComponent<TMPro.TextMeshProUGUI>().text = "BLACK TO MOVE";
+            turnDisplayButtonObject.GetComponent<Image>().color = new Color32(244, 231, 192, 100);
+
+        } else if (turnDisplayText.Equals("BLACK TO MOVE")) 
+        {
+            turnDisplayTextObject.GetComponent<TMPro.TextMeshProUGUI>().text = "WHITE TO MOVE";
+            turnDisplayButtonObject.GetComponent<Image>().color = new Color32(244, 231, 192, 255);
+        }
+
+        //Turn Swap
         activePlayer = activePlayer == whitePlayer ? blackPlayer : whitePlayer;
         board.DeselectPiece();
         killCount = 0;

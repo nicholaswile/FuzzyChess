@@ -15,6 +15,7 @@ public class AnimationsToggle : MonoBehaviour
         } else {
             PlayerPrefs.SetInt("AnimationsEnabled", 0);
         }
+        SFXController.PlaySoundMenuButton();
     }
     
     void Start()
