@@ -28,6 +28,8 @@ public class GameUI : MonoBehaviour
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
 
+    public Quaternion onepos, twopos, threepos, fourpos, fivepos, sixpos, randpos;
+
 
     private void Awake()
     {
@@ -46,6 +48,19 @@ public class GameUI : MonoBehaviour
 
         GameManager.StateChanged += GameManager_StateChanged;
         GameManager.RollStateChanged += GameManager_RollStateChanged;
+
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        onepos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
+        twopos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(0, 90, -90);
+        threepos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(0, -90, -90);
+        fourpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
+        fivepos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(0, 0, 90);
+        sixpos = rb.transform.rotation;
 
         menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
         modeChoice = menuInfo.modeNumber;
@@ -534,42 +549,112 @@ public class GameUI : MonoBehaviour
     {
         GameManager.Instance.UpdateRollState(RollState.TrueRoll);
         Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        StartCoroutine(SpinWait());
         if (result == 1)
         {
             Debug.Log("Static 1");
-            rb.transform.rotation = Quaternion.Euler(0, 180, -90);
+            StartCoroutine(OneRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(0, 180, -90);
         }
         else if (result == 2)
         {
             Debug.Log("Static 2");
-            rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
+            StartCoroutine(TwoRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
         }
         else if (result == 3)
         {
             Debug.Log("Static 3");
-            rb.transform.rotation = Quaternion.Euler(0, 90, -90);
+            StartCoroutine(ThreeRoll(1f));
+           //rb.transform.rotation = Quaternion.Euler(0, 90, -90);
         }
         else if (result == 4)
         {
             Debug.Log("Static 4");
-            rb.transform.rotation = Quaternion.Euler(0, -90, -90);
+            StartCoroutine(FourRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(0, -90, -90);
         }
         else if (result == 5)
         {
             Debug.Log("Static 5");
-            rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
+            StartCoroutine(FiveRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
         }
         else if (result == 6)
         {
             Debug.Log("Static 6");
-            rb.transform.rotation = Quaternion.Euler(0, 0, 90);
+            StartCoroutine(SixRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(0, 0, 90);
         }
         StartCoroutine(IWait());
     }
 
     private IEnumerator IWait()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
+        GameObject KnightScreen = GameObject.Find("KnightScreen");
+        GameObject knightbonus = KnightScreen.transform.GetChild(0).gameObject;
+        knightbonus.SetActive(false);
         GameManager.Instance.UpdateRollState(RollState.FalseRoll);
+    }
+
+    private IEnumerator SpinWait()
+    {
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        rb.AddTorque(1000f, 0f, 0f);
+        yield return new WaitForSeconds(1);
+        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+        randpos = rb.transform.rotation;
+
+    }
+
+    private IEnumerator OneRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, onepos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator TwoRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, twopos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator ThreeRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, threepos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator FourRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, fourpos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator FiveRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, fivepos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator SixRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, sixpos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
     }
 }

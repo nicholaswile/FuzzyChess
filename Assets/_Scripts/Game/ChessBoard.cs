@@ -517,6 +517,9 @@ public class ChessBoard : MonoBehaviour
             if (knightHasMoved) 
             {
                 result++;
+                GameObject KnightScreen = GameObject.Find("KnightScreen");
+                GameObject knightbonus = KnightScreen.transform.GetChild(0).gameObject;
+                knightbonus.SetActive(true);
             }
 
             Debug.Log("Result: " + result);
