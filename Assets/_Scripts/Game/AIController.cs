@@ -39,7 +39,7 @@ public class AIController : MonoBehaviour
     //Is Attack Move | AI Piece | Movement Location | Value of Move
     private List<ArrayList> aiMoves = new List<ArrayList>();
 
-    private IEnumerator AI_TakeTurn_Coroutine() //TODO: Make AI better select which pieces to move
+    private IEnumerator AI_TakeTurn_Coroutine()
     {
         List<Piece> aiPieces = controller.activePlayer.ActivePieces; 
 
@@ -52,29 +52,28 @@ public class AIController : MonoBehaviour
                 break;
 
             //DEBUG: Output number of moves avaliable, what's attacking, what's being attacked, and all values related to movement.
-            Debug.Log("There are " + aiMoves.Count + " AI moves that can be made this turn.");
+            /*Debug.Log("There are " + aiMoves.Count + " AI moves that can be made this turn.");
             foreach (ArrayList a in aiMoves)
             {
                 if ((bool)a[0])
                     Debug.Log("AI " + ((Piece)a[1]).pieceType + " attacking Player " + board.GetPieceOnSquare(board.GetCoordsFromPosition((Vector3)a[2])) + ". Move Value: " + a[3]);
                 else
                     Debug.Log("AI " + ((Piece)a[1]).pieceType + " moving to " + board.GetCoordsFromPosition((Vector3)a[2]) + ". Move Value: " + a[3]);
-            }
+            }*/
 
             Piece attackingPiece = (Piece)aiMoves.ElementAt(0)[1];
             Vector3 piecePosition = board.GetPositionFromCoords(attackingPiece.occupiedSquare);
             Vector3 movePosition = (Vector3)aiMoves.ElementAt(0)[2];
 
             //Select square with piece that can attack opponent
-            yield return new WaitForSeconds(1.75f);
+            yield return new WaitForSeconds(1f);
             board.OnSquareSelected(piecePosition);
 
             if (attackingPiece.pieceType != PieceType.Knight)
             {
-                //Attack (Begins Roll)
-                yield return new WaitForSeconds(1.25f);
+                //Move
+                yield return new WaitForSeconds(1.5f);
                 board.OnSquareSelected(movePosition);
-                SFXController.PlaySoundMovement();
             }
             else
             {
@@ -100,19 +99,20 @@ public class AIController : MonoBehaviour
                 //Knight take Pre-Attack Jump if Jump exists.
                 if(preAttackSquare != attackingPiece.occupiedSquare)
                 {
-                    yield return new WaitForSeconds(1.25f);
+                    yield return new WaitForSeconds(1.5f);
                     board.OnSquareSelected(board.GetPositionFromCoords(preAttackSquare));
-                    SFXController.PlaySoundMovement();
                 }
 
-                //Knight Attack (Begins Roll with +1)
+                //Knight Attack (Roll with +1)
                 yield return new WaitForSeconds(1.25f);
                 board.OnSquareSelected(movePosition);
-                SFXController.PlaySoundMovement();
             }
 
+            //Wait extra if the move was an attack
+            if ((bool)aiMoves.ElementAt(0)[0] == true)
+                yield return new WaitForSeconds(2.75f);
+
             aiMoves = updateAiMoves(aiPieces);
-            //threateningMoves = updateThreateningMoves(aiPieces, enemyPieces);
         }
 
         //Skip turn when there are no more moves to make.
@@ -191,31 +191,47 @@ public class AIController : MonoBehaviour
         return newAiMoves;
     }
 
-    private float getMoveValue(bool isCapture, bool isKnightSpecial, Vector2Int moveLocation, Piece aiPiece, Piece enemyPiece)
+    //OUTPUT: Returns the location of the enemy player's king.
+    private Vector2Int getOppositeKingLocation()
     {
-        if (isCapture && isKnightSpecial)
-            return (float)1 / (captureTable[aiPiece.pieceType][enemyPiece.pieceType] - 1) * pieceValue[enemyPiece.pieceType];
-        else if (isCapture)
-            return (float)1 / (captureTable[aiPiece.pieceType][enemyPiece.pieceType]) * pieceValue[enemyPiece.pieceType];
+        King[] kings = GameObject.Find("King(Clone)").GetComponents<King>();
+        if (kings[0].team == controller.activePlayer.team)
+        {
+            //Opponent king is the second object
+            return kings[1].occupiedSquare;
+        }
         else
         {
-            float yAim;
-            if (controller.activePlayer == controller.blackPlayer)
-                yAim = .1f;
-            else
-                yAim = -.1f;
-
-            return (float)moveValue[aiPiece.pieceType] + (aiPiece.occupiedSquare.y - moveLocation.y) * yAim;
+            //OpponentKing is the first object
+            return kings[0].occupiedSquare;
         }
     }
 
+    //INPUT: Whether the move is a capture move, Whether the move is a special knight move, The final location of the move, The AI piece making the move, The enemy piece being attack (if any)
+    //OUTPUT: Total weighted value of the move.
+    private double getMoveValue(bool isCapture, bool isKnightSpecial, Vector2Int moveLocation, Piece aiPiece, Piece enemyPiece)
+    {
+        if (isCapture && isKnightSpecial)
+            return (double)1 / (captureTable[aiPiece.pieceType][enemyPiece.pieceType] - 1) * pieceValue[enemyPiece.pieceType];
+        else if (isCapture)
+            return (double)1 / (captureTable[aiPiece.pieceType][enemyPiece.pieceType]) * pieceValue[enemyPiece.pieceType];
+        else
+        {
+            Vector2Int kingLocation = getOppositeKingLocation();
+            double distanceToKing = Math.Sqrt(Math.Pow(moveLocation.x - kingLocation.x, 2) + Math.Pow(moveLocation.y - kingLocation.y, 2));
+
+            return moveValue[aiPiece.pieceType] - distanceToKing;
+        }
+    }
+
+    //Helper function to sort the move list by the move values.
     private int sortMoveList(ArrayList x, ArrayList y)
     {
-        if ((float)x[x.Count - 1] < (float)y[y.Count - 1])
+        if ((double)x[x.Count - 1] < (double)y[y.Count - 1])
         {
             return 1;
         }
-        else if ((float)x[x.Count - 1] > (float)y[y.Count - 1])
+        else if ((double)x[x.Count - 1] > (double)y[y.Count - 1])
         {
             return -1;
         }
@@ -223,6 +239,8 @@ public class AIController : MonoBehaviour
             return 0;
     }
 
+    //INPUT: Possible move
+    //OUTPUT: Boolean value of whether the move's corp has already made a move or not.
     private bool corpMoved(ArrayList move)
     {
         Piece piece = (Piece)move[1];
@@ -233,11 +251,6 @@ public class AIController : MonoBehaviour
         if (piece.corpType == CorpType.King && controller.KingCorpUsed < 1)
             return false;
         return true;
-    }
-
-    private bool belowThreshold(ArrayList move)
-    {
-        return (float)move[3] < 5;
     }
 
     public void AI_TakeTurn() 
