@@ -53,13 +53,18 @@ public class GameUI : MonoBehaviour
         {
             undoButton.interactable = false;
             if (modeChoice == 3)
+            {
                 skipButton.interactable = false;
+                delegateLeftButton.interactable = false;
+                delegateRightButton.interactable = false;
+                recallButton.interactable = false;
+            }
         }
     }
 
     private void Update()
     {
-        if (controller.activePlayer == controller.whitePlayer || modeChoice == 2)
+        if (modeChoice != 3 && (controller.activePlayer == controller.whitePlayer || modeChoice == 2))
         {
             if (board.selectedPiece != null)
             {
