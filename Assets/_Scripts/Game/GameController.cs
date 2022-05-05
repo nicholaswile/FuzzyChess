@@ -62,6 +62,8 @@ public class GameController : MonoBehaviour
         StartNewGame();
         menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
         modeChoice = menuInfo.modeNumber;
+        if (modeChoice == 3)
+            AIController.AI_TakeTurn();
     }
 
     private void StartNewGame()
@@ -188,6 +190,8 @@ public class GameController : MonoBehaviour
         {
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
             OpenCorpSelection();
+            if (modeChoice == 3)
+                AIController.AI_TakeTurn();
         }
     }
 

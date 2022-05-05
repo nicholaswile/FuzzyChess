@@ -12,6 +12,7 @@ public class GameUI : MonoBehaviour
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     [SerializeField] private ChessBoard board;
+    [SerializeField] private GameController controller;
     [SerializeField] private AIController AIController;
     public const int NUMBER_OF_ACTIONS = 6;
     private int turnCount = 1;
@@ -48,23 +49,30 @@ public class GameUI : MonoBehaviour
 
         menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
         modeChoice = menuInfo.modeNumber;
-        if (modeChoice == 2)
+        if (modeChoice != 1) 
+        {
             undoButton.interactable = false;
+            if (modeChoice == 3)
+                skipButton.interactable = false;
+        }
     }
 
     private void Update()
     {
-        if (board.selectedPiece != null)
+        if (controller.activePlayer == controller.whitePlayer || modeChoice == 2)
         {
-            delegateLeftButton.interactable = board.CanDelegate(CorpType.Left);
-            delegateRightButton.interactable = board.CanDelegate(CorpType.Right);
-            recallButton.interactable = board.CanRecall();
-        }
-        else if (board.selectedPiece == null) 
-        {
-            delegateLeftButton.interactable = false;
-            delegateRightButton.interactable = false;
-            recallButton.interactable = false;
+            if (board.selectedPiece != null)
+            {
+                delegateLeftButton.interactable = board.CanDelegate(CorpType.Left);
+                delegateRightButton.interactable = board.CanDelegate(CorpType.Right);
+                recallButton.interactable = board.CanRecall();
+            }
+            else if (board.selectedPiece == null)
+            {
+                delegateLeftButton.interactable = false;
+                delegateRightButton.interactable = false;
+                recallButton.interactable = false;
+            }
         }
     }
 
@@ -88,8 +96,8 @@ public class GameUI : MonoBehaviour
         }
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
-        skipButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
-        undoButton.interactable = (state == GameState.PlayerTurn && modeChoice != 2);
+        skipButton.interactable = (modeChoice != 3 && (state == GameState.PlayerTurn || modeChoice == 2));
+        undoButton.interactable = (state == GameState.PlayerTurn && modeChoice == 1);
         //moveButton.interactable = (state == GameState.PlayerTurn);
         //camButton.interactable = (state == GameState.PlayerTurn);
         rollButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
@@ -227,6 +235,8 @@ public class GameUI : MonoBehaviour
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
             controller.OpenCorpSelection();
             board.ResetCommanderData();
+            if (modeChoice == 3)
+                AIController.AI_TakeTurn();
         }
     }
 

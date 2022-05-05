@@ -21,7 +21,7 @@ public class BoardInputHandler : MonoBehaviour, InputHandler
     public void ProcessInput(Vector3 inputPosition, GameObject selectedObject, Action callback)
     {
 
-        if (controller.activePlayer == controller.whitePlayer || modeChoice == 2)
+        if ( modeChoice != 3 && (controller.activePlayer == controller.whitePlayer || modeChoice == 2))
 
             board.OnSquareSelected(inputPosition);
     }

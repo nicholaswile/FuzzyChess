@@ -28,7 +28,7 @@ public class MainMenu : MonoBehaviour
         settingsScreen.SetActive(false);
 
         // Will comment the following out once ai vs ai mode is complete
-        aiVsAiButton.interactable = false;
+        //aiVsAiButton.interactable = false;
 
         // Text = saved win score
         SetStatText();

@@ -29,7 +29,9 @@ public class CursorObj : MonoBehaviour
 
     private void OnMouseOver()
     {
-        if (board.isSelectable(gameObject.GetComponent<Piece>()) && (controller.activePlayer == controller.whitePlayer || modeChoice == 2) && !Input.GetMouseButton(1))
+        if (modeChoice == 3 && !Input.GetMouseButton(1))
+            CursorManager.Instance.SetActiveCursorType(CursorManager.CursorType.Default);
+        else if (board.isSelectable(gameObject.GetComponent<Piece>()) && (controller.activePlayer == controller.whitePlayer || modeChoice == 2) && !Input.GetMouseButton(1))
         {
             CursorManager.Instance.SetActiveCursorType(cursorType);
             Tooltip.ShowTooltip_Static("Piece: " + gameObject.GetComponent<Piece>().pieceType.ToString() + "\n" +

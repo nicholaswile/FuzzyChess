@@ -58,13 +58,15 @@ public class AIController : MonoBehaviour
 
     private IEnumerator AI_TakeTurn_Coroutine()
     {
-        List<Piece> aiPieces = controller.blackPlayer.ActivePieces; 
+        Team currentTeam = controller.activePlayer.team;
+
+        List<Piece> aiPieces = controller.activePlayer.ActivePieces; 
+        List<Piece> activeCorpPieces = controller.activePlayer.KingCorpPieces;
         List<Piece> enemyPieces = controller.whitePlayer.ActivePieces;
+        if (currentTeam == Team.White)
+            enemyPieces = controller.blackPlayer.ActivePieces;
 
-        List<Piece> activeCorpPieces = controller.blackPlayer.KingCorpPieces;
-
-
-        while (controller.activePlayer == controller.blackPlayer)
+        while (controller.activePlayer.team == currentTeam)
         {
             //TEMP FIX FOR INFINITE LOOP AT END OF GAME
             if (state == GameState.Win || state == GameState.Lose)
@@ -161,12 +163,12 @@ public class AIController : MonoBehaviour
                 }
             }
 
-            if (activeCorpPieces == controller.blackPlayer.KingCorpPieces) 
-                activeCorpPieces = controller.blackPlayer.RightCorpPieces;
-            else if (activeCorpPieces == controller.blackPlayer.RightCorpPieces) 
-                activeCorpPieces = controller.blackPlayer.LeftCorpPieces;
-            else if (activeCorpPieces == controller.blackPlayer.LeftCorpPieces) 
-                activeCorpPieces = controller.blackPlayer.KingCorpPieces;
+            if (activeCorpPieces == controller.activePlayer.KingCorpPieces)
+                activeCorpPieces = controller.activePlayer.RightCorpPieces;
+            else if (activeCorpPieces == controller.activePlayer.RightCorpPieces)
+                activeCorpPieces = controller.activePlayer.LeftCorpPieces;
+            else if (activeCorpPieces == controller.activePlayer.LeftCorpPieces)
+                activeCorpPieces = controller.activePlayer.KingCorpPieces;
         }
     }
 
