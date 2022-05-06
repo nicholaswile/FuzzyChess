@@ -160,6 +160,14 @@ public class MainMenu : MonoBehaviour
         SFXController.PlaySoundMenuButton();
     }
 
+    public void UI_ClassicMode()
+    {
+        mapChoice.mapNumber = 0;
+        playScreen.SetActive(true);
+        mapScreen.SetActive(false);
+        SFXController.PlaySoundMenuButton();
+    }
+
     public void UI_Clouds()
     {
         mapChoice.mapNumber = 1;

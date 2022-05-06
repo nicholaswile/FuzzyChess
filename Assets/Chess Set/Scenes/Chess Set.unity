@@ -2984,6 +2984,14 @@ MonoBehaviour:
   skyClouds: {fileID: 2100000, guid: 3e5399bd195de7649b874f58c1b9f8a3, type: 2}
   skyGalaxy: {fileID: 2100000, guid: 369b9ebe3a62b904dbc19bd332b44086, type: 2}
   skyMars: {fileID: 2100000, guid: 5d133deeaa66ed445853e946ff25e073, type: 2}
+  brick: {fileID: 2100000, guid: e4a45c4dbc2729947ac470dcc3f5d362, type: 2}
+  moon: {fileID: 2100000, guid: 5232986d5470bbc428f7e50ca8e821d7, type: 2}
+  mars: {fileID: 2100000, guid: 4c20c7dee20b9144583ef40b685be02e, type: 2}
+  chessBoard: {fileID: 1366859593}
+  cameras:
+  - {fileID: 701772143}
+  - {fileID: 204396565}
+  - {fileID: 219652656}
 --- !u!4 &603500580
 Transform:
   m_ObjectHideFlags: 0
