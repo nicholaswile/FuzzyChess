@@ -11,6 +11,7 @@ public class AIController : MonoBehaviour
     [SerializeField] private GameUI gameUI;
     private GameState state;
     private int aiStyle = 0;
+    private bool madeFirstTurn = false;
 
     private Dictionary<PieceType, Dictionary<PieceType, int>> captureTable = new Dictionary<PieceType, Dictionary<PieceType, int>>() {
         {PieceType.King, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 4}, {PieceType.Rook, 5}, {PieceType.Pawn, 1}}},
@@ -42,6 +43,12 @@ public class AIController : MonoBehaviour
 
     private IEnumerator AI_TakeTurn_Coroutine()
     {
+        if (madeFirstTurn == false)
+        {
+            yield return new WaitForSeconds(3.5f);
+            madeFirstTurn = true;
+        }
+
         List<Piece> aiPieces = controller.activePlayer.ActivePieces; 
 
         aiMoves = updateAiMoves(aiPieces);
@@ -195,7 +202,7 @@ public class AIController : MonoBehaviour
     //OUTPUT: Returns the location of the enemy player's king.
     private Vector2Int getOppositeKingLocation()
     {
-        King[] kings = GameObject.Find("King(Clone)").GetComponents<King>();
+        King[] kings = GameObject.FindObjectsOfType<King>();
         if (kings[0].team == controller.activePlayer.team)
         {
             //Opponent king is the second object
