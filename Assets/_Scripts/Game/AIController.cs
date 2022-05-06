@@ -29,6 +29,22 @@ public class AIController : MonoBehaviour
         {PieceType.Rook, 15},
         {PieceType.Pawn, 5}
     };
+    private Dictionary<PieceType, int> moveValueAggressive = new Dictionary<PieceType, int>() {
+        {PieceType.King, 1},
+        {PieceType.Queen, 20},
+        {PieceType.Knight, 40},
+        {PieceType.Bishop, 2},
+        {PieceType.Rook, 40},
+        {PieceType.Pawn, 4}
+    };
+    private Dictionary<PieceType, int> moveValueDefensive = new Dictionary<PieceType, int>() {
+        {PieceType.King, 1},
+        {PieceType.Queen, 12},
+        {PieceType.Knight, 5},
+        {PieceType.Bishop, 2},
+        {PieceType.Rook, 12},
+        {PieceType.Pawn, 10}
+    };
     private Dictionary<PieceType, int> pieceValue = new Dictionary<PieceType, int>() {
         {PieceType.King, 500},
         {PieceType.Queen, 80},
@@ -228,7 +244,20 @@ public class AIController : MonoBehaviour
             Vector2Int kingLocation = getOppositeKingLocation();
             double distanceToKing = Math.Sqrt(Math.Pow(moveLocation.x - kingLocation.x, 2) + Math.Pow(moveLocation.y - kingLocation.y, 2));
 
-            return moveValue[aiPiece.pieceType] - distanceToKing;
+            if (aiStyle == 1)
+            {
+                //offesive and favors developing rooks and knights while hates moving pawns
+                return moveValueAggressive[aiPiece.pieceType] - distanceToKing;
+            }
+            else if (aiStyle == 2)
+            {
+                //defensive and favors developing rooks, the queen, and pawns; it also rarely moves the knight during the opening
+                return moveValueDefensive[aiPiece.pieceType] - distanceToKing;
+            }
+            else
+            {
+                return moveValue[aiPiece.pieceType] - distanceToKing;
+            }
         }
     }
 
