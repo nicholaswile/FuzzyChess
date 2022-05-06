@@ -61,7 +61,8 @@ public class AIController : MonoBehaviour
     {
         if (madeFirstTurn == false)
         {
-            yield return new WaitForSeconds(2.5f);
+            if (controller.activePlayer.team == Team.White)
+                yield return new WaitForSeconds(2.5f);
             madeFirstTurn = true;
         }
 
