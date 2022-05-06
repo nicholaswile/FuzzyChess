@@ -194,7 +194,9 @@ public class GameController : MonoBehaviour
         GenerateAllPlayerMoves(activePlayer);
         GenerateAllPlayerMoves(GetOppositePlayer(activePlayer));
         GameUI TheGameUI = GameObject.Find("UI").GetComponent<GameUI>();
+
         int iteratorNum = TheGameUI.GetIteratorCount();
+
         ChangeActiveCorp();
 
         if (iteratorNum % NUMBER_OF_ACTIONS != 0)
@@ -247,7 +249,7 @@ public class GameController : MonoBehaviour
         kingCorpUsed = 0;
     }
 
-    private Player GetOppositePlayer(Player player)
+    public Player GetOppositePlayer(Player player)
     {
         return player == whitePlayer ? blackPlayer : whitePlayer;
     }
