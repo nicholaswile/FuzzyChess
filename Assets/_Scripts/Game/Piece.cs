@@ -19,6 +19,7 @@ public abstract class Piece : MonoBehaviour
     private bool delegated = false;
     public bool isDelegated { get { return delegated; } set { delegated = value; } }
     public List<Vector2Int> AvailableMoves;
+    public bool animationsEnabled;
 
     static Vector2Int[] directions = new Vector2Int[]
     {
@@ -39,6 +40,11 @@ public abstract class Piece : MonoBehaviour
         AvailableMoves = new List<Vector2Int>();
         materialSetter = GetComponent<MaterialSetter>();
         hasMoved = false;
+    }
+    
+    private void Start()
+    {
+        animationsEnabled = Convert.ToBoolean(PlayerPrefs.GetInt("AnimationsEnabled"));
     }
 
     public int CorpMoveNumber()
@@ -108,9 +114,13 @@ public abstract class Piece : MonoBehaviour
 
     public void MoveTo(Transform transform, Vector3 targetPosition)
     {
-        transform.position = targetPosition;
-
-        SFXController.PlaySoundMovement();
+        if(animationsEnabled)
+        {
+            StartCoroutine(MoveAtoB(transform.gameObject, transform.position, targetPosition));
+        } else {
+            transform.position = targetPosition;
+            SFXController.PlaySoundMovement();
+        }
     }
 
     public virtual void MovePiece(Vector2Int coords) 
@@ -123,7 +133,7 @@ public abstract class Piece : MonoBehaviour
     }
 
     //a setter for hasMoved, since its private.
-    public void setHasMoved(bool a)
+    public void setHasMoved(bool a) 
     {
         hasMoved = a;
     }
@@ -272,6 +282,29 @@ public abstract class Piece : MonoBehaviour
         if (adjacentEnemySquares.Count == 0)
             return false;
         else return true;
+    }
+
+    IEnumerator MoveAtoB(GameObject piece, Vector3 startingLocation, Vector3 destination)
+    {
+        board.acceptingInputs = false;
+        startingLocation.y = 0.08f;
+        Vector3 apex = startingLocation;
+
+        while(piece.transform.position != apex)
+        {
+            piece.transform.position = Vector3.MoveTowards(piece.transform.position, apex, 0.6f * Time.deltaTime);
+            yield return null;
+        }
+        while(piece.transform.position != destination)
+        {
+            piece.transform.position = Vector3.MoveTowards(piece.transform.position, destination, 0.4f * Time.deltaTime);
+            yield return null;
+        }
+        if(Vector3.Distance(piece.transform.position, destination) < .1f)
+        {
+            SFXController.PlaySoundMovement();
+        }
+        board.acceptingInputs = true;
     }
 
 }

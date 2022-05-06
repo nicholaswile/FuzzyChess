@@ -10,6 +10,7 @@ public class AIController : MonoBehaviour
     [SerializeField] private GameController controller;
     [SerializeField] private GameUI gameUI;
     private GameState state;
+    private int aiStyle = 0;
 
     private Dictionary<PieceType, Dictionary<PieceType, int>> captureTable = new Dictionary<PieceType, Dictionary<PieceType, int>>() {
         {PieceType.King, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 4}, {PieceType.Rook, 5}, {PieceType.Pawn, 1}}},
@@ -261,6 +262,11 @@ public class AIController : MonoBehaviour
     private void Awake()
     {
         GameManager.StateChanged += GameManager_StateChanged;
+    }
+
+    private void Start()
+    {
+        aiStyle = PlayerPrefs.GetInt("AIStyle");
     }
 
     private void GameManager_StateChanged(GameState state)

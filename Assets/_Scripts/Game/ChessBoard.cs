@@ -33,11 +33,13 @@ public class ChessBoard : MonoBehaviour
 
     private const string DICE = "ResultDie";
     public bool selectedPieceMoved { get; set; }
+    public bool acceptingInputs { get; set; }
 
     private void Awake()
     {
         highlighter = GetComponent<CreateHighlighters>();
         CreateBoardGrid();
+        acceptingInputs = true;
     }
 
     public void SetDependencies(GameController controller)
@@ -81,7 +83,7 @@ public class ChessBoard : MonoBehaviour
                 SelectPiece(piece, piece.corpType);
 
 
-            else if (selectedPiece.CanMoveTo(coords))
+            else if (selectedPiece.CanMoveTo(coords) && acceptingInputs)
             {
                 OnSelectedPieceMoved(coords, selectedPiece);
             }
@@ -515,6 +517,9 @@ public class ChessBoard : MonoBehaviour
             if (knightHasMoved) 
             {
                 result++;
+                GameObject KnightScreen = GameObject.Find("KnightScreen");
+                GameObject knightbonus = KnightScreen.transform.GetChild(0).gameObject;
+                knightbonus.SetActive(true);
             }
 
             Debug.Log("Result: " + result);
