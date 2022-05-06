@@ -125,11 +125,35 @@ public class AIController : MonoBehaviour
                 {
                     yield return new WaitForSeconds(1.5f);
                     board.OnSquareSelected(board.GetPositionFromCoords(preAttackSquare));
-                }
 
-                //Knight Attack (Roll with +1)
-                yield return new WaitForSeconds(1.25f);
-                board.OnSquareSelected(movePosition);
+                    //Knight Attack (Roll with +1)
+                    yield return new WaitForSeconds(1.25f);
+                    board.OnSquareSelected(movePosition);
+                }
+                else
+                {
+                    //Knight Move
+                    yield return new WaitForSeconds(1.5f);
+                    board.OnSquareSelected(movePosition);
+
+                    List<Vector2Int> adjacentEnemy = attackingPiece.GetAdjacentEnemySquares(attackingPiece.occupiedSquare);
+                    if (adjacentEnemy.Count > 0)
+                    {
+                        Vector2Int mostValueableEnemy = adjacentEnemy[0];
+                        int mostValue = pieceValue[board.GetPieceOnSquare(adjacentEnemy[0]).pieceType];
+
+                        foreach (Vector2Int enemyLocation in adjacentEnemy)
+                        {
+                            if (pieceValue[board.GetPieceOnSquare(enemyLocation).pieceType] > mostValue)
+                                mostValueableEnemy = enemyLocation;
+                        }
+
+                        //Knight Attack (Roll with +1)
+                        yield return new WaitForSeconds(1.25f);
+                        board.OnSquareSelected(board.GetPositionFromCoords(mostValueableEnemy));
+                        yield return new WaitForSeconds(2.75f);
+                    }
+                }
             }
 
             //Wait extra if the move was an attack
