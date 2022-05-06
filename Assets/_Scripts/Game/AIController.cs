@@ -22,10 +22,10 @@ public class AIController : MonoBehaviour
         {PieceType.Pawn, new Dictionary<PieceType, int>() {{PieceType.King, 6}, {PieceType.Queen, 6}, {PieceType.Knight, 6}, {PieceType.Bishop, 5}, {PieceType.Rook, 6}, {PieceType.Pawn, 4}}}
     };
     private Dictionary<PieceType, int> moveValue = new Dictionary<PieceType, int>() {
-        {PieceType.King, 1},
+        {PieceType.King, 2},
         {PieceType.Queen, 10},
         {PieceType.Knight, 15},
-        {PieceType.Bishop, 2},
+        {PieceType.Bishop, 4},
         {PieceType.Rook, 15},
         {PieceType.Pawn, 5}
     };
@@ -35,7 +35,7 @@ public class AIController : MonoBehaviour
         {PieceType.Knight, 120},
         {PieceType.Bishop, 140},
         {PieceType.Rook, 100},
-        {PieceType.Pawn, 10}
+        {PieceType.Pawn, 25}
     };
 
     //Is Attack Move | AI Piece | Movement Location | Value of Move
@@ -45,7 +45,7 @@ public class AIController : MonoBehaviour
     {
         if (madeFirstTurn == false)
         {
-            yield return new WaitForSeconds(3.5f);
+            yield return new WaitForSeconds(2.5f);
             madeFirstTurn = true;
         }
 
