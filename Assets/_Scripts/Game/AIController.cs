@@ -10,6 +10,8 @@ public class AIController : MonoBehaviour
     [SerializeField] private GameController controller;
     [SerializeField] private GameUI gameUI;
     private GameState state;
+    private int aiStyle = 0;
+    private bool madeFirstTurn = false;
 
     private Dictionary<PieceType, Dictionary<PieceType, int>> captureTable = new Dictionary<PieceType, Dictionary<PieceType, int>>() {
         {PieceType.King, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 4}, {PieceType.Rook, 5}, {PieceType.Pawn, 1}}},
@@ -19,142 +21,152 @@ public class AIController : MonoBehaviour
         {PieceType.Rook, new Dictionary<PieceType, int>() {{PieceType.King, 4}, {PieceType.Queen, 4}, {PieceType.Knight, 4}, {PieceType.Bishop, 5}, {PieceType.Rook, 5}, {PieceType.Pawn, 5}}},
         {PieceType.Pawn, new Dictionary<PieceType, int>() {{PieceType.King, 6}, {PieceType.Queen, 6}, {PieceType.Knight, 6}, {PieceType.Bishop, 5}, {PieceType.Rook, 6}, {PieceType.Pawn, 4}}}
     };
-    private Dictionary<PieceType, int> captureWorth = new Dictionary<PieceType, int>() {
-        {PieceType.King, 101},
-        {PieceType.Queen, 40},
-        {PieceType.Knight, 60},
-        {PieceType.Bishop, 70},
-        {PieceType.Rook, 50},
+    private Dictionary<PieceType, int> moveValue = new Dictionary<PieceType, int>() {
+        {PieceType.King, 2},
+        {PieceType.Queen, 10},
+        {PieceType.Knight, 15},
+        {PieceType.Bishop, 4},
+        {PieceType.Rook, 15},
         {PieceType.Pawn, 5}
     };
-    private Dictionary<PieceType, int> defenseWorth = new Dictionary<PieceType, int>() {
-        {PieceType.King, 100},
-        {PieceType.Queen, 40},
-        {PieceType.Knight, 60},
-        {PieceType.Bishop, 70},
-        {PieceType.Rook, 50},
-        {PieceType.Pawn, 5}
+    private Dictionary<PieceType, int> moveValueAggressive = new Dictionary<PieceType, int>() {
+        {PieceType.King, 1},
+        {PieceType.Queen, 20},
+        {PieceType.Knight, 40},
+        {PieceType.Bishop, 2},
+        {PieceType.Rook, 40},
+        {PieceType.Pawn, 4}
+    };
+    private Dictionary<PieceType, int> moveValueDefensive = new Dictionary<PieceType, int>() {
+        {PieceType.King, 1},
+        {PieceType.Queen, 12},
+        {PieceType.Knight, 5},
+        {PieceType.Bishop, 2},
+        {PieceType.Rook, 12},
+        {PieceType.Pawn, 10}
+    };
+    private Dictionary<PieceType, int> pieceValue = new Dictionary<PieceType, int>() {
+        {PieceType.King, 500},
+        {PieceType.Queen, 80},
+        {PieceType.Knight, 120},
+        {PieceType.Bishop, 140},
+        {PieceType.Rook, 100},
+        {PieceType.Pawn, 25}
     };
 
-    //IsAIAttacking | AI Piece | Opponent Piece | Roll Requirement | Value of the Piece Under Attack | Cost of Move
-    private List<ArrayList> moveList = new List<ArrayList>(); 
+    //Is Attack Move | AI Piece | Movement Location | Value of Move
+    private List<ArrayList> aiMoves = new List<ArrayList>();
 
     private IEnumerator AI_TakeTurn_Coroutine()
     {
-        List<Piece> aiPieces = controller.blackPlayer.ActivePieces; 
-        List<Piece> enemyPieces = controller.whitePlayer.ActivePieces;
-
-        List<Piece> activeCorpPieces = controller.blackPlayer.KingCorpPieces;
-
-
-        while (controller.activePlayer == controller.blackPlayer)
+        if (madeFirstTurn == false)
         {
-            //TEMP FIX FOR INFINITE LOOP AT END OF GAME
+            if (controller.activePlayer.team == Team.White)
+                yield return new WaitForSeconds(2.5f);
+            madeFirstTurn = true;
+        }
+
+        List<Piece> aiPieces = controller.activePlayer.ActivePieces; 
+
+        aiMoves = updateAiMoves(aiPieces);
+
+        while (aiMoves.Count > 0)
+        {
+            //Break loop at end of game.
             if (state == GameState.Win || state == GameState.Lose)
                 break;
 
-            updateMoveList(aiPieces, enemyPieces);
-            moveList.Sort(sortMoveList);
-
             //DEBUG: Output number of moves avaliable, what's attacking, what's being attacked, and all values related to movement.
-            Debug.Log("There are " + moveList.Count + " capturing moves that can be made.");
-            foreach (ArrayList a in moveList)
+            /*Debug.Log("There are " + aiMoves.Count + " AI moves that can be made this turn.");
+            foreach (ArrayList a in aiMoves)
             {
                 if ((bool)a[0])
-                    Debug.Log("AI " + ((Piece)a[1]).pieceType + " attacking Player " + ((Piece)a[2]).pieceType + ". A roll of " + a[3] + " will capture. The value of this piece is " + a[4] + ". Cost: " + a[5]);
+                    Debug.Log("AI " + ((Piece)a[1]).pieceType + " attacking Player " + board.GetPieceOnSquare(board.GetCoordsFromPosition((Vector3)a[2])) + ". Move Value: " + a[3]);
                 else
-                    Debug.Log("AI " + ((Piece)a[1]).pieceType + " is being attacked by Player " + ((Piece)a[2]).pieceType + ". A roll of " + a[3] + " will capture. The value of this piece is " + a[4] + ". Cost: " + a[5]);
-            }
+                    Debug.Log("AI " + ((Piece)a[1]).pieceType + " moving to " + board.GetCoordsFromPosition((Vector3)a[2]) + ". Move Value: " + a[3]);
+            }*/
 
-            int i = 0;
-            while (i < moveList.Count && (bool)moveList.ElementAt(i)[0] == false)
-                i++;
+            Piece attackingPiece = (Piece)aiMoves.ElementAt(0)[1];
+            Vector3 piecePosition = board.GetPositionFromCoords(attackingPiece.occupiedSquare);
+            Vector3 movePosition = (Vector3)aiMoves.ElementAt(0)[2];
 
-            if (moveList.Count > 0 && i < moveList.Count)
+            //Select square with piece that can attack opponent
+            yield return new WaitForSeconds(1f);
+            board.OnSquareSelected(piecePosition);
+
+            if (attackingPiece.pieceType != PieceType.Knight)
             {
-
-                Piece attackingPiece = ((Piece)moveList.ElementAt(i)[1]);
-                Vector3 piecePosition = board.GetPositionFromCoords(attackingPiece.occupiedSquare);
-                Vector3 movePosition = board.GetPositionFromCoords(((Piece)moveList.ElementAt(i)[2]).occupiedSquare);
-
-                //Select square with piece that can attack opponent
-                yield return new WaitForSeconds(2.5f);
-                board.OnSquareSelected(piecePosition);
-
-                if (attackingPiece.pieceType != PieceType.Knight)
-                {
-                    //Attack (Begins Roll)
-                    yield return new WaitForSeconds(1.25f);
-                    board.OnSquareSelected(movePosition);
-                    SFXController.PlaySoundMovement();
-                }
-                else
-                {
-                    //Knight Determine Movement Location before Attack
-                    Vector2Int preAttackSquare = attackingPiece.occupiedSquare;
-                    foreach (Vector2Int move in attackingPiece.AvailableMoves)
-                    {
-                        if (board.GetPieceOnSquare(move) == null)
-                        {
-                            foreach (Vector2Int doubleMove in attackingPiece.GetAdjacentEnemySquares(move))
-                            {
-                                if (doubleMove == ((Piece)moveList.ElementAt(i)[2]).occupiedSquare)
-                                {
-                                    preAttackSquare = move;
-                                    break;
-                                }
-                            }
-                            if (preAttackSquare != attackingPiece.occupiedSquare)
-                                break;
-                        }
-                    }
-                
-                    //Knight take Pre-Attack Jump if Jump exists.
-                    if(preAttackSquare != attackingPiece.occupiedSquare)
-                    {
-                        yield return new WaitForSeconds(1.25f);
-                        board.OnSquareSelected(board.GetPositionFromCoords(preAttackSquare));
-                        SFXController.PlaySoundMovement();
-                    }
-
-                    //Knight Attack (Begins Roll with +1)
-                    yield return new WaitForSeconds(1.25f);
-                    board.OnSquareSelected(movePosition);
-                    SFXController.PlaySoundMovement();
-                }
+                //Move
+                yield return new WaitForSeconds(1.5f);
+                board.OnSquareSelected(movePosition);
             }
             else
             {
-                foreach (Piece corpPiece in activeCorpPieces.ToList())
+                //Knight Determine Movement Location before Attack
+                Vector2Int preAttackSquare = attackingPiece.occupiedSquare;
+                foreach (Vector2Int move in attackingPiece.AvailableMoves)
                 {
-                    Vector3 piecePosition = board.GetPositionFromCoords(corpPiece.occupiedSquare);
-                    if (board.isSelectable(corpPiece) && corpPiece.AvailableMoves.Count > 0)
+                    if (board.GetPieceOnSquare(move) == null)
                     {
-                        yield return new WaitForSeconds(2.5f);
-                        board.OnSquareSelected(piecePosition);
-
-                        foreach (Vector2Int move in corpPiece.AvailableMoves.ToList())
+                        foreach (Vector2Int doubleMove in attackingPiece.GetAdjacentEnemySquares(move))
                         {
-                            Vector3 movePosition = board.GetPositionFromCoords(move);
-
-                            yield return new WaitForSeconds(1.25f);
-                            board.OnSquareSelected(movePosition);
-                            SFXController.PlaySoundMovement();
-
-                            break;
+                            if (doubleMove == board.GetCoordsFromPosition(movePosition))
+                            {
+                                preAttackSquare = move;
+                                break;
+                            }
                         }
-                        break;
+                        if (preAttackSquare != attackingPiece.occupiedSquare)
+                            break;
+                    }
+                }
+                
+                //Knight take Pre-Attack Jump if Jump exists.
+                if(preAttackSquare != attackingPiece.occupiedSquare)
+                {
+                    yield return new WaitForSeconds(1.5f);
+                    board.OnSquareSelected(board.GetPositionFromCoords(preAttackSquare));
+
+                    //Knight Attack (Roll with +1)
+                    yield return new WaitForSeconds(1.25f);
+                    board.OnSquareSelected(movePosition);
+                }
+                else
+                {
+                    //Knight Move
+                    yield return new WaitForSeconds(1.5f);
+                    board.OnSquareSelected(movePosition);
+
+                    List<Vector2Int> adjacentEnemy = attackingPiece.GetAdjacentEnemySquares(attackingPiece.occupiedSquare);
+                    if (adjacentEnemy.Count > 0)
+                    {
+                        Vector2Int mostValueableEnemy = adjacentEnemy[0];
+                        int mostValue = pieceValue[board.GetPieceOnSquare(adjacentEnemy[0]).pieceType];
+
+                        foreach (Vector2Int enemyLocation in adjacentEnemy)
+                        {
+                            if (pieceValue[board.GetPieceOnSquare(enemyLocation).pieceType] > mostValue)
+                                mostValueableEnemy = enemyLocation;
+                        }
+
+                        //Knight Attack (Roll with +1)
+                        yield return new WaitForSeconds(1.25f);
+                        board.OnSquareSelected(board.GetPositionFromCoords(mostValueableEnemy));
+                        yield return new WaitForSeconds(2.75f);
                     }
                 }
             }
 
-            if (activeCorpPieces == controller.blackPlayer.KingCorpPieces) 
-                activeCorpPieces = controller.blackPlayer.RightCorpPieces;
-            else if (activeCorpPieces == controller.blackPlayer.RightCorpPieces) 
-                activeCorpPieces = controller.blackPlayer.LeftCorpPieces;
-            else if (activeCorpPieces == controller.blackPlayer.LeftCorpPieces) 
-                activeCorpPieces = controller.blackPlayer.KingCorpPieces;
+            //Wait extra if the move was an attack
+            if ((bool)aiMoves.ElementAt(0)[0] == true)
+                yield return new WaitForSeconds(2.75f);
+
+            aiMoves = updateAiMoves(aiPieces);
         }
+
+        //Skip turn when there are no more moves to make.
+        GameObject.Find("UI").GetComponent<GameUI>().UI_Skip();
+
     }
 
     //INPUT: A knight piece
@@ -182,13 +194,12 @@ public class AIController : MonoBehaviour
     }
 
     //INPUT: A list of pieces from the AI team and a list from the enemy team
-    //OUTPUT: Update moveList list of potential moves
-    //FORMAT: IsAIAttacking | AI Piece | Opponent Piece | Roll Requirement | Value of the Piece Under Attack | Cost of Move
-    private void updateMoveList(List<Piece> aiPieces, List<Piece> enemyPieces)
+    //OUTPUT: Sorted list of moves the AI can make
+    //FORMAT: aiMoves = {Is Attack Move | AI Piece | Movement Location | Value of Move}
+    private List<ArrayList> updateAiMoves(List<Piece> aiPieces)
     {
-        moveList.Clear();
+        List<ArrayList> newAiMoves = new List<ArrayList>();
 
-        //For every AI piece
         foreach (Piece aiPiece in aiPieces)
         {
             if (aiPiece.AvailableMoves.Count > 0)
@@ -200,7 +211,7 @@ public class AIController : MonoBehaviour
                     {
                         //Add all additional knight moves.
                         Piece enemyPiece = board.GetPieceOnSquare(move);
-                        moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece) - 1, captureWorth[enemyPiece.pieceType]) });
+                        newAiMoves.Add(new ArrayList() { true, aiPiece, board.GetPositionFromCoords(enemyPiece.occupiedSquare), getMoveValue(true, true, move, aiPiece, enemyPiece) - 1 });
                     }
                 }
 
@@ -208,60 +219,81 @@ public class AIController : MonoBehaviour
                 foreach (Vector2Int move in aiPiece.AvailableMoves)
                 {
                     Piece enemyPiece = board.GetPieceOnSquare(move);
-                    //Add a potentialAttack if there is a piece and it is from the enemy's team.
                     if (enemyPiece != null && !aiPiece.IsFromSameTeam(enemyPiece))
-                        moveList.Add(new ArrayList() { true, aiPiece, enemyPiece, getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType], getMoveCost(getMinRoll(aiPiece, enemyPiece), captureWorth[enemyPiece.pieceType]) });
-                }
-            }
-        }
-
-        //For every non-AI piece
-        foreach (Piece enemyPiece in enemyPieces)
-        {
-            if (enemyPiece.AvailableMoves.Count > 0)
-            {
-                //Handle finding the true area a knight can capture. Knight's AvailableMoves doesn't give an honest representation.
-                if (enemyPiece.pieceType == PieceType.Knight)
-                {
-                    foreach (Vector2Int move in getKnightMoves(enemyPiece))
+                        //Add an aiMove capture if there is a piece and it is from the enemy's team.
+                        newAiMoves.Add(new ArrayList() { true, aiPiece, board.GetPositionFromCoords(enemyPiece.occupiedSquare), getMoveValue(true, false, move, aiPiece, enemyPiece) });
+                    else if (enemyPiece == null)
                     {
-                        //Add all additional knight moves.
-                        Piece aiPiece = board.GetPieceOnSquare(move);
-                        moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece) - 1, defenseWorth[aiPiece.pieceType]) });
+                        //Add an aiMove movement if there no piece in an avaliable move spot
+                        newAiMoves.Add(new ArrayList() { false, aiPiece, board.GetPositionFromCoords(move), getMoveValue(false, false, move, aiPiece, null) });
                     }
                 }
-
-                //For every move that a non-AI piece can make
-                foreach (Vector2Int move in enemyPiece.AvailableMoves)
-                {
-                    Piece aiPiece = board.GetPieceOnSquare(move);
-                    //Add a potentialDanger if there is a piece and it is from the AI's team.
-                    if (aiPiece != null && !enemyPiece.IsFromSameTeam(aiPiece))
-                        moveList.Add(new ArrayList() { false, aiPiece, enemyPiece, getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType], getMoveCost(getMinRoll(enemyPiece, aiPiece), defenseWorth[aiPiece.pieceType]) });
-                }
             }
         }
 
-        moveList.RemoveAll(corpMoved);
+        //Remove all AI moves where the corp has already moved
+        newAiMoves.RemoveAll(corpMoved);
+
+        //Sort all moves by Value
+        newAiMoves.Sort(sortMoveList);
+
+        return newAiMoves;
     }
 
-    private int getMinRoll(Piece attacking, Piece defending)
+    //OUTPUT: Returns the location of the enemy player's king.
+    private Vector2Int getOppositeKingLocation()
     {
-        return captureTable[attacking.pieceType][defending.pieceType];
+        King[] kings = GameObject.FindObjectsOfType<King>();
+        if (kings[0].team == controller.activePlayer.team)
+        {
+            //Opponent king is the second object
+            return kings[1].occupiedSquare;
+        }
+        else
+        {
+            //OpponentKing is the first object
+            return kings[0].occupiedSquare;
+        }
     }
 
-    private float getMoveCost(int minRoll, int pieceValue)
+    //INPUT: Whether the move is a capture move, Whether the move is a special knight move, The final location of the move, The AI piece making the move, The enemy piece being attack (if any)
+    //OUTPUT: Total weighted value of the move.
+    private double getMoveValue(bool isCapture, bool isKnightSpecial, Vector2Int moveLocation, Piece aiPiece, Piece enemyPiece)
     {
-        return ((float)1/minRoll) * pieceValue;
+        if (isCapture && isKnightSpecial)
+            return (double)1 / (captureTable[aiPiece.pieceType][enemyPiece.pieceType] - 1) * pieceValue[enemyPiece.pieceType];
+        else if (isCapture)
+            return (double)1 / (captureTable[aiPiece.pieceType][enemyPiece.pieceType]) * pieceValue[enemyPiece.pieceType];
+        else
+        {
+            Vector2Int kingLocation = getOppositeKingLocation();
+            double distanceToKing = Math.Sqrt(Math.Pow(moveLocation.x - kingLocation.x, 2) + Math.Pow(moveLocation.y - kingLocation.y, 2));
+
+            if (aiStyle == 1)
+            {
+                //offesive and favors developing rooks and knights while hates moving pawns
+                return moveValueAggressive[aiPiece.pieceType] - distanceToKing;
+            }
+            else if (aiStyle == 2)
+            {
+                //defensive and favors developing rooks, the queen, and pawns; it also rarely moves the knight during the opening
+                return moveValueDefensive[aiPiece.pieceType] - distanceToKing;
+            }
+            else
+            {
+                return moveValue[aiPiece.pieceType] - distanceToKing;
+            }
+        }
     }
 
+    //Helper function to sort the move list by the move values.
     private int sortMoveList(ArrayList x, ArrayList y)
     {
-        if ((float)x[5] < (float)y[5])
+        if ((double)x[x.Count - 1] < (double)y[y.Count - 1])
         {
             return 1;
         }
-        else if ((float)x[5] > (float)y[5])
+        else if ((double)x[x.Count - 1] > (double)y[y.Count - 1])
         {
             return -1;
         }
@@ -269,24 +301,18 @@ public class AIController : MonoBehaviour
             return 0;
     }
 
+    //INPUT: Possible move
+    //OUTPUT: Boolean value of whether the move's corp has already made a move or not.
     private bool corpMoved(ArrayList move)
     {
         Piece piece = (Piece)move[1];
-        if (piece.pieceType != PieceType.King && piece.pieceType != PieceType.Bishop)
-        {
-            if (piece.CorpMoveNumber() >= 2)
-                return true;
-            else if (piece.CorpMoveNumber() >= 1 && piece.CommanderMovedOne() == false)
-                return true;
-            else
-                return false;
-        }
-        else
-        {
-            if (piece.CorpMoveNumber() >= 1)
-                return true;
+        if (piece.corpType == CorpType.Left && controller.LeftCorpUsed < 1)
             return false;
-        }
+        if (piece.corpType == CorpType.Right && controller.RightCorpUsed < 1)
+            return false;
+        if (piece.corpType == CorpType.King && controller.KingCorpUsed < 1)
+            return false;
+        return true;
     }
 
     public void AI_TakeTurn() 
@@ -297,6 +323,11 @@ public class AIController : MonoBehaviour
     private void Awake()
     {
         GameManager.StateChanged += GameManager_StateChanged;
+    }
+
+    private void Start()
+    {
+        aiStyle = PlayerPrefs.GetInt("AIStyle");
     }
 
     private void GameManager_StateChanged(GameState state)

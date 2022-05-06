@@ -33,11 +33,13 @@ public class ChessBoard : MonoBehaviour
 
     private const string DICE = "ResultDie";
     public bool selectedPieceMoved { get; set; }
+    public bool acceptingInputs { get; set; }
 
     private void Awake()
     {
         highlighter = GetComponent<CreateHighlighters>();
         CreateBoardGrid();
+        acceptingInputs = true;
     }
 
     public void SetDependencies(GameController controller)
@@ -55,7 +57,7 @@ public class ChessBoard : MonoBehaviour
         return bottomLeftMarker.position + new Vector3(coords.x * squareSize, 0f, coords.y * squareSize);
     }
 
-    private Vector2Int GetCoordsFromPosition(Vector3 inputPosition)
+    public Vector2Int GetCoordsFromPosition(Vector3 inputPosition)
     {
         int x = Mathf.FloorToInt(inputPosition.x / squareSize) + BOARD_SIZE / 2;
         int y = Mathf.FloorToInt(inputPosition.z / squareSize) + BOARD_SIZE / 2;
@@ -81,7 +83,7 @@ public class ChessBoard : MonoBehaviour
                 SelectPiece(piece, piece.corpType);
 
 
-            else if (selectedPiece.CanMoveTo(coords))
+            else if (selectedPiece.CanMoveTo(coords) && acceptingInputs)
             {
                 OnSelectedPieceMoved(coords, selectedPiece);
             }
@@ -152,7 +154,7 @@ public class ChessBoard : MonoBehaviour
         if (selectedPiece.CorpMoveNumber() >= 1 && !selectedPiece.CommanderMovedOne()) 
         {
             selection.Clear();
-            selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
+            selection.AddRange(selectedPiece.GetAdjacentSquares());
         } 
         //else if (selectedPiece.CorpMoveNumber() >= 0 && !selectedPiece.CommanderMovedOne()) selection.AddRange(selectedPiece.GetAdjacentSquares(selectedPiece.occupiedSquare));
         ShowSelectionSquares(selection);
@@ -338,6 +340,7 @@ public class ChessBoard : MonoBehaviour
 
     private void OnSelectedPieceMoved(Vector2Int coords, Piece piece)
     {
+        Tooltip.HideTooltip_Static();
         Piece pieceOnSquare = GetPieceOnSquare(coords);
         TryToTakeOppositePiece(coords);
 
@@ -514,6 +517,9 @@ public class ChessBoard : MonoBehaviour
             if (knightHasMoved) 
             {
                 result++;
+                GameObject KnightScreen = GameObject.Find("KnightScreen");
+                GameObject knightbonus = KnightScreen.transform.GetChild(0).gameObject;
+                knightbonus.SetActive(true);
             }
 
             Debug.Log("Result: " + result);
@@ -624,6 +630,12 @@ public class ChessBoard : MonoBehaviour
         controller.EndTurn();
     }
 
+    //this simply exists to allow external methods to clear the list of piece moves for the undo function. Needed for endturn() in gamecontroller
+    public void ClearUndoPieceMoves()
+    {
+        pieceMoves2.Clear();
+    }
+
     public void UpdateBoardOnPieceMove(Vector2Int newCoords, Vector2Int oldCoords, Piece newPiece, Piece oldPiece)
     {
         grid[oldCoords.x, oldCoords.y] = oldPiece;
@@ -698,5 +710,64 @@ public class ChessBoard : MonoBehaviour
         List<String> newPieceMoves = new List<String>(pieceMoves);
         pieceMoves.Clear();
         return newPieceMoves;
+    }
+
+    public int GetRollNeeded(Piece attackingPiece, Piece defendingPiece)
+    {
+        if (attackingPiece.pieceType == PieceType.King)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 1;
+            else if (defendingPiece.pieceType == PieceType.Rook)
+                return 5;
+            else return 4;
+        }
+        else if (attackingPiece.pieceType == PieceType.Queen)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 2;
+            else if (defendingPiece.pieceType == PieceType.Rook)
+                return 5;
+            else return 4;
+        }
+        else if (attackingPiece.pieceType == PieceType.Knight && !knightHasMoved)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 2;
+            else return 5;
+        }
+        else if (attackingPiece.pieceType == PieceType.Knight && knightHasMoved)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 1;
+            else return 4;
+        }
+        else if (attackingPiece.pieceType == PieceType.Bishop)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 3;
+            else if (defendingPiece.pieceType == PieceType.Bishop)
+                return 4;
+            else return 5;
+        }
+        else if (attackingPiece.pieceType == PieceType.Rook)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 5;
+            else if (defendingPiece.pieceType == PieceType.Rook)
+                return 5;
+            else if (defendingPiece.pieceType == PieceType.Bishop)
+                return 5;
+            else return 4;
+        }
+        else if (attackingPiece.pieceType == PieceType.Pawn)
+        {
+            if (defendingPiece.pieceType == PieceType.Pawn)
+                return 4;
+            else if (defendingPiece.pieceType == PieceType.Bishop)
+                return 5;
+            else return 6;
+        }
+        else return 0;
     }
 }

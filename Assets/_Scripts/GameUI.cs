@@ -7,11 +7,12 @@ using System;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard;
+    [SerializeField] private GameObject mainGameUI, captureTable, cam2d, cam3d, cam360, winScreen, loseScreen, rollScreen, diceObj, movesList, mainSample, ListParent, chessBoard, scrollBar;
     [SerializeField] private Button exitButton, skipButton, undoButton, moveButton, camButton, rollButton, recallButton, delegateLeftButton, delegateRightButton;
     //[SerializeField] private Sprite ReplaceSprite;
     private Dictionary<string, string> MakeChessNotation = new Dictionary<string, string>();
     [SerializeField] private ChessBoard board;
+    [SerializeField] private GameController controller;
     [SerializeField] private AIController AIController;
     public const int NUMBER_OF_ACTIONS = 6;
     private int turnCount = 1;
@@ -22,8 +23,12 @@ public class GameUI : MonoBehaviour
     private bool pieceTaken = false;
     private bool pieceTakeFail = false;
     private List<GameObject> moveListObjects = new List<GameObject> ();
+    private MenuInfo menuInfo;
+    private int modeChoice;
 
     private Vector3[,] camSwitch = new Vector3[2, 2];
+
+    public Quaternion onepos, twopos, threepos, fourpos, fivepos, sixpos, randpos;
 
 
     private void Awake()
@@ -43,21 +48,51 @@ public class GameUI : MonoBehaviour
 
         GameManager.StateChanged += GameManager_StateChanged;
         GameManager.RollStateChanged += GameManager_RollStateChanged;
+
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        onepos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
+        twopos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(0, 90, -90);
+        threepos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(0, -90, -90);
+        fourpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
+        fivepos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Euler(0, 0, 90);
+        sixpos = rb.transform.rotation;
+
+        menuInfo = FindObjectsOfType<MenuInfo>()[FindObjectsOfType<MenuInfo>().Length - 1];
+        modeChoice = menuInfo.modeNumber;
+        if (modeChoice != 1) 
+        {
+            undoButton.interactable = false;
+            if (modeChoice == 3)
+            {
+                skipButton.interactable = false;
+                delegateLeftButton.interactable = false;
+                delegateRightButton.interactable = false;
+                recallButton.interactable = false;
+            }
+        }
     }
 
     private void Update()
     {
-        if (board.selectedPiece != null)
+        if (modeChoice != 3 && (controller.activePlayer == controller.whitePlayer || modeChoice == 2))
         {
-            delegateLeftButton.interactable = board.CanDelegate(CorpType.Left);
-            delegateRightButton.interactable = board.CanDelegate(CorpType.Right);
-            recallButton.interactable = board.CanRecall();
-        }
-        else if (board.selectedPiece == null) 
-        {
-            delegateLeftButton.interactable = false;
-            delegateRightButton.interactable = false;
-            recallButton.interactable = false;
+            if (board.selectedPiece != null)
+            {
+                delegateLeftButton.interactable = board.CanDelegate(CorpType.Left);
+                delegateRightButton.interactable = board.CanDelegate(CorpType.Right);
+                recallButton.interactable = board.CanRecall();
+            }
+            else if (board.selectedPiece == null)
+            {
+                delegateLeftButton.interactable = false;
+                delegateRightButton.interactable = false;
+                recallButton.interactable = false;
+            }
         }
     }
 
@@ -81,11 +116,11 @@ public class GameUI : MonoBehaviour
         }
         // Can only skip on player turn
         //exitButton.interactable = (state == GameState.PlayerTurn);
-        skipButton.interactable = (state == GameState.PlayerTurn);
-        undoButton.interactable = (state == GameState.PlayerTurn);
+        skipButton.interactable = (modeChoice != 3 && (state == GameState.PlayerTurn || modeChoice == 2));
+        undoButton.interactable = (state == GameState.PlayerTurn && modeChoice == 1);
         //moveButton.interactable = (state == GameState.PlayerTurn);
         //camButton.interactable = (state == GameState.PlayerTurn);
-        rollButton.interactable = (state == GameState.PlayerTurn);
+        rollButton.interactable = (state == GameState.PlayerTurn || modeChoice == 2);
 
 
         winScreen.SetActive(state == GameState.Win);
@@ -210,7 +245,15 @@ public class GameUI : MonoBehaviour
             GameManager.Instance.UpdateGameState(GameState.EnemyTurn);
             controller.OpenCorpSelection();
             board.ResetCommanderData();
-            AIController.AI_TakeTurn();
+
+            //Changed during Merge
+            //AIController.AI_TakeTurn();
+            board.ClearUndoPieceMoves();
+            if (modeChoice != 2)
+            {
+                AIController.AI_TakeTurn();
+                board.ClearUndoPieceMoves();
+            }
         }
 
         else if (GameManager.Instance.State == GameState.EnemyTurn)
@@ -219,6 +262,14 @@ public class GameUI : MonoBehaviour
             GameManager.Instance.UpdateGameState(GameState.PlayerTurn);
             controller.OpenCorpSelection();
             board.ResetCommanderData();
+            
+            //Changed during merge
+            board.ClearUndoPieceMoves();
+            if (modeChoice == 3)
+            {
+                AIController.AI_TakeTurn();
+                board.ClearUndoPieceMoves();
+            }
         }
     }
 
@@ -434,7 +485,15 @@ public class GameUI : MonoBehaviour
                 newListing.SetActive(true);
             moveListObjects.Add(newListing);
         }
+        //LayoutRebuilder.ForceRebuildLayoutImmediate(movesList.transform.Find("Viewport").GetComponent<RectTransform>());
+        //scrollBar.GetComponent<Scrollbar>().value = 0;
+
         //Debug.Log(newMoves);
+    }
+
+    public void ScrollToBottom()
+    {
+        scrollBar.GetComponent<Scrollbar>().value = 0;
     }
 
     //Swaps the color of the sprite's piece when called
@@ -503,42 +562,112 @@ public class GameUI : MonoBehaviour
     {
         GameManager.Instance.UpdateRollState(RollState.TrueRoll);
         Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        StartCoroutine(SpinWait());
         if (result == 1)
         {
             Debug.Log("Static 1");
-            rb.transform.rotation = Quaternion.Euler(0, 180, -90);
+            StartCoroutine(OneRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(0, 180, -90);
         }
         else if (result == 2)
         {
             Debug.Log("Static 2");
-            rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
+            StartCoroutine(TwoRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(-90f, 180, -90);
         }
         else if (result == 3)
         {
             Debug.Log("Static 3");
-            rb.transform.rotation = Quaternion.Euler(0, 90, -90);
+            StartCoroutine(ThreeRoll(1f));
+           //rb.transform.rotation = Quaternion.Euler(0, 90, -90);
         }
         else if (result == 4)
         {
             Debug.Log("Static 4");
-            rb.transform.rotation = Quaternion.Euler(0, -90, -90);
+            StartCoroutine(FourRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(0, -90, -90);
         }
         else if (result == 5)
         {
             Debug.Log("Static 5");
-            rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
+            StartCoroutine(FiveRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(90f, 0, 90);
         }
         else if (result == 6)
         {
             Debug.Log("Static 6");
-            rb.transform.rotation = Quaternion.Euler(0, 0, 90);
+            StartCoroutine(SixRoll(1f));
+            //rb.transform.rotation = Quaternion.Euler(0, 0, 90);
         }
         StartCoroutine(IWait());
     }
 
     private IEnumerator IWait()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(3.25f);
+        GameObject KnightScreen = GameObject.Find("KnightScreen");
+        GameObject knightbonus = KnightScreen.transform.GetChild(0).gameObject;
+        knightbonus.SetActive(false);
         GameManager.Instance.UpdateRollState(RollState.FalseRoll);
+    }
+
+    private IEnumerator SpinWait()
+    {
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        rb.AddTorque(1000f, 0f, 0f);
+        yield return new WaitForSeconds(1);
+        rb.angularVelocity = Vector3.zero;
+        rb.velocity = Vector3.zero;
+        randpos = rb.transform.rotation;
+
+    }
+
+    private IEnumerator OneRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, onepos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator TwoRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, twopos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator ThreeRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, threepos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator FourRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, fourpos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator FiveRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, fivepos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
+    }
+    private IEnumerator SixRoll(float rollTime)
+    {
+        yield return null;
+        Rigidbody rb = diceObj.GetComponent<Rigidbody>();
+        randpos = rb.transform.rotation;
+        rb.transform.rotation = Quaternion.Slerp(randpos, sixpos, rollTime);
+        rollTime = rollTime - Time.deltaTime;
     }
 }
