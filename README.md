@@ -12,7 +12,7 @@
 
 # Tools
 - Languages: C#
-- Technology: Unity 3D, Windows
+- Technology: Unity 3D, GitHub, Windows
 
 # Demo Video
 - Live Demo (starts at 17:00) [https://youtu.be/oOie1JRec9M](https://youtu.be/oOie1JRec9M?t=1020)
